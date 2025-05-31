@@ -24,7 +24,7 @@
 ### 1. Клонирование и настройка
 ```bash
 # Перейти в папку проекта
-cd telegram-hotel
+cd rest-aggregator-miniapp
 
 # Скопировать файл окружения
 cp .env.example .env

@@ -104,10 +104,10 @@ $telegram->setWebhook($webhookUrl);
 
 ```bash
 # Проверка сертификата
-openssl x509 -in docker/nginx/ssl/telegram-hotel.crt -text -noout
+openssl x509 -in docker/nginx/ssl/rest-aggregator-miniapp.crt -text -noout
 
 # Проверка приватного ключа
-openssl rsa -in docker/nginx/ssl/telegram-hotel.key -check
+openssl rsa -in docker/nginx/ssl/rest-aggregator-miniapp.key -check
 ```
 
 ### Тестирование в браузере

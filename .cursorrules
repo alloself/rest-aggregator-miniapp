@@ -1,0 +1,70 @@
+# REST Aggregator Miniapp - Project Intelligence
+
+## Project Overview
+Laravel 12 application with Telegram bot integration for aggregating REST API calls. Uses Docker for development with full stack including MySQL, Redis, and modern frontend tooling.
+
+## Critical Development Patterns
+
+### Environment Management
+- **Always use `make` commands**: Project has comprehensive Makefile for Docker operations
+- **WSL2 Environment**: Development on Windows with Linux containers
+- **Container-First**: All development happens within Docker containers
+
+### Key Commands
+```bash
+make setup         # Initial project setup (first run)
+make up            # Start all containers
+make shell         # Enter app container for Laravel commands
+make composer      # Install PHP dependencies
+make migrate       # Run database migrations
+```
+
+### Technology Stack Specifics
+- **Laravel 12**: Latest version with PHP 8.2+ requirements
+- **Telegraph Package**: Use DefStudio's Telegraph for Telegram bot (NOT direct API)
+- **TailwindCSS v4**: Latest version with new architecture
+- **Vite 6.3.5**: Modern build tool with hot reload
+- **Redis**: Used for cache, sessions, and queues
+
+### Database Architecture
+Core entities needed:
+- `telegram_users`: Bot user management
+- `api_endpoints`: External API configurations
+- `bot_commands`: Available bot operations
+- `api_calls`: Call history and logging
+- `user_sessions`: Bot conversation state
+
+### File Structure Patterns
+```
+app/
+├── Http/Controllers/TelegramBotController.php (needs implementation)
+├── Services/ (create for business logic)
+├── Models/ (need core models)
+└── Jobs/ (for queue processing)
+```
+
+### Bot Implementation Notes
+- Webhook-based communication (not polling)
+- Routes already defined in `routes/web.php`
+- Use Redis for user session state management
+- Command pattern for bot operations
+
+### Development Workflow
+1. Always start with `make up` to ensure containers are running
+2. Use `make shell` to enter app container for artisan commands
+3. Frontend development uses Vite dev server on port 5173
+4. Database admin available at localhost:8081 (phpMyAdmin)
+
+### Configuration Requirements
+- `.env` file needs setup for database and bot configuration
+- Telegraph configuration file needed for bot setup
+- Webhook URL must be HTTPS for production (SSL_GUIDE.md available)
+
+### Known Project Characteristics
+- Russian documentation in DOCKER_README.md (international team)
+- Production-ready Docker setup with SSL configuration
+- Modern stack with latest package versions
+- Queue-ready architecture for background processing
+
+## Memory Bank Location
+Project uses memory-bank/ directory for documentation. Always read ALL memory bank files when starting work to understand current project state and context. 
