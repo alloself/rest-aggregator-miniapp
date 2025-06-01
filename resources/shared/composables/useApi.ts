@@ -1,6 +1,6 @@
 import { ref, reactive } from 'vue';
 import { apiClient } from '../api/client';
-import type { ApiError, PaginatedResponse, QueryParams } from '../types/api';
+import type { ApiError, PaginatedResponse, QueryParams } from '../types';
 
 export function useApi() {
   const loading = ref(false);

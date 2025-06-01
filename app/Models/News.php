@@ -10,6 +10,17 @@ class News extends BaseModel
 {
     use SoftDeletes;
 
+    /**
+     * Custom interfaces for ModelTyper - исправляем типы
+     *
+     * @var array
+     */
+    public array $interfaces = [
+        'likes_count' => [
+            'type' => 'number',
+        ],
+    ];
+
     protected $fillable = [
         'title',
         'content',
@@ -91,6 +102,6 @@ class News extends BaseModel
      */
     public function getLikesCountAttribute(): int
     {
-        return $this->likes()->count();
+        return (float) $this->likes()->count();
     }
 }

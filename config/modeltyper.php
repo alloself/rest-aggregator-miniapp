@@ -12,7 +12,7 @@ return [
     |
     | Requires output-file set to true
     */
-    'run-after-migrate' => false,
+    'run-after-migrate' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -92,7 +92,7 @@ return [
     |
     | Uses Laravel Pluralizer
     */
-    'plurals' => true,
+    'plurals' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -198,77 +198,76 @@ return [
     | 'year' => 'string',
     */
     'custom_mappings' => [
-        // Fix для accessor methods
-        'int' => 'number',
-        'bool' => 'boolean',
-        
-        // UUID mapping
-        'uuid' => 'string',
-        
-        // Laravel specific casts
-        'encrypted' => 'string',
-        'decimal' => 'number',
-        
-        // JSON fields
-        'json' => 'Record<string, any>',
-        'array' => 'any[]',
-        
-        // Restaurant specific types
-        'price' => 'number',
-        'coordinates' => 'Point | null',
-        
-        // Date handling
-        'datetime' => 'Date',
-        'date' => 'Date',
-        'timestamp' => 'Date',
+        // 'binary' => 'Blob',
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Specify which Model directories to use
+    | Define Custom Relationships
     |--------------------------------------------------------------------------
     |
-    | When specified, only Models in these directories will be used for
-    | TypeScript generation. The directories are relative to the app
-    | directory.
+    | Custom relationships allow you to add support for relationships from
+    | external packages that are not a part of the Laravel core. Note that
+    | relationship method names are case sensitive.
     |
-    | This can be particularly useful when you have multiple model directories
-    | such as 'Models', 'Models/Auth', 'Models/Blog' etc.
+    | Singular: relationships that return a single model
+    | Plural: relationships that return multiple models
     |
-    | If this array is empty, modeltyper will use all models under app/Models
+    | Example:
+    |   'singular' => [
+    |       'belongsToThrough',
+    |   ],
     */
-    'model_directories' => [
-        'Models',
+    'custom_relationships' => [
+        'singular' => [
+            // 'belongsToThrough',
+        ],
+
+        'plural' => [
+            //
+        ],
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Models to include for generation
+    | Case for Model Attributes and Relationships
     |--------------------------------------------------------------------------
-    |
-    | When specified, only these models will be used for TypeScript generation.
-    | If this array is empty, all models will be used.
-    |
-    | Example: ['User', 'Post', 'Comment']
-    |
-    | You can also use namespaces: ['App\Models\User', 'App\Models\Post']
+    | Options: snake, camel, pascal
+    | Defines the case style for model attributes and relationships in the
+    | TypeScript definitions. For keeping a consistent naming
+    | convention throughout the codebase.
     */
-    'specific_models' => [
-        //
+    'case' => [
+        'columns' => 'snake',
+        'relations' => 'snake',
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Models to exclude from generation
+    | Included Models
     |--------------------------------------------------------------------------
     |
-    | These models will be excluded from TypeScript generation.
+    | The include models list allows you to allowlist certain models from being
+    | generated.
+    */
+    'included_models' => [
+        // Only these models are allowed
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Excluded Models
+    |--------------------------------------------------------------------------
     |
-    | Example: ['PasswordReset', 'PersonalAccessToken']
+    | The exclude models list allows you to ignore certain models from
+    | generating TypeScript definitions.
     */
     'excluded_models' => [
         'PersonalAccessToken',
-        'DatabaseNotification',
+        'DatabaseNotification', 
         'FailedJob',
+        'Job',
+        'JobBatch',
+        'PasswordReset',
     ],
 ];

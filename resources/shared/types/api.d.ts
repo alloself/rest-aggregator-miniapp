@@ -1,5 +1,6 @@
 // API Response Types для Restaurant Aggregator Platform
 // Эти типы НЕ генерируются автоматически и создаются вручную
+// Типы моделей импортируются из models.d.ts (автогенерируемый ModelTyper)
 
 // Generic API Response wrapper
 export interface ApiResponse<T> {
@@ -8,28 +9,43 @@ export interface ApiResponse<T> {
   status: 'success' | 'error';
 }
 
-// Pagination response
+// Pagination response (Laravel стандарт)
 export interface PaginatedResponse<T> {
   data: T[];
-  meta: {
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-  };
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number | null;
+  to: number | null;
   links: {
     first: string;
     last: string;
-    prev?: string;
-    next?: string;
+    prev: string | null;
+    next: string | null;
   };
 }
 
 // Error response
-export interface ErrorResponse {
+export interface ApiError {
   message: string;
   errors?: Record<string, string[]>;
-  status: 'error';
+}
+
+// Common API parameters
+export interface PaginationParams {
+  page?: number;
+  per_page?: number;
+}
+
+export interface FilterParams {
+  search?: string;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+}
+
+export interface QueryParams extends PaginationParams, FilterParams {
+  [key: string]: any;
 }
 
 // Like action response

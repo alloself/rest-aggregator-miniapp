@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-import type { ApiError } from '../types/auth';
+import type { ApiError } from '../types/api';
 
 class ApiClient {
   private instance: AxiosInstance;

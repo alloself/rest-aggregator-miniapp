@@ -1,18 +1,17 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { authAPI } from '../api/auth';
-import { apiClient } from '../api/client';
-import type { AuthUser, LoginRequest, AuthState, ApiError } from '../types/auth';
+import type { AuthUser, LoginRequest, ProfileUpdateRequest } from '../types/auth';
+import type { ApiError } from '../types/api';
 
 export const useAuthStore = defineStore('auth', () => {
   // State
   const user = ref<AuthUser | null>(null);
-  const token = ref<string | null>(null);
   const isLoading = ref<boolean>(false);
   const error = ref<string | null>(null);
 
   // Computed
-  const isAuthenticated = computed(() => !!user.value && !!token.value);
+  const isAuthenticated = computed(() => !!user.value);
   const isAdmin = computed(() => user.value?.roles.includes('admin') ?? false);
   const isRestaurantOwner = computed(() => user.value?.roles.includes('restaurant_owner') ?? false);
 
@@ -22,14 +21,14 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
 
     try {
+      // Сначала получаем CSRF cookie
+      await authAPI.getCsrfCookie();
+      
+      // Затем логинимся
       const response = await authAPI.login(credentials);
       
-      // Сохраняем данные пользователя и токен
+      // Сохраняем пользователя (session хранится в httpOnly cookie)
       user.value = response.user;
-      token.value = response.token;
-      
-      // Устанавливаем токен в API client
-      apiClient.setToken(response.token);
       
       return response;
     } catch (err) {
@@ -45,23 +44,19 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading.value = true;
     
     try {
-      // Пытаемся отправить запрос на сервер
-      if (token.value) {
-        await authAPI.logout();
-      }
+      // Отправляем запрос на выход (очистит session)
+      await authAPI.logout();
     } catch (err) {
       // Игнорируем ошибки при выходе
       console.warn('Logout error:', err);
     } finally {
-      // Очищаем данные независимо от результата
+      // Очищаем пользователя
       clearAuth();
       isLoading.value = false;
     }
   }
 
   async function fetchUser() {
-    if (!token.value) return null;
-
     isLoading.value = true;
     error.value = null;
 
@@ -73,7 +68,7 @@ export const useAuthStore = defineStore('auth', () => {
       const apiError = err as ApiError;
       error.value = apiError.message;
       
-      // Если токен недействителен, очищаем аутентификацию
+      // Если не аутентифицирован, очищаем данные пользователя
       if (apiError.message.includes('Unauthenticated')) {
         clearAuth();
       }
@@ -84,11 +79,26 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function updateProfile(data: ProfileUpdateRequest) {
+    isLoading.value = true;
+    error.value = null;
+
+    try {
+      const response = await authAPI.updateProfile(data);
+      user.value = response.user;
+      return response;
+    } catch (err) {
+      const apiError = err as ApiError;
+      error.value = apiError.message;
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   function clearAuth() {
     user.value = null;
-    token.value = null;
     error.value = null;
-    apiClient.clearToken();
   }
 
   // Проверка роли пользователя
@@ -101,24 +111,28 @@ export const useAuthStore = defineStore('auth', () => {
     return roles.some(role => hasRole(role));
   }
 
-  // Инициализация при запуске приложения
-  function initAuth() {
-    const savedToken = apiClient.getToken();
+  // Проверка доступа к ресторану
+  function canAccessRestaurant(restaurantId?: string): boolean {
+    if (isAdmin.value) return true;
+    if (!isRestaurantOwner.value) return false;
     
-    if (savedToken) {
-      token.value = savedToken;
-      // Пытаемся получить данные пользователя
-      fetchUser().catch(() => {
-        // Если не удалось, очищаем токен
-        clearAuth();
-      });
+    return user.value?.restaurant_id === restaurantId;
+  }
+
+  // Инициализация при запуске приложения
+  async function initAuth() {
+    try {
+      // Пытаемся получить текущего пользователя из session
+      await fetchUser();
+    } catch {
+      // Если session недействительна, пользователь не залогинен
+      clearAuth();
     }
   }
 
   return {
     // State
     user,
-    token,
     isLoading,
     error,
     
@@ -131,9 +145,11 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     logout,
     fetchUser,
+    updateProfile,
     clearAuth,
     hasRole,
     hasAnyRole,
+    canAccessRestaurant,
     initAuth,
   };
 }); 

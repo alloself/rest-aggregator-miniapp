@@ -11,10 +11,9 @@ export interface Category {
   updated_at?: Date | null
   // relations
   parent?: Category
-  children?: Categories
-  dishes?: Dishes
+  children?: Category[]
+  dishes?: Dish[]
 }
-export type Categories = Category[]
 
 export interface CollectionItem {
   // columns
@@ -29,7 +28,6 @@ export interface CollectionItem {
   collection?: CuratedCollection
   item?: CollectionItem
 }
-export type CollectionItems = CollectionItem[]
 
 export interface CuratedCollection {
   // columns
@@ -45,9 +43,8 @@ export interface CuratedCollection {
   updated_at?: Date | null
   // relations
   created_by_admin?: User
-  items?: CollectionItems
+  items?: CollectionItem[]
 }
-export type CuratedCollections = CuratedCollection[]
 
 export interface Dish {
   // columns
@@ -58,21 +55,20 @@ export interface Dish {
   price: number
   image_path?: string | null
   is_available: boolean
-  allergens?: Record<string, any> | null
+  allergens?: Record<string, unknown> | null
   sort_order: number
   created_at?: Date | null
   updated_at?: Date | null
   deleted_at?: Date | null
-  // mutators
+  // overrides
   likes_count: number
   // relations
   menu?: Menu
   restaurant?: Restaurant
-  categories?: Categories
-  likes?: Likes
-  collection_items?: CollectionItems
+  categories?: Category[]
+  likes?: Like[]
+  collection_items?: CollectionItem[]
 }
-export type Dishes = Dish[]
 
 export interface Event {
   // columns
@@ -88,15 +84,17 @@ export interface Event {
   created_at?: Date | null
   updated_at?: Date | null
   deleted_at?: Date | null
-  // mutators
-  likes_count: number
+  // overrides
   is_active: boolean
+  likes_count: number
   // relations
   restaurant?: Restaurant
-  likes?: Likes
-  collection_items?: CollectionItems
+  likes?: Like[]
+  collection_items?: CollectionItem[]
 }
-export type Events = Event[]
+
+export interface File {
+}
 
 export interface Like {
   // columns
@@ -109,7 +107,6 @@ export interface Like {
   // relations
   likeable?: Like
 }
-export type Likes = Like[]
 
 export interface Menu {
   // columns
@@ -123,9 +120,8 @@ export interface Menu {
   updated_at?: Date | null
   // relations
   restaurant?: Restaurant
-  dishes?: Dishes
+  dishes?: Dish[]
 }
-export type Menus = Menu[]
 
 export interface News {
   // columns
@@ -141,14 +137,13 @@ export interface News {
   created_at?: Date | null
   updated_at?: Date | null
   deleted_at?: Date | null
-  // mutators
+  // overrides
   likes_count: number
   // relations
   author?: News
-  likes?: Likes
-  collection_items?: CollectionItems
+  likes?: Like[]
+  collection_items?: CollectionItem[]
 }
-export type NewsCollection = News[]
 
 export interface Permission {
   // columns
@@ -158,11 +153,16 @@ export interface Permission {
   created_at?: Date | null
   updated_at?: Date | null
   // relations
-  roles?: Roles
-  users?: Users
-  permissions?: Permissions
+  roles?: Role[]
+  users?: User[]
+  permissions?: Permission[]
 }
-export type Permissions = Permission[]
+
+export interface Fileable {
+  // relations
+  fileable?: Fileable
+  file?: File
+}
 
 export interface Restaurant {
   // columns
@@ -172,7 +172,7 @@ export interface Restaurant {
   address?: string | null
   phone?: string | null
   telegram_bot_token: string
-  settings?: Record<string, any> | null
+  settings?: Record<string, unknown> | null
   is_active: boolean
   created_by_admin_id: string
   created_at?: Date | null
@@ -180,12 +180,11 @@ export interface Restaurant {
   deleted_at?: Date | null
   // relations
   created_by_admin?: User
-  menus?: Menus
-  events?: Events
-  news?: News
-  collection_items?: CollectionItems
+  menus?: Menu[]
+  events?: Event[]
+  news?: News[]
+  collection_items?: CollectionItem[]
 }
-export type Restaurants = Restaurant[]
 
 export interface Role {
   // columns
@@ -195,10 +194,9 @@ export interface Role {
   created_at?: Date | null
   updated_at?: Date | null
   // relations
-  permissions?: Permissions
-  users?: Users
+  permissions?: Permission[]
+  users?: User[]
 }
-export type Roles = Role[]
 
 export interface User {
   // columns
@@ -211,11 +209,11 @@ export interface User {
   created_at?: Date | null
   updated_at?: Date | null
   deleted_at?: Date | null
+  // overrides
+  tokens: never
+  notifications: never
   // relations
   restaurant?: Restaurant
-  notifications?: DatabaseNotifications
-  roles?: Roles
-  permissions?: Permissions
-  tokens?: PersonalAccessTokens
+  roles?: Role[]
+  permissions?: Permission[]
 }
-export type Users = User[]

@@ -1,6 +1,6 @@
 // Примеры использования lodash утилит в Restaurant Aggregator Platform
 import { arrayUtils, objectUtils, stringUtils, restaurantUtils } from './index'
-import type { Restaurant, Dish, Event, Category } from '../types/models'
+import type { Restaurant, Dish, Event, Category } from '../types'
 
 // Пример данных (используем Partial для упрощения примеров)
 const sampleDishes: Partial<Dish>[] = [

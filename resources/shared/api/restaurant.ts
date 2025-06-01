@@ -1,6 +1,5 @@
 import { apiClient } from './client';
-import type { Restaurant, Menu, Dish, Event } from '../types/models';
-import type { PaginatedResponse, QueryParams } from '../types/api';
+import type { Restaurant, Menu, Dish, Event, PaginatedResponse, QueryParams } from '../types';
 
 export class RestaurantAPI {
   // Public endpoints (no auth required)

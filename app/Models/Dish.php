@@ -11,6 +11,17 @@ class Dish extends BaseModel
 {
     use SoftDeletes;
 
+    /**
+     * Custom interfaces for ModelTyper - исправляем типы
+     *
+     * @var array
+     */
+    public array $interfaces = [
+        'likes_count' => [
+            'type' => 'number',
+        ],
+    ];
+
     protected $fillable = [
         'menu_id',
         'name',
@@ -105,8 +116,8 @@ class Dish extends BaseModel
     /**
      * Get the likes count for this dish.
      */
-    public function getLikesCountAttribute(): int
+    public function getLikesCountAttribute(): float
     {
-        return $this->likes()->count();
+        return (float) $this->likes()->count();
     }
 }

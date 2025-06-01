@@ -16,6 +16,36 @@ composer require --dev fumeapp/modeltyper
 php artisan vendor:publish --provider="FumeApp\ModelTyper\ModelTyperServiceProvider" --tag=config
 ```
 
+### 🧹 **Очистка нежелательных полей**
+**Проблема**: ModelTyper автоматически генерирует поля `tokens` и `notifications` для User модели от Laravel Sanctum и Notifications трейтов.
+
+**Решение**: Использование кастомных интерфейсов ModelTyper для исключения нежелательных полей:
+
+```php
+// app/Models/User.php
+public array $interfaces = [
+    'tokens' => [
+        'type' => 'never',
+    ],
+    'notifications' => [
+        'type' => 'never',
+    ],
+];
+
+protected $hidden = [
+    'password',
+    'remember_token', 
+    'two_factor_recovery_codes',
+    'two_factor_secret',
+    'tokens',           // Скрываем Sanctum tokens от ModelTyper
+    'notifications',    // Скрываем notifications от ModelTyper
+];
+```
+
+**Дополнительно**:
+1. **Исключение моделей**: PersonalAccessToken и DatabaseNotification исключены в конфигурации
+2. **Кастомные типы**: Для accessor методов используются кастомные интерфейсы
+
 ### ⚙️ **Конфигурация для проекта**
 ```php
 // config/modeltyper.php

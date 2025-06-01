@@ -18,6 +18,20 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasUuids, HasRoles, SoftDeletes, HasApiTokens, TwoFactorAuthenticatable;
 
     /**
+     * Custom interfaces for ModelTyper - исключаем нежелательные поля
+     *
+     * @var array
+     */
+    public array $interfaces = [
+        'tokens' => [
+            'type' => 'never',
+        ],
+        'notifications' => [
+            'type' => 'never',
+        ],
+    ];
+
+    /**
      * Indicates if the IDs are auto-incrementing.
      *
      * @var bool
@@ -53,6 +67,8 @@ class User extends Authenticatable
         'remember_token',
         'two_factor_recovery_codes',
         'two_factor_secret',
+        'tokens',           // Скрываем Sanctum tokens от ModelTyper
+        'notifications',    // Скрываем notifications от ModelTyper
     ];
 
     /**

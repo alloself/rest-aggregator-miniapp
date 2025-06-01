@@ -10,6 +10,20 @@ class Event extends BaseModel
 {
     use SoftDeletes;
 
+    /**
+     * Custom interfaces for ModelTyper - исправляем типы
+     *
+     * @var array
+     */
+    public array $interfaces = [
+        'is_active' => [
+            'type' => 'boolean',
+        ],
+        'likes_count' => [
+            'type' => 'number',
+        ],
+    ];
+
     protected $fillable = [
         'restaurant_id',
         'title',
@@ -107,15 +121,15 @@ class Event extends BaseModel
     /**
      * Get the likes count for this event.
      */
-    public function getLikesCountAttribute(): int
+    public function getLikesCountAttribute() : int
     {
-        return $this->likes()->count();
+        return (int) $this->likes()->count();
     }
 
     /**
      * Check if the event is currently happening.
      */
-    public function getIsActiveAttribute(): bool
+    public function getIsActiveAttribute() : bool
     {
         $now = now();
         return $this->start_date <= $now && $this->end_date >= $now;

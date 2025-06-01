@@ -1,10 +1,10 @@
 # Active Context - REST Aggregator Miniapp
 
-## Текущий статус проекта: MODELTYPER_FIXED ✅
-*Обновлено: Исправлены проблемы с типами ModelTyper, добавлен lodash, настроена автоматическая генерация типов*
+## Текущий статус проекта: TYPES_STRUCTURE_OPTIMIZED ✅
+*Обновлено: Полностью очищена структура типов, исправлены type guards, переписана аутентификация под session-based*
 
 ## Фокус текущей работы
-**ModelTyper Integration Complete** - Проблемы с неправильными типами `int` и `bool` решены, lodash добавлен, готов к Vue Authentication Integration.
+**Types Structure Optimized** - Удалены дублирующие файлы типов, исправлены ужасные type guards, переписана аутентификация под Sanctum SPA (session-based), готов к Vue Authentication Integration.
 
 ## Завершенные компоненты ✅
 
@@ -52,15 +52,29 @@
 
 ## Исправленные проблемы ✅
 
-### ModelTyper Type Issues (РЕШЕНО)
-```typescript
-// Было: неправильные типы
-likes_count: int        // ❌
-is_active: bool         // ❌
+### Types Structure Optimization (ПОЛНОСТЬЮ РЕШЕНО)
+✅ **Дублирующие файлы удалены**: Убраны `models.ts` и `api.ts` 
+✅ **Type guards исправлены**: Красивые guards без `obj is import('./api').ApiError`
+✅ **Session-based auth**: Переписаны Auth типы под Sanctum SPA (без токенов)
+✅ **Центральный импорт**: Все типы через `resources/shared/types/index.ts`
 
-// Стало: правильные TypeScript типы  
-likes_count: number     // ✅
-is_active: boolean      // ✅
+```typescript
+// ✅ Красивые type guards
+export function isApiError(obj: any): obj is ApiError
+export function isPaginatedResponse<T>(obj: any): obj is PaginatedResponse<T>
+export function isUser(obj: any): obj is User
+
+// ✅ Session-based аутентификация (БЕЗ токенов)
+export interface AuthUser extends Omit<User, 'roles'> {
+  roles: string[];              // ["admin", "restaurant_owner"]
+  restaurant?: Restaurant;      // для владельцев ресторанов
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+  remember?: boolean;           // "Remember me" - НЕТ токенов!
+}
 ```
 
 ### Lodash Integration (ДОБАВЛЕНО)
@@ -85,15 +99,18 @@ make types
 2. sed замены int → number          # Автоматическое исправление
 3. sed замены bool → boolean        # Автоматическое исправление
 4. Исправление News type collision  # Фикс конфликтов типов
+5. Удаление tokens из User          # Удаление Sanctum связей
+6. Удаление notifications из User   # Удаление Laravel Notifications
 ```
 
 ## Следующие приоритеты
 
-### Этап 1: Vue Authentication Store (NEXT PRIORITY)
-- [ ] **Pinia Auth Store**: Управление токенами и пользователем
-- [ ] **Auth Composables**: useAuth, usePermissions, useApi
-- [ ] **API Client**: Axios с автоматическими токенами
-- [ ] **Route Guards**: Защита маршрутов по ролям
+### Этап 1: Vue Authentication Implementation (NEXT PRIORITY)
+- [x] **Auth Types**: Session-based типы для Sanctum SPA (ГОТОВО)
+- [x] **Auth Store**: Pinia store без токенов, с session handling (ГОТОВО)  
+- [x] **Auth API**: CSRF cookies, session endpoints (ГОТОВО)
+- [ ] **Auth Composables**: useAuth, usePermissions для ролей
+- [ ] **Route Guards**: Защита маршрутов по ролям (session-based)
 - [ ] **Login Forms**: shadcn-vue формы входа
 
 ### Этап 2: Restaurant Dashboard Foundation

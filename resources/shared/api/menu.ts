@@ -1,6 +1,5 @@
 import { apiClient } from './client';
-import type { Menu, Dish, Category } from '../types/models';
-import type { PaginatedResponse, QueryParams } from '../types/api';
+import type { Menu, Dish, Category, PaginatedResponse, QueryParams } from '../types';
 
 export class MenuAPI {
   // Public endpoints

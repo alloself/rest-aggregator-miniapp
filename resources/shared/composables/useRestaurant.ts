@@ -2,7 +2,7 @@ import { ref, computed } from 'vue';
 import { restaurantAPI } from '../api';
 import { useApi } from './useApi';
 import { formatPhoneNumber } from '../utils';
-import type { Restaurant } from '../types/models';
+import type { Restaurant } from '../types';
 
 export function useRestaurant() {
   const { loading, error, apiCall } = useApi();
