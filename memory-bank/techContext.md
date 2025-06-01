@@ -259,36 +259,74 @@ QUEUE_CONNECTION=database
 LOG_CHANNEL=daily
 ```
 
-### TypeScript Configuration
+### TypeScript Configuration (ОБНОВЛЕНО)
+
+#### СТРОГИЕ ПРАВИЛА:
+- **🚫 ЗАПРЕЩЕНО использовать `any` тип!** 
+- Используйте `unknown`, конкретные типы или type guards
+- При API запросах указывайте generic типы: `apiClient.get<User>('/api/user')`
+
+#### Конфигурация tsconfig.json:
 ```json
-// tsconfig.json
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "skipLibCheck": true,
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "strict": true,
+    "jsx": "preserve",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "allowJs": true,
     "noEmit": true,
-    "jsx": "preserve",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["resources/js/*"],
-      "@shared/*": ["resources/js/shared/*"]
-    }
+      "@/*": ["./resources/*"],
+      "@shared/*": ["./resources/shared/*"],
+      "@site/*": ["./resources/site/*"],
+      "@account/*": ["./resources/account/*"],
+      "@admin/*": ["./resources/admin/*"]
+    },
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types/", "./resources/shared/types"]
   },
-  "include": ["resources/js/**/*.ts", "resources/js/**/*.d.ts", "resources/js/**/*.vue"],
+  "include": [
+    "resources/**/*.ts",
+    "resources/**/*.d.ts", 
+    "resources/**/*.tsx",
+    "resources/**/*.vue",
+    "resources/**/*.js"
+  ],
+  "exclude": ["node_modules", "dist", "vendor", "bootstrap/cache"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
 ```
+
+#### Типизация Vite Environment:
+```typescript
+// resources/shared/types/vite-env.d.ts
+/// <reference types="vite/client" />
+
+// Расширяем стандартный Vite интерфейс нашими переменными
+interface ImportMetaEnv {
+  readonly VITE_API_URL: string;
+  readonly VITE_APP_NAME: string;
+  readonly VITE_APP_ENV: string;
+  // добавьте другие переменные по мере необходимости
+}
+```
+
+#### Принципы типизации:
+1. **Используйте ModelTyper типы**: Автоматически генерируемые типы из Laravel моделей
+2. **Type Guards вместо any**: `isApiError()`, `isPaginationResponse()`  
+3. **Generic API calls**: `apiClient.get<Restaurant[]>('/api/restaurants')`
+4. **Strict mode**: Включен строгий режим TypeScript
 
 ## Security Configuration
 

@@ -23,8 +23,8 @@
             "@account/*": ["./resources/account/*"],
             "@admin/*": ["./resources/admin/*"]
         },
-        "types": ["node", "vite/client"],
-        "typeRoots": ["./node_modules/@types/", "./resources/shared/types", "./node_modules"],
+        "types": ["node"],
+        "typeRoots": ["./node_modules/@types/", "./resources/shared/types"]
     },
     "include": [
         "resources/**/*.ts",

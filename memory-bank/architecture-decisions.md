@@ -590,4 +590,108 @@ php artisan storage:link
 ],
 ```
 
-This architecture ensures clean separation of concerns, proper security for restaurant data, efficient Telegram integration without unnecessary user data storage, and seamless transition from Docker development to standard hosting production. 
+This architecture ensures clean separation of concerns, proper security for restaurant data, efficient Telegram integration without unnecessary user data storage, and seamless transition from Docker development to standard hosting production.
+
+## Frontend Authentication Architecture (ОБНОВЛЕНО)
+
+### 🔐 **Laravel Sanctum SPA Migration (Session-based Auth)**
+
+#### ❌ Старая токенная система (УБРАНО):
+- Bearer токены в localStorage
+- Authorization headers  
+- Методы `setToken()`, `getToken()`, `clearToken()`
+- Ручное управление токенами
+
+#### ✅ Новая session-based система (ВНЕДРЕНО):
+```typescript
+// API Client для Sanctum SPA
+class ApiClient {
+  constructor() {
+    this.instance = axios.create({
+      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+      withCredentials: true, // ⚡ Критично для session cookies
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+      }
+    });
+  }
+
+  async login(credentials: LoginCredentials): Promise<void> {
+    await this.getCSRFCookie(); // Автоматическая CSRF защита
+    await this.post<void>('/login', credentials);
+  }
+
+  async user<T = unknown>(): Promise<T> {
+    return this.get<T>('/api/user'); // Автоматически использует session
+  }
+}
+```
+
+#### 🛡️ Автоматические возможности:
+- **CSRF Cookie**: Автоматически получается перед POST запросами
+- **Retry на 419**: При CSRF ошибке токен обновляется и запрос повторяется  
+- **Auth Events**: При 401 ошибке отправляется `auth:unauthorized` событие
+- **HttpOnly Cookies**: Защита от XSS атак
+
+#### ⚙️ Laravel конфигурация:
+```php
+// config/sanctum.php
+'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'localhost,127.0.0.1')),
+
+// config/cors.php
+'supports_credentials' => true,
+'paths' => ['api/*', '/login', '/logout', '/sanctum/csrf-cookie'],
+
+// config/session.php
+'domain' => env('SESSION_DOMAIN', 'localhost'),
+```
+
+#### 🎯 TypeScript Code Quality Rules:
+
+##### **СТРОГИЙ ЗАПРЕТ `any` типа:**
+```typescript
+// ❌ ЗАПРЕЩЕНО
+const response: any = await apiClient.get('/api/user');
+
+// ✅ ПРАВИЛЬНО
+const response = await apiClient.get<AuthUser>('/api/user');
+const unknown_data = await apiClient.get<unknown>('/api/unknown-endpoint');
+```
+
+##### **Type Guards вместо any:**
+```typescript
+// ❌ ЗАПРЕЩЕНО
+if ((error as any).response) { ... }
+
+// ✅ ПРАВИЛЬНО  
+if (isApiError(error)) {
+  console.error(error.message);
+}
+```
+
+##### **Строгая типизация переменных окружения:**
+```typescript
+// resources/shared/types/vite-env.d.ts
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_API_URL: string;
+  readonly VITE_APP_NAME: string;
+  readonly VITE_APP_ENV: string;
+}
+```
+
+#### 🔄 Auth Store Integration:
+```typescript
+// Использование типизированного API
+const userData = await apiClient.user<AuthUser>();
+const response = await apiClient.patch<AuthUser>('/api/user/profile', data);
+
+// Обработка событий потери аутентификации
+window.addEventListener('auth:unauthorized', () => {
+  authStore.clearAuth();
+  router.push('/login');
+});
+```
+
+This migration to Sanctum SPA provides better security, simplified state management, and eliminates the need for manual token handling while maintaining full TypeScript type safety without any `any` types. 

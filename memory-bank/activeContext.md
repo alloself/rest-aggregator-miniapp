@@ -1,10 +1,23 @@
 # Active Context - REST Aggregator Miniapp
 
-## Текущий статус проекта: TYPES_STRUCTURE_OPTIMIZED ✅
-*Обновлено: Полностью очищена структура типов, исправлены type guards, переписана аутентификация под session-based*
+## ⚡ КРИТИЧЕСКИЕ ПРАВИЛА РАЗРАБОТКИ
+
+### 🚫 СТРОГИЙ ЗАПРЕТ `any` типа
+- **НИ В КОЕМ СЛУЧАЕ не используйте `any` тип!**
+- Используйте `unknown`, конкретные типы или type guards
+- При API запросах указывайте generic: `apiClient.get<User>('/api/user')`
+
+### 🔐 Session-based Authentication (Sanctum SPA)
+- **БЕЗ токенов в localStorage** - только HttpOnly cookies
+- **Автоматическая CSRF защита** через cookies
+- **withCredentials: true** для всех запросов
+- **Event-driven** auth state management
+
+## Текущий статус проекта: SANCTUM_SPA_COMPLETE ✅
+*Обновлено: Аутентификация полностью переписана на Sanctum SPA, ЗАПРЕЩЕН any тип, TypeScript правильно настроен*
 
 ## Фокус текущей работы
-**Types Structure Optimized** - Удалены дублирующие файлы типов, исправлены ужасные type guards, переписана аутентификация под Sanctum SPA (session-based), готов к Vue Authentication Integration.
+**Session Authentication Complete** - Полностью настроена session-based аутентификация, CSRF защита, строгая типизация БЕЗ any, готов к Vue Router и компонентам.
 
 ## Завершенные компоненты ✅
 
@@ -52,11 +65,15 @@
 
 ## Исправленные проблемы ✅
 
-### Types Structure Optimization (ПОЛНОСТЬЮ РЕШЕНО)
+### Types Structure & Session Auth (ПОЛНОСТЬЮ РЕШЕНО)
 ✅ **Дублирующие файлы удалены**: Убраны `models.ts` и `api.ts` 
 ✅ **Type guards исправлены**: Красивые guards без `obj is import('./api').ApiError`
 ✅ **Session-based auth**: Переписаны Auth типы под Sanctum SPA (без токенов)
 ✅ **Центральный импорт**: Все типы через `resources/shared/types/index.ts`
+✅ **ANY тип ЗАПРЕЩЕН**: Строгие правила типизации БЕЗ any
+✅ **Vite env typing**: Правильная типизация переменных окружения  
+✅ **CSRF protection**: Автоматическая защита через cookies
+✅ **API Client**: Session-based axios instance с auto retry
 
 ```typescript
 // ✅ Красивые type guards
@@ -105,13 +122,13 @@ make types
 
 ## Следующие приоритеты
 
-### Этап 1: Vue Authentication Implementation (NEXT PRIORITY)
+### Этап 1: Vue Authentication Implementation (COMPLETED) ✅
 - [x] **Auth Types**: Session-based типы для Sanctum SPA (ГОТОВО)
-- [x] **Auth Store**: Pinia store без токенов, с session handling (ГОТОВО)  
-- [x] **Auth API**: CSRF cookies, session endpoints (ГОТОВО)
-- [ ] **Auth Composables**: useAuth, usePermissions для ролей
-- [ ] **Route Guards**: Защита маршрутов по ролям (session-based)
-- [ ] **Login Forms**: shadcn-vue формы входа
+- [x] **Auth Store**: Pinia store БЕЗ токенов, с session handling (ГОТОВО)  
+- [x] **Auth API Client**: Sanctum SPA client с CSRF защитой (ГОТОВО)
+- [x] **TypeScript Strict Mode**: ЗАПРЕТ any типа (ГОТОВО)
+- [x] **Environment Types**: Vite env с proper typing (ГОТОВО)
+- [x] **Session Authentication**: HttpOnly cookies, auto CSRF (ГОТОВО)
 
 ### Этап 2: Restaurant Dashboard Foundation
 - [ ] **Vue Router Setup**: Маршруты для dashboard

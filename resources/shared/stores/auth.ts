@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { authAPI } from '../api/auth';
+import { apiClient } from '../api/client';
 import type { AuthUser, LoginRequest, ProfileUpdateRequest } from '../types/auth';
 import type { ApiError } from '../types/api';
 
@@ -21,16 +21,14 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
 
     try {
-      // Сначала получаем CSRF cookie
-      await authAPI.getCsrfCookie();
+      // API client автоматически получает CSRF cookie и логинит
+      await apiClient.login(credentials);
       
-      // Затем логинимся
-      const response = await authAPI.login(credentials);
+      // Получаем данные пользователя после успешного логина
+      const userData = await apiClient.user<AuthUser>();
+      user.value = userData;
       
-      // Сохраняем пользователя (session хранится в httpOnly cookie)
-      user.value = response.user;
-      
-      return response;
+      return { user: userData, message: 'Login successful' };
     } catch (err) {
       const apiError = err as ApiError;
       error.value = apiError.message;
@@ -45,7 +43,7 @@ export const useAuthStore = defineStore('auth', () => {
     
     try {
       // Отправляем запрос на выход (очистит session)
-      await authAPI.logout();
+      await apiClient.logout();
     } catch (err) {
       // Игнорируем ошибки при выходе
       console.warn('Logout error:', err);
@@ -61,9 +59,9 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
 
     try {
-      const response = await authAPI.getUser();
-      user.value = response.user;
-      return response.user;
+      const userData = await apiClient.user<AuthUser>();
+      user.value = userData;
+      return userData;
     } catch (err) {
       const apiError = err as ApiError;
       error.value = apiError.message;
@@ -84,8 +82,9 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null;
 
     try {
-      const response = await authAPI.updateProfile(data);
-      user.value = response.user;
+      // Пока используем patch запрос для обновления профиля
+      const response = await apiClient.patch<AuthUser>('/api/user/profile', data);
+      user.value = response;
       return response;
     } catch (err) {
       const apiError = err as ApiError;
@@ -128,6 +127,11 @@ export const useAuthStore = defineStore('auth', () => {
       // Если session недействительна, пользователь не залогинен
       clearAuth();
     }
+
+    // Слушаем события потери аутентификации от API client
+    window.addEventListener('auth:unauthorized', () => {
+      clearAuth();
+    });
   }
 
   return {

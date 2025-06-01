@@ -1,49 +1,70 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import type { ApiError } from '../types/api';
 
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
 class ApiClient {
   private instance: AxiosInstance;
-  private token: string | null = null;
 
   constructor() {
     this.instance = axios.create({
-      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1',
+      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
       },
       timeout: 10000,
+      withCredentials: true, // Критично для session-based auth
     });
 
     this.setupInterceptors();
   }
 
   private setupInterceptors() {
-    // Request interceptor - добавляем токен
-    this.instance.interceptors.request.use(
-      (config) => {
-        if (this.token) {
-          config.headers.Authorization = `Bearer ${this.token}`;
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-
     // Response interceptor - обработка ошибок
     this.instance.interceptors.response.use(
       (response: AxiosResponse) => response,
       (error: AxiosError<ApiError>) => {
+        // 419 - CSRF Token Mismatch
+        if (error.response?.status === 419) {
+          // Обновляем CSRF токен и пытаемся снова
+          return this.refreshCSRFAndRetry(error);
+        }
+        
+        // 401 - Unauthorized (сессия истекла)
         if (error.response?.status === 401) {
-          // Токен недействителен, очищаем аутентификацию
-          this.clearToken();
-          // Можно добавить редирект на страницу входа
-          window.location.href = '/login';
+          // Очищаем состояние аутентификации
+          this.handleAuthenticationError();
         }
         
         return Promise.reject(this.formatError(error));
       }
     );
+  }
+
+  private async refreshCSRFAndRetry(error: AxiosError<ApiError>): Promise<any> {
+    try {
+      // Получаем новый CSRF токен
+      await this.getCSRFCookie();
+      
+      // Повторяем исходный запрос
+      if (error.config) {
+        return this.instance.request(error.config);
+      }
+    } catch (csrfError) {
+      console.error('Failed to refresh CSRF token:', csrfError);
+    }
+    
+    return Promise.reject(this.formatError(error));
+  }
+
+  private handleAuthenticationError() {
+    // Можно отправить событие для обновления состояния аутентификации
+    window.dispatchEvent(new CustomEvent('auth:unauthorized'));
   }
 
   private formatError(error: AxiosError<ApiError>): ApiError {
@@ -56,29 +77,14 @@ class ApiClient {
     };
   }
 
-  // Установка токена для авторизованных запросов
-  setToken(token: string | null) {
-    this.token = token;
-    
-    if (token) {
-      localStorage.setItem('auth_token', token);
-    } else {
-      localStorage.removeItem('auth_token');
+  // Получение CSRF cookie (обязательно перед первым POST запросом)
+  async getCSRFCookie(): Promise<void> {
+    try {
+      await this.instance.get('/sanctum/csrf-cookie');
+    } catch (error) {
+      console.error('Failed to get CSRF cookie:', error);
+      throw error;
     }
-  }
-
-  // Получение токена из localStorage
-  getToken(): string | null {
-    if (!this.token) {
-      this.token = localStorage.getItem('auth_token');
-    }
-    return this.token;
-  }
-
-  // Очистка токена
-  clearToken() {
-    this.token = null;
-    localStorage.removeItem('auth_token');
   }
 
   // Методы для HTTP запросов
@@ -106,10 +112,25 @@ class ApiClient {
     const response = await this.instance.delete<T>(url, config);
     return response.data;
   }
+
+  // Аутентификация через session cookies
+  async login(credentials: LoginCredentials): Promise<void> {
+    // Сначала получаем CSRF cookie
+    await this.getCSRFCookie();
+    
+    // Затем логинимся (Laravel возвращает просто статус, не данные)
+    await this.post<void>('/login', credentials);
+  }
+
+  async logout(): Promise<void> {
+    await this.post<void>('/logout');
+  }
+
+  // Получение данных текущего пользователя
+  async user<T = unknown>(): Promise<T> {
+    return this.get<T>('/api/user');
+  }
 }
 
 // Создаем единственный экземпляр API client
-export const apiClient = new ApiClient();
-
-// Инициализация токена при загрузке
-apiClient.getToken(); 
+export const apiClient = new ApiClient(); 
