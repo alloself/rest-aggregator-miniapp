@@ -31,7 +31,7 @@ cp .env.example .env
 
 # Отредактировать .env файл с настройками для Docker:
 # DB_HOST=mysql
-# DB_DATABASE=telegram_hotel
+# DB_DATABASE=rest-aggregator-miniapp
 # DB_USERNAME=laravel_user
 # DB_PASSWORD=laravel_password
 # REDIS_HOST=redis
@@ -112,7 +112,7 @@ docker/
 ```env
 # База данных
 DB_HOST=mysql
-DB_DATABASE=telegram_hotel
+DB_DATABASE=rest-aggregator-miniapp
 DB_USERNAME=laravel_user
 DB_PASSWORD=laravel_password
 
@@ -176,12 +176,12 @@ make build  # Пересобрать все образы
 
 ### Бэкап базы данных:
 ```bash
-docker-compose exec mysql mysqldump -u laravel_user -p telegram_hotel > backup.sql
+docker-compose exec mysql mysqldump -u laravel_user -p rest-aggregator-miniapp > backup.sql
 ```
 
 ### Восстановление базы данных:
 ```bash
-docker-compose exec -T mysql mysql -u laravel_user -p telegram_hotel < backup.sql
+docker-compose exec -T mysql mysql -u laravel_user -p rest-aggregator-miniapp < backup.sql
 ```
 
 ## 🚨 Важные замечания

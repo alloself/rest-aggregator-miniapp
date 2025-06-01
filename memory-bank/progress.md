@@ -1,7 +1,7 @@
 # Progress Tracking - REST Aggregator Miniapp
 
-## Общий прогресс: 15%
-*Последнее обновление: Инициализация Memory Bank*
+## Общий прогресс: 40%
+*Последнее обновление: Soft Deletes для пользователей*
 
 ## Что работает ✅
 
@@ -20,10 +20,29 @@
 - [x] **Telegram Routes**: Webhook и management endpoints определены
 - [x] **Basic Structure**: MVC структура Laravel готова к разработке
 
+### Package Integration & UUID Compatibility
+- [x] **Spatie Permission Migration**: Адаптирована для UUID primary keys
+- [x] **Custom Permission Models**: Созданы App\Models\Permission и Role с UUID support
+- [x] **Package Configuration**: Обновлен config/permission.php для кастомных моделей
+
+### Model Architecture & Code Organization
+- [x] **BaseModel**: Создана абстрактная базовая модель с общими UUID настройками
+- [x] **Architecture Simplification**: Упрощена архитектура, используется Laravel's HasUuids напрямую
+- [x] **TelegramUser Model**: Модель для Telegram пользователей с полной функциональностью  
+- [x] **Database Migration**: Создана миграция telegram_users с UUID primary key
+- [x] **Comprehensive Testing**: Unit и Feature тесты для всех UUID моделей
+
+### Soft Deletes Implementation
+- [x] **User Model Soft Deletes**: Добавлен SoftDeletes trait к User модели
+- [x] **TelegramUser Model Soft Deletes**: Добавлен SoftDeletes trait к TelegramUser модели
+- [x] **Database Migrations**: Поля deleted_at добавлены в исходные миграции создания таблиц
+- [x] **Enhanced Methods**: Добавлен метод findByTelegramIdWithTrashed для поиска удаленных пользователей
+- [x] **Comprehensive Testing**: Полное покрытие тестами soft deletes функциональности
+
 ## В процессе разработки 🔄
 
 ### Сейчас в фокусе
-- **Memory Bank Documentation**: Создание базовой документации проекта
+- **Model Architecture Completion**: Завершение создания базовой архитектуры моделей
 
 ## Что нужно построить 🔧
 

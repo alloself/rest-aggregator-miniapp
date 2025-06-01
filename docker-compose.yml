@@ -37,7 +37,7 @@ services:
     container_name: rest-aggregator-miniapp-mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: telegram_hotel
+      MYSQL_DATABASE: rest-aggregator-miniapp
       MYSQL_ROOT_PASSWORD: root_password
       MYSQL_USER: laravel_user
       MYSQL_PASSWORD: laravel_password

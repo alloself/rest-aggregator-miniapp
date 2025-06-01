@@ -1,10 +1,10 @@
 # Active Context - REST Aggregator Miniapp
 
-## Текущий статус проекта: INITIALIZATION
-*Обновлено: Первоначальная инициализация Memory Bank*
+## Текущий статус проекта: INFRASTRUCTURE_SETUP
+*Обновлено: Добавление Soft Deletes для пользователей*
 
 ## Фокус текущей работы
-**Инициализация Memory Bank системы** - создание базовой документации проекта для отслеживания состояния и планирования разработки.
+**Soft Deletes Implementation** - добавление функциональности мягкого удаления для User и TelegramUser моделей с полным тестированием.
 
 ## Что было обнаружено при анализе
 
@@ -18,10 +18,23 @@
 ### Что отсутствует (требует реализации)
 1. **TelegramBotController**: Контроллер существует в маршрутах, но файла нет
 2. **Database Migrations**: Нет кастомных миграций для основных таблиц
-3. **Models**: Отсутствуют модели для работы с данными
+3. **Core Models**: Отсутствуют модели TelegramUser, ApiEndpoint, ApiCall
 4. **Services**: Нет сервисного слоя для бизнес-логики
 5. **Bot Commands**: Система команд бота не реализована
 6. **Configuration**: Telegraph конфигурация не настроена
+
+### Решенные проблемы ✅
+1. **UUID Compatibility**: Адаптированы миграции spatie/laravel-permission для UUID
+2. **Custom Models**: Созданы Permission и Role модели с UUID поддержкой
+3. **Package Configuration**: Обновлен config/permission.php для использования кастомных моделей
+4. **BaseModel Architecture**: Создана базовая модель с общими UUID настройками
+5. **Architecture Simplification**: Упрощена архитектура, удален лишний trait
+6. **TelegramUser Model**: Создана модель для Telegram пользователей с миграцией
+7. **Comprehensive Testing**: Все UUID модели покрыты тестами
+8. **Soft Deletes Implementation**: Добавлены SoftDeletes для User и TelegramUser
+9. **Enhanced TelegramUser Methods**: Добавлен метод findByTelegramIdWithTrashed  
+10. **Soft Deletes Testing**: Полное покрытие тестами функциональности мягкого удаления
+11. **Migration Optimization**: Удалены отдельные миграции, soft deletes добавлены в исходные миграции
 
 ## Приоритеты разработки
 

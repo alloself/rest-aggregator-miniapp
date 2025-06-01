@@ -47,7 +47,7 @@ shell: ## Войти в контейнер приложения
 	docker-compose exec app bash
 
 shell-mysql: ## Войти в контейнер MySQL
-	docker-compose exec mysql mysql -u laravel_user -p telegram_hotel
+	docker-compose exec mysql mysql -u laravel_user -p rest-aggregator-miniapp
 
 composer: ## Установить PHP зависимости
 	docker-compose exec app composer install
