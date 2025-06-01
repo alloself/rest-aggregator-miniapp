@@ -138,4 +138,17 @@ setup: build up composer key-generate migrate permissions ## Полная нас
 
 clean: ## Удалить все контейнеры и volumes
 	docker-compose down -v
-	docker system prune -f 
+	docker system prune -f
+
+types: ## Generate TypeScript types from Laravel models
+	@echo "Generating TypeScript types..."
+	docker-compose exec app php artisan model:typer
+	@echo "Fixing int/bool types..."
+	@sed -i 's/: int\b/: number/g' resources/shared/types/models.d.ts
+	@sed -i 's/: bool\b/: boolean/g' resources/shared/types/models.d.ts
+	@sed -i 's/export type News = News\[\]/export type NewsCollection = News[]/g' resources/shared/types/models.d.ts
+	@echo "TypeScript types generated and fixed ✅"
+
+dev: ## Запустить Vite dev серверы для всех интерфейсов  
+	@echo "$(GREEN)🚀 Запуск Vite dev серверов...$(NC)"
+	docker-compose exec node npm run dev 

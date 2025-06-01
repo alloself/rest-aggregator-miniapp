@@ -1,70 +1,217 @@
 # REST Aggregator Miniapp - Project Intelligence
 
 ## Project Overview
-Laravel 12 application with Telegram bot integration for aggregating REST API calls. Uses Docker for development with full stack including MySQL, Redis, and modern frontend tooling.
+**Restaurant Aggregator Platform** - Laravel 12 сервис для ресторанов с автоматическим развертыванием персональных Telegram Mini Apps. Платформа включает три отдельных интерфейса: публичный сайт, личный кабинет ресторанов, и административную панель.
 
-## Critical Development Patterns
+## Critical Architecture Patterns
 
-### Environment Management
-- **Always use `make` commands**: Project has comprehensive Makefile for Docker operations
-- **WSL2 Environment**: Development on Windows with Linux containers
-- **Container-First**: All development happens within Docker containers
+### Three-Interface Strategy
+- **Public Site (`/`)**: Презентация сервиса, каталог ресторанов, регистрация
+- **Restaurant Dashboard (`/restaurant`)**: ЛК для владельцев ресторанов  
+- **Admin Panel (`/admin`)**: Административное управление платформой
+- **Hybrid Architecture**: Laravel Blade templates + Vue 3 SPA applications
 
-### Key Commands
+### Frontend Stack & Architecture
+- **Vue 3 Latest + TypeScript**: Основной фреймворк с полной типизацией
+- **Feature-Sliced Design (FSD)**: Структурирование кода по фичам
+- **Multiple Vue Apps**: Отдельное Vue приложение для каждого интерфейса
+- **shadcn-vue Components**: UI library (https://github.com/unovue/shadcn-vue)
+- **Pinia**: State management
+- **Vue Router**: Client-side routing
+- **VeeValidate + Zod**: Type-safe form validation
+- **Tailwind CSS v4**: Utility-first styling
+- **SCSS + БЭМ**: Additional styling methodology
+
+### Development Environment
+- **Make Commands**: Comprehensive automation для всех операций
+- **Docker First**: Полная контейнеризация development environment
+- **Multiple Vite Servers**: Отдельный dev server для каждого интерфейса
+- **Hot Module Replacement**: Real-time updates для Vue компонентов
+
+### Key Technologies
+- **Laravel 12**: Backend framework (PHP 8.2+)
+- **Vite 6.3.5**: Build tool с multiple entry points
+- **DefStudio/Telegraph**: Telegram Bot API integration
+- **MySQL + Redis**: Database и caching layer
+- **Docker + WSL2**: Containerized development
+
+## Core Business Features
+
+### Restaurant Content Management
+1. **Menu Management System**:
+   - CRUD operations для блюд
+   - Many-to-many категоризация (одно блюдо в нескольких категориях)
+   - Сезонные категории ("Летние блюда", "Новогоднее меню")
+   - Image upload и optimization для блюд
+   - Pricing и availability management
+
+2. **Event Planning System**:
+   - Calendar-based event creation
+   - Registration и capacity management
+   - Тематические события с фильтрацией
+   - Time-based event discovery
+
+3. **News & Announcements**:
+   - Restaurant news publishing
+   - Platform-wide announcements
+   - Featured content management
+
+### Social & Engagement Features
+1. **Like System**:
+   - Polymorphic likes для dishes, events, news
+   - Real-time like counters
+   - Engagement analytics
+
+2. **User Favorites**:
+   - Favorite restaurants
+   - Bookmarked content
+   - Personal recommendations
+
+### Content Aggregation & Discovery
+1. **Smart Collections**:
+   - **Calendar-based**: "События на выходные", "На эту неделю"
+   - **Thematic**: "Тематические события", "Специальные предложения"
+   - **Seasonal**: "Летние террасы", "Новогодние банкеты"
+   - **Trending**: "Популярные блюда недели"
+
+2. **Recommendation Engine**:
+   - User preference learning
+   - Personalized content suggestions
+   - Time-based recommendations
+
+## Development Workflow Commands
+
+### Essential Commands
 ```bash
-make setup         # Initial project setup (first run)
 make up            # Start all containers
-make shell         # Enter app container for Laravel commands
-make composer      # Install PHP dependencies
-make migrate       # Run database migrations
+make shell         # Enter app container
+make dev           # Start all Vite dev servers
+make npm-install   # Install Node.js dependencies
+make build         # Production build all Vue apps
 ```
 
-### Technology Stack Specifics
-- **Laravel 12**: Latest version with PHP 8.2+ requirements
-- **Telegraph Package**: Use DefStudio's Telegraph for Telegram bot (NOT direct API)
-- **TailwindCSS v4**: Latest version with new architecture
-- **Vite 6.3.5**: Modern build tool with hot reload
-- **Redis**: Used for cache, sessions, and queues
-
-### Database Architecture
-Core entities needed:
-- `telegram_users`: Bot user management
-- `api_endpoints`: External API configurations
-- `bot_commands`: Available bot operations
-- `api_calls`: Call history and logging
-- `user_sessions`: Bot conversation state
-
-### File Structure Patterns
+### Frontend Structure (FSD)
 ```
-app/
-├── Http/Controllers/TelegramBotController.php (needs implementation)
-├── Services/ (create for business logic)
-├── Models/ (need core models)
-└── Jobs/ (for queue processing)
+resources/js/
+├── site/          # Public site Vue app
+├── restaurant/    # Restaurant dashboard Vue app  
+├── admin/         # Admin panel Vue app
+└── shared/        # Common components & utilities
+    ├── ui/        # shadcn-vue + custom components
+    │   ├── calendar/      # Event calendar components
+    │   ├── image-upload/  # Image handling
+    │   ├── like-button/   # Social features
+    │   └── drag-drop/     # Category management
+    ├── api/       # API clients для всех entities
+    └── stores/    # Pinia stores (меню, события, лайки)
 ```
 
-### Bot Implementation Notes
-- Webhook-based communication (not polling)
-- Routes already defined in `routes/web.php`
-- Use Redis for user session state management
-- Command pattern for bot operations
+### Enhanced Features Structure
+```
+features/
+├── menu-management/     # Dish CRUD, categorization
+├── event-planning/      # Calendar, registration
+├── content-curation/    # Admin collections
+├── like-system/         # Social engagement
+└── news-management/     # Content publishing
+```
 
-### Development Workflow
-1. Always start with `make up` to ensure containers are running
-2. Use `make shell` to enter app container for artisan commands
-3. Frontend development uses Vite dev server on port 5173
-4. Database admin available at localhost:8081 (phpMyAdmin)
+## Architecture Decisions
 
-### Configuration Requirements
-- `.env` file needs setup for database and bot configuration
-- Telegraph configuration file needed for bot setup
-- Webhook URL must be HTTPS for production (SSL_GUIDE.md available)
+### Core Business Logic
+- **Multi-Tenant Architecture**: Support for multiple restaurants
+- **Bot Token Management**: Restaurants provide their own Telegram tokens
+- **Automated Mini App Deployment**: Platform manages all Mini Apps centrally
+- **Real-time Analytics**: Usage statistics and monitoring
+- **Content Discovery Engine**: Smart recommendations и подборки
 
-### Known Project Characteristics
-- Russian documentation in DOCKER_README.md (international team)
-- Production-ready Docker setup with SSL configuration
-- Modern stack with latest package versions
-- Queue-ready architecture for background processing
+### Database Design (Enhanced)
+- **UUID Primary Keys**: For all main entities
+- **BaseModel Pattern**: Common functionality через inheritance
+- **Soft Deletes**: Safe deletion для critical entities
+- **Many-to-Many Relations**: Dishes ↔ Categories, flexible categorization
+- **Polymorphic Relations**: Likes, News, Collections для unified system
+- **Temporal Data**: Events с time-based filtering
+- **Hierarchical Categories**: Parent-child relationships для organization
 
-## Memory Bank Location
-Project uses memory-bank/ directory for documentation. Always read ALL memory bank files when starting work to understand current project state and context. 
+### Complex Data Relationships
+```sql
+-- Core entities
+restaurants → menus → dishes ↔ categories (many-to-many)
+restaurants → events (time-based)
+users → likes (polymorphic: dishes, events, news)
+admin → curated_collections → items (polymorphic)
+```
+
+### Frontend Architecture Principles
+1. **Component Isolation**: Each interface has independent Vue app
+2. **Shared Resources**: Common utilities в shared/ directory
+3. **Type Safety**: Full TypeScript coverage с Zod validation
+4. **Accessibility**: shadcn-vue ensures accessible components
+5. **Performance**: Code splitting и lazy loading
+6. **Real-time Updates**: WebSocket для лайков и notifications
+7. **Image Optimization**: Multiple formats и sizes для performance
+
+## Critical Implementation Notes
+
+### Blade + Vue Integration
+- Blade templates serve as application shells
+- Vue apps mount inside Blade containers
+- Each interface has separate entry point
+- Shared assets через @shared alias
+
+### State Management Strategy
+- **Pinia stores** for complex state (меню, события, лайки)
+- **Composables** for reusable logic
+- **Provide/Inject** for deep component communication
+- **Props/Events** for parent-child communication
+
+### Styling Approach
+- **Tailwind v4** as primary styling system
+- **shadcn-vue** for consistent component design
+- **SCSS modules** for custom components
+- **БЭМ methodology** for CSS class naming
+
+### Custom UI Components Architecture
+- **Native Drag-Drop** на HTML5 Drag API для category assignment
+- **Custom Calendar** на Vue 3 Composition API для event planning  
+- **Image upload** с preview и cropping (собственная реализация)
+- **Like buttons** с CSS animations (без внешних библиотек)
+- **Collection builder** с custom drag-drop для admin curation
+- **Toast notifications** на event emitter без зависимостей
+
+## Known Project Characteristics
+- **Restaurant-focused**: Business logic centered around restaurant operations
+- **Telegram Integration**: Core feature - не просто API testing
+- **Multi-interface**: Three distinct user experiences
+- **Modern Frontend**: Latest Vue 3 ecosystem с TypeScript
+- **Performance Critical**: Multiple apps need efficient bundling
+- **Scalable Architecture**: Support for growing number of restaurants
+- **Social Features**: Like system, favorites, recommendations
+- **Content Heavy**: Menus, events, images require optimization
+- **Geographic**: Location-based filtering и discovery
+- **Seasonal**: Time-based content и automated collections
+
+## Minimal Dependencies
+```json
+{
+  "dependencies": {
+    "@vueuse/core": "^10.5.0",        // Core utilities только
+    "mitt": "^3.0.1"                  // Lightweight event emitter
+  },
+  "customImplementations": {
+    "calendar": "Собственный Vue 3 календарь",
+    "dragDrop": "HTML5 Drag API + Vue composables", 
+    "notifications": "Custom toast система"
+  }
+}
+```
+
+## Memory Bank Usage
+Always read memory-bank/ files for current project state:
+- `activeContext.md` - current work focus (enhanced features)
+- `progress.md` - implementation status
+- `projectbrief.md` - core requirements (updated)
+- `productContext.md` - user experience goals (expanded)
+- `techContext.md` - technical specifications (enhanced)
+- `systemPatterns.md` - architectural patterns (completely updated) 

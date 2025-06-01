@@ -9,11 +9,13 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Sanctum\HasApiTokens;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasUuids, HasRoles, SoftDeletes;
+    use HasFactory, Notifiable, HasUuids, HasRoles, SoftDeletes, HasApiTokens, TwoFactorAuthenticatable;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -38,6 +40,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'restaurant_id', // Связь с рестораном для владельцев
     ];
 
     /**
@@ -48,6 +51,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
     ];
 
     /**
@@ -61,5 +66,37 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Relationship with restaurant (for restaurant owners).
+     */
+    public function restaurant()
+    {
+        return $this->belongsTo(Restaurant::class);
+    }
+
+    /**
+     * Check if user is admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    /**
+     * Check if user is restaurant owner.
+     */
+    public function isRestaurantOwner(): bool
+    {
+        return $this->hasRole('restaurant_owner') && $this->restaurant_id;
+    }
+
+    /**
+     * Get user's restaurant if owner.
+     */
+    public function ownedRestaurant()
+    {
+        return $this->isRestaurantOwner() ? $this->restaurant : null;
     }
 }

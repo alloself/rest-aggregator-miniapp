@@ -16,10 +16,14 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->uuid('restaurant_id')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
+            
+            // Индекс добавляем, но foreign key будет в отдельной миграции
+            $table->index('restaurant_id');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

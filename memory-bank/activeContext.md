@@ -1,118 +1,197 @@
 # Active Context - REST Aggregator Miniapp
 
-## Текущий статус проекта: INFRASTRUCTURE_SETUP
-*Обновлено: Добавление Soft Deletes для пользователей*
+## Текущий статус проекта: MODELTYPER_FIXED ✅
+*Обновлено: Исправлены проблемы с типами ModelTyper, добавлен lodash, настроена автоматическая генерация типов*
 
 ## Фокус текущей работы
-**Soft Deletes Implementation** - добавление функциональности мягкого удаления для User и TelegramUser моделей с полным тестированием.
+**ModelTyper Integration Complete** - Проблемы с неправильными типами `int` и `bool` решены, lodash добавлен, готов к Vue Authentication Integration.
 
-## Что было обнаружено при анализе
+## Завершенные компоненты ✅
 
-### Существующие компоненты
-1. **Laravel 12 Application**: Базовая структура Laravel приложения
-2. **Docker Environment**: Полноценная Docker конфигурация с MySQL, Redis, Nginx
-3. **Telegram Routes**: Маршруты для webhook и управления ботом уже определены
-4. **Dependencies**: Все необходимые пакеты указаны в composer.json и package.json
-5. **Build Tools**: Настроены Vite, TailwindCSS v4, современный frontend stack
+### 1. Database Architecture (OPTIMIZED)
+- ✅ **BaseModel с UUID**: Все модели используют UUID primary keys
+- ✅ **Correct Migration Order**: Исправлен порядок миграций для правильных foreign keys
+- ✅ **Complex Relations**: Many-to-many (dishes↔categories), polymorphic (likes, news)
+- ✅ **Permission System**: Spatie Permission с UUID совместимостью
+- ✅ **Sanctum Tables**: Personal access tokens с UUID поддержкой
+- ✅ **Test Data**: Полные seeders с реальными данными
 
-### Что отсутствует (требует реализации)
-1. **TelegramBotController**: Контроллер существует в маршрутах, но файла нет
-2. **Database Migrations**: Нет кастомных миграций для основных таблиц
-3. **Core Models**: Отсутствуют модели TelegramUser, ApiEndpoint, ApiCall
-4. **Services**: Нет сервисного слоя для бизнес-логики
-5. **Bot Commands**: Система команд бота не реализована
-6. **Configuration**: Telegraph конфигурация не настроена
+### 2. Authentication System (COMPLETE & TESTED)
+- ✅ **Laravel Sanctum**: API токены с expiration и abilities
+- ✅ **Laravel Fortify**: Password reset, profile updates (без views)
+- ✅ **Role-Based Access**: admin, restaurant_owner роли
+- ✅ **Custom Middleware**: CheckRestaurantOwner для ограничения доступа
+- ✅ **Token Abilities**: Разные права для админов и владельцев
+- ✅ **Migration Dependencies**: Циклические зависимости решены
 
-### Решенные проблемы ✅
-1. **UUID Compatibility**: Адаптированы миграции spatie/laravel-permission для UUID
-2. **Custom Models**: Созданы Permission и Role модели с UUID поддержкой
-3. **Package Configuration**: Обновлен config/permission.php для использования кастомных моделей
-4. **BaseModel Architecture**: Создана базовая модель с общими UUID настройками
-5. **Architecture Simplification**: Упрощена архитектура, удален лишний trait
-6. **TelegramUser Model**: Создана модель для Telegram пользователей с миграцией
-7. **Comprehensive Testing**: Все UUID модели покрыты тестами
-8. **Soft Deletes Implementation**: Добавлены SoftDeletes для User и TelegramUser
-9. **Enhanced TelegramUser Methods**: Добавлен метод findByTelegramIdWithTrashed  
-10. **Soft Deletes Testing**: Полное покрытие тестами функциональности мягкого удаления
-11. **Migration Optimization**: Удалены отдельные миграции, soft deletes добавлены в исходные миграции
+### 3. Frontend Setup (OPTIMIZED)
+- ✅ **Vite Configuration**: Multiple entry points для трех интерфейсов
+- ✅ **SCSS Architecture**: Правильное подключение без дублирования
+- ✅ **TypeScript Entry Points**: Чистые точки входа без лишних импортов
+- ✅ **Alias Configuration**: Удобные пути для shared компонентов
 
-## Приоритеты разработки
+### 4. API Endpoints (COMPLETE & TESTED)
+- ✅ **Auth API**: login, logout, user info, token management
+- ✅ **Public API**: рестораны, меню, блюда, события (без auth)
+- ✅ **Restaurant API**: управление собственным контентом
+- ✅ **Admin API**: полное управление платформой
+- ✅ **Like System**: работает без auth через telegram_user_id
 
-### Этап 1: Базовая инфраструктура
-- [ ] Создание TelegramBotController
-- [ ] Настройка Telegraph конфигурации
-- [ ] Создание базовых миграций для core tables
-- [ ] Создание моделей: TelegramUser, ApiEndpoint, ApiCall
+### 5. Models & Controllers (COMPLETE)
+- ✅ **9 Core Models**: Restaurant, Menu, Dish, Category, Event, News, Like, etc.
+- ✅ **API Controllers**: полный CRUD для всех сущностей
+- ✅ **API Resources**: правильная сериализация данных
+- ✅ **Form Requests**: валидация входящих данных
 
-### Этап 2: Bot Command System  
-- [ ] Абстрактный класс BotCommand
-- [ ] Command Registry Service
-- [ ] Базовые команды: /start, /help
-- [ ] User session management
+### 6. ModelTyper Integration (FIXED) ✅
+- ✅ **Configuration**: Правильная настройка config/modeltyper.php
+- ✅ **Type Generation**: Автоматическая генерация TypeScript типов
+- ✅ **Type Fixes**: Исправление int → number, bool → boolean
+- ✅ **Make Command**: `make types` для автоматической генерации и исправления
+- ✅ **Lodash Integration**: Добавлен lodash с типизированными утилитами
 
-### Этап 3: API Integration
-- [ ] ApiAggregatorService
-- [ ] HTTP client configuration
-- [ ] API endpoint management
-- [ ] Response caching system
+## Исправленные проблемы ✅
 
-### Этап 4: Advanced Features
-- [ ] Queue system для async operations
-- [ ] API aggregation functionality
-- [ ] History and logging
-- [ ] Error handling и user feedback
+### ModelTyper Type Issues (РЕШЕНО)
+```typescript
+// Было: неправильные типы
+likes_count: int        // ❌
+is_active: bool         // ❌
 
-## Текущие решения
+// Стало: правильные TypeScript типы  
+likes_count: number     // ✅
+is_active: boolean      // ✅
+```
 
-### Architecture Decisions Made
-1. **UUID Primary Keys**: Использовать UUID для всех основных таблиц
-2. **DefStudio/Telegraph**: Основной пакет для Telegram Bot API
-3. **Redis State Management**: Redis для session и conversation state
-4. **Service Layer Pattern**: Выделение бизнес-логики в отдельные сервисы
-5. **Command Pattern**: Команды бота как отдельные классы
+### Lodash Integration (ДОБАВЛЕНО)
+```typescript
+// Доступные утилиты
+import { _, arrayUtils, objectUtils, stringUtils, restaurantUtils } from '@shared/utils'
 
-### Technical Decisions Made  
-1. **Webhook Architecture**: Использование webhook вместо polling
-2. **Queue-Based Processing**: Асинхронная обработка тяжелых операций
-3. **Docker-First Development**: Все развитие в контейнерах
-4. **Make Commands**: Автоматизация через Makefile
+// Примеры использования
+arrayUtils.groupBy(dishes, 'category')
+objectUtils.cloneDeep(restaurant)
+stringUtils.kebabCase('Restaurant Name')
+restaurantUtils.groupDishesByCategory(dishes)
+```
 
-## Ближайшие шаги
+### Automated Type Generation (НАСТРОЕНО)
+```bash
+# Команда для генерации типов
+make types
 
-### Следующая сессия должна начать с:
-1. **Создание базового TelegramBotController**
-2. **Настройка Telegraph конфигурации**
-3. **Создание первой миграции для telegram_users**
-4. **Тестирование webhook connectivity**
+# Что происходит:
+1. php artisan model:typer          # Генерация базовых типов
+2. sed замены int → number          # Автоматическое исправление
+3. sed замены bool → boolean        # Автоматическое исправление
+4. Исправление News type collision  # Фикс конфликтов типов
+```
 
-### Вопросы для clarification:
-- Нужно ли создать .env.example с базовыми настройками?
-- Какие команды бота реализовать в первую очередь?
-- Нужна ли система ролей/permissions для пользователей?
-- Требуется ли логирование всех bot interactions?
+## Следующие приоритеты
 
-## Context для следующего взаимодействия
+### Этап 1: Vue Authentication Store (NEXT PRIORITY)
+- [ ] **Pinia Auth Store**: Управление токенами и пользователем
+- [ ] **Auth Composables**: useAuth, usePermissions, useApi
+- [ ] **API Client**: Axios с автоматическими токенами
+- [ ] **Route Guards**: Защита маршрутов по ролям
+- [ ] **Login Forms**: shadcn-vue формы входа
 
-### Environment Setup Needed
-- `.env` файл с Telegram bot token
-- Database setup и миграции
-- Telegraph package configuration
-- Redis connection testing
+### Этап 2: Restaurant Dashboard Foundation
+- [ ] **Vue Router Setup**: Маршруты для dashboard
+- [ ] **Layout Components**: Sidebar, header, navigation
+- [ ] **Menu Management**: Первый CRUD интерфейс с lodash утилитами
+- [ ] **API Integration**: Подключение к готовым endpoints
 
-### Development Flow
-1. Всегда начинать с `make up` для контейнеров
-2. Использовать `make shell` для Laravel commands
-3. Тестировать через `make test` после изменений
-4. Обновлять Memory Bank после значительных изменений
+### Этап 3: Shared UI Components
+- [ ] **shadcn-vue Installation**: UI library setup
+- [ ] **Form Components**: With VeeValidate + Zod
+- [ ] **Table Components**: For data display с lodash сортировкой
+- [ ] **Modal Components**: For CRUD operations
 
-## Известные ограничения
-- Webhook требует HTTPS для production
-- Telegram API rate limits
-- Redis memory limits для session storage  
-- Docker resource usage на WSL2
+## Технические детали
 
-## Метрики для отслеживания
-- Время ответа бота на команды
-- Успешность API calls
-- Memory usage Redis для sessions
-- Database query performance 
+### ModelTyper Configuration (FINAL)
+```php
+// config/modeltyper.php
+'output-file' => true,
+'output-file-path' => './resources/shared/types/models.d.ts',
+'plurals' => true,
+'optional-relations' => true,
+'timestamps-date' => true,
+'custom_mappings' => [
+    'int' => 'number',
+    'bool' => 'boolean',
+    // ... другие маппинги
+],
+```
+
+### Lodash Utilities Structure
+```typescript
+// resources/shared/utils/index.ts
+export { _ }                    // Прямой экспорт lodash
+export const arrayUtils = {}   // Типизированные утилиты массивов
+export const objectUtils = {}  // Типизированные утилиты объектов
+export const stringUtils = {}  // Типизированные утилиты строк
+export const restaurantUtils = {} // Специфичные для ресторанов
+```
+
+### Ready for Integration
+```typescript
+// Типы готовы к использованию
+import type { Restaurant, Dish, Event, User } from '@shared/types/models'
+
+// Утилиты готовы к использованию
+import { arrayUtils, restaurantUtils } from '@shared/utils'
+
+// API структура готова
+interface AuthUser {
+  id: string;              // UUID
+  name: string;
+  email: string; 
+  roles: string[];         // ["admin"] | ["restaurant_owner"]
+  restaurant_id?: string;  // UUID для владельцев
+  restaurant?: Restaurant; // Типизированная связь
+}
+```
+
+## Development Workflow
+
+### Essential Commands
+```bash
+make up            # Start all containers
+make shell         # Enter app container
+make dev           # Start Vite dev servers (готов)
+make types         # Generate TypeScript types (НОВАЯ КОМАНДА)
+make npm-install   # Install frontend dependencies
+
+# Database commands
+php artisan migrate:fresh --seed  # Recreate with test data
+```
+
+### Next Session Focus
+1. **Vue Auth Store**: Pinia store с tokens и user state
+2. **API Client Setup**: Axios interceptors для автоматических токенов
+3. **Route Protection**: Navigation guards для protected routes
+4. **First Dashboard Page**: Базовый интерфейс restaurant owner с lodash
+
+## Критические решения принятые
+
+### ModelTyper Integration Strategy
+- ✅ Конфигурация для правильного output path
+- ✅ Custom mappings для основных типов
+- ✅ Автоматические sed замены для accessor методов
+- ✅ Make команда для воспроизводимой генерации
+
+### Lodash Integration Pattern
+- ✅ Типизированные wrapper функции
+- ✅ Restaurant-specific утилиты
+- ✅ Экспорт через shared/utils для переиспользования
+- ✅ TypeScript constraints для type safety
+
+### Frontend Asset Strategy  
+- ✅ Vite как единственный источник для CSS входов
+- ✅ TypeScript файлы без CSS импортов для чистоты
+- ✅ Alias система для удобной работы с shared компонентами
+- ✅ Lodash доступен через @shared/utils alias
+
+**Статус: Backend готов, типы исправлены, lodash добавлен. Переходим к Vue интеграции** 🚀 
