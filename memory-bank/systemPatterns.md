@@ -108,6 +108,15 @@ class MenuManagementService {
 }
 ```
 
+#### **Frontend Form Integration:**
+```typescript
+// Menu Management использует SmartForm для:
+// - Создание блюд (DishForm)
+// - Редактирование категорий (CategoryForm) 
+// - Bulk operations (BulkEditForm)
+// - Menu settings (MenuConfigForm)
+```
+
 ### 2. Event Planning Service  
 ```php
 class EventPlanningService {
@@ -151,6 +160,10 @@ resources/js/
 │   │   │   ├── input/              # Input, Textarea, Select
 │   │   │   ├── dialog/             # Modal, Sheet, Popover
 │   │   │   └── table/              # Table, DataTable
+│   │   ├── forms/                  # Form components (НОВЫЙ СЛОЙ)
+│   │   │   ├── smart-form/         # SmartForm генератор
+│   │   │   ├── field-wrapper/      # Wrapper для field validation
+│   │   │   └── form-schemas/       # Переиспользуемые схемы форм
 │   │   ├── custom/                 # Custom компоненты НА ОСНОВЕ shadcn
 │   │   │   ├── calendar/           # Calendar (shadcn Card + Button)
 │   │   │   ├── image-upload/       # Image upload (shadcn Input + Card)
@@ -235,9 +248,56 @@ resources/js/
 ```
 UI Architecture Layers:
 1. Base Layer: shadcn-vue компоненты (Button, Card, Input, Dialog, Table)
-2. Custom Layer: Специфичные компоненты НА ОСНОВЕ shadcn
-3. Feature Layer: Бизнес-логика компонентов
-4. Page Layer: Композиция для страниц
+2. Form Layer: SmartForm генератор для schema-based форм
+3. Custom Layer: Специфичные компоненты НА ОСНОВЕ shadcn
+4. Feature Layer: Бизнес-логика компонентов
+5. Page Layer: Композиция для страниц
+```
+
+#### **Smart Form Generator Pattern**
+```typescript
+// Schema-based форма для Menu Management
+const dishFormFields: ISmartFormField[] = [
+  {
+    key: 'name',
+    component: 'Input',
+    rule: z.string().min(2).max(100),
+    props: { placeholder: 'Название блюда', required: true }
+  },
+  {
+    key: 'price',
+    component: 'NumberInput', 
+    rule: z.number().min(0),
+    props: { placeholder: 'Цена', step: 0.01 }
+  },
+  {
+    key: 'categories',
+    component: 'MultiSelect',
+    rule: z.array(z.string()).min(1),
+    props: { 
+      placeholder: 'Выберите категории',
+      initialItems: categories,
+      multiple: true 
+    },
+    events: {
+      'update:modelValue': (value) => updateCategories(value)
+    }
+  },
+  {
+    key: 'description',
+    component: 'Textarea',
+    rule: z.string().optional(),
+    props: { placeholder: 'Описание блюда', rows: 3 }
+  }
+];
+
+// Использование в компоненте
+<SmartForm 
+  :fields="dishFormFields"
+  :initial-values="selectedDish"
+  :readonly="viewMode"
+  @update:form="(form) => dishForm = form"
+/>
 ```
 
 #### **Custom Component Development Rules**
