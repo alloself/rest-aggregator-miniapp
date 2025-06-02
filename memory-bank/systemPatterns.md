@@ -144,11 +144,19 @@ class SocialFeaturesService {
 ```
 resources/js/
 ├── shared/                          # Общие ресурсы
-│   ├── ui/                         # shadcn-vue компоненты
-│   │   ├── calendar/               # Calendar components
-│   │   ├── image-upload/           # Image upload widget
-│   │   ├── like-button/            # Like system UI
-│   │   └── drag-drop/              # Drag-and-drop utilities
+│   ├── ui/                         # UI компоненты (UPDATED STRATEGY)
+│   │   ├── shadcn/                 # Базовые shadcn-vue компоненты
+│   │   │   ├── button/             # Button, ButtonGroup
+│   │   │   ├── card/               # Card, CardHeader, CardContent
+│   │   │   ├── input/              # Input, Textarea, Select
+│   │   │   ├── dialog/             # Modal, Sheet, Popover
+│   │   │   └── table/              # Table, DataTable
+│   │   ├── custom/                 # Custom компоненты НА ОСНОВЕ shadcn
+│   │   │   ├── calendar/           # Calendar (shadcn Card + Button)
+│   │   │   ├── image-upload/       # Image upload (shadcn Input + Card)
+│   │   │   ├── like-button/        # Like system (shadcn Button)
+│   │   │   └── drag-drop/          # Drag-drop (shadcn Card + List)
+│   │   └── icons/                  # mdi-icons integration
 │   ├── api/                        # API clients
 │   │   ├── restaurants.ts          
 │   │   ├── menus.ts
@@ -221,7 +229,52 @@ resources/js/
         └── platform-analytics/     # Global metrics
 ```
 
-### 2. State Management Patterns
+### 2. UI Component Architecture Principles (UPDATED)
+
+#### **Component Layering Strategy**
+```
+UI Architecture Layers:
+1. Base Layer: shadcn-vue компоненты (Button, Card, Input, Dialog, Table)
+2. Custom Layer: Специфичные компоненты НА ОСНОВЕ shadcn
+3. Feature Layer: Бизнес-логика компонентов
+4. Page Layer: Композиция для страниц
+```
+
+#### **Custom Component Development Rules**
+- ✅ **ВСЕГДА базируйтесь на shadcn-vue компонентах**
+- ✅ **Icons: только mdi-icons** (НЕ lucide-vue-next)
+- ❌ **ЗАПРЕЩЕНО**: vue-draggable-plus, vue-datepicker, vue-toastification
+- ✅ **Консистентность**: Все custom компоненты наследуют стиль shadcn
+- ✅ **Доступность**: Автоматически через shadcn базу
+
+#### **Example Custom Component Pattern**
+```typescript
+// ✅ ПРАВИЛЬНО: Calendar на основе shadcn Card + Button
+<template>
+  <Card class="calendar-widget">
+    <CardHeader>
+      <CardTitle>Event Calendar</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div class="calendar-grid">
+        <Button 
+          v-for="date in dates" 
+          :key="date" 
+          variant="ghost"
+          @click="selectDate(date)"
+        >
+          {{ date }}
+        </Button>
+      </div>
+    </CardContent>
+  </Card>
+</template>
+
+// ❌ НЕПРАВИЛЬНО: Внешняя библиотека
+import { VueDatePicker } from '@vuepic/vue-datepicker'
+```
+
+### 3. State Management Patterns
 ```typescript
 // Pinia Store Architecture
 interface MenuStore {

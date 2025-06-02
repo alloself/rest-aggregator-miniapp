@@ -21,6 +21,7 @@
 - **Zod**: Schema validation library
 - **Tailwind CSS v4.1.8**: Utility-first CSS фреймворк
 - **shadcn-vue**: UI компоненты для Vue (https://github.com/unovue/shadcn-vue)
+- **mdi-icons**: Единственная иконочная библиотека (НЕ lucide-vue-next)
 - **SCSS**: CSS preprocessor
 - **БЭМ Methodology**: CSS naming convention
 
@@ -110,12 +111,16 @@ resources/
 │   ├── types/                # TypeScript типы (ModelTyper + custom)
 │   │   ├── models.d.ts       # Автогенерируемые типы Laravel моделей
 │   │   └── api.d.ts          # Ручные типы для API responses
-│   └── views/                # Общие Blade компоненты
-├── views/
+│   ├── api/                  # API клиенты
+│   ├── stores/               # Pinia stores
+│   ├── composables/          # Vue composables
+│   └── utils/                # Утилиты
+├── views/                    # Blade Templates (STANDARD LOCATION)
 │   ├── site.blade.php        # Основной template для сайта
-│   ├── restaurant.blade.php  # Template для ЛК ресторанов
+│   ├── restaurant.blade.php  # Template для ЛК ресторанов  
 │   ├── admin.blade.php       # Template для админки
-│   └── components/           # Blade компоненты
+│   ├── layouts/              # Layout templates
+│   └── components/           # Переиспользуемые Blade компоненты
 └── js/                       # Vue.js приложения (используют shared/types)
 ```
 

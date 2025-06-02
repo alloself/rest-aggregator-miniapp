@@ -93,6 +93,7 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       isLoading.value = false;
     }
+
   }
 
   function clearAuth() {

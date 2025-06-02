@@ -19,6 +19,13 @@
 ## Фокус текущей работы
 **Session Authentication Complete** - Полностью настроена session-based аутентификация, CSRF защита, строгая типизация БЕЗ any, готов к Vue Router и компонентам.
 
+## ⚡ ВАЖНО: Dev серверы уже запущены
+**НЕ запускать `make dev` повторно!** Dev серверы работают в контейнерах автоматически:
+- ✅ Vite HMR активен для всех интерфейсов 
+- ✅ Vue DevTools включены и готовы
+- ✅ Порты доступны: http://localhost:8080/ (site/account/admin)
+- ⚠️ Повторный запуск может вызвать конфликты портов
+
 ## Завершенные компоненты ✅
 
 ### 1. Database Architecture (OPTIMIZED)
@@ -136,13 +143,36 @@ make types
 - [ ] **Menu Management**: Первый CRUD интерфейс с lodash утилитами
 - [ ] **API Integration**: Подключение к готовым endpoints
 
-### Этап 3: Shared UI Components
-- [ ] **shadcn-vue Installation**: UI library setup
-- [ ] **Form Components**: With VeeValidate + Zod
-- [ ] **Table Components**: For data display с lodash сортировкой
-- [ ] **Modal Components**: For CRUD operations
+### Этап 3: Shared UI Components (UPDATED STRATEGY)
+- [ ] **shadcn-vue Installation**: UI library setup  
+- [ ] **mdi-icons Integration**: Единственная иконочная библиотека
+- [ ] **Form Components**: With VeeValidate + Zod на основе shadcn Form/Input
+- [ ] **Table Components**: For data display с lodash сортировкой на основе shadcn Table
+- [ ] **Modal Components**: For CRUD operations на основе shadcn Dialog
+- [ ] **Custom Components**: Calendar, drag-drop, image-upload НА ОСНОВЕ shadcn компонентов
+
+### 🎨 UI Component Strategy
+**Принцип**: Все custom компоненты строятся на базе shadcn-vue для консистентности
+- **Base Layer**: shadcn-vue (Button, Card, Input, Dialog, Table)
+- **Custom Layer**: Calendar, Drag-Drop, Image Upload на основе shadcn компонентов
+- **Icons**: mdi-icons (НЕ lucide-vue-next)
+- **No External UI**: НЕТ vue-draggable-plus, vue-datepicker и др.
 
 ## Технические детали
+
+### Blade Templates Structure (UPDATED)
+```
+resources/views/                 # СТАНДАРТНАЯ Laravel директория
+├── site.blade.php              # Public site template
+├── restaurant.blade.php        # Restaurant dashboard template  
+├── admin.blade.php             # Admin panel template
+├── layouts/                    # Layout templates
+│   ├── app.blade.php           # Основной layout
+│   └── guest.blade.php         # Layout для неавторизованных
+└── components/                 # Переиспользуемые Blade компоненты
+    ├── navigation.blade.php    # Навигация
+    └── footer.blade.php        # Подвал
+```
 
 ### ModelTyper Configuration (FINAL)
 ```php
@@ -167,6 +197,21 @@ export const arrayUtils = {}   // Типизированные утилиты м
 export const objectUtils = {}  // Типизированные утилиты объектов
 export const stringUtils = {}  // Типизированные утилиты строк
 export const restaurantUtils = {} // Специфичные для ресторанов
+
+// resources/shared/ui/ - НОВАЯ СТРУКТУРА
+├── shadcn/                     // Базовые shadcn-vue компоненты
+│   ├── button/                 // Button, ButtonGroup
+│   ├── card/                   // Card, CardHeader, CardContent
+│   ├── input/                  // Input, Textarea, Select
+│   ├── dialog/                 // Modal, Sheet, Popover
+│   └── table/                  // Table, DataTable
+├── custom/                     // Custom компоненты НА ОСНОВЕ shadcn
+│   ├── calendar/               // Event calendar (shadcn Card + Button)
+│   ├── image-upload/           // Image handling (shadcn Input + Card)
+│   ├── drag-drop/              // Category management (shadcn Card + List)
+│   └── like-button/            // Social features (shadcn Button)
+└── icons/                      // mdi-icons integration
+    └── index.ts                // Icon component wrapper
 ```
 
 ### Ready for Integration
@@ -194,14 +239,13 @@ interface AuthUser {
 ```bash
 make up            # Start all containers
 make shell         # Enter app container
-make dev           # Start Vite dev servers (готов)
+# make dev         # ⚠️ НЕ ЗАПУСКАТЬ! Уже работает автоматически
 make types         # Generate TypeScript types (НОВАЯ КОМАНДА)
 make npm-install   # Install frontend dependencies
 
 # Database commands
 php artisan migrate:fresh --seed  # Recreate with test data
 ```
-
 ### Next Session Focus
 1. **Vue Auth Store**: Pinia store с tokens и user state
 2. **API Client Setup**: Axios interceptors для автоматических токенов

@@ -155,7 +155,13 @@ admin → curated_collections → items (polymorphic)
 ## Critical Implementation Notes
 
 ### Blade + Vue Integration
-- Blade templates serve as application shells
+- **Blade Templates Location**: resources/views/ (standard Laravel location)
+- **Template Structure**:
+  - resources/views/site.blade.php (public site shell)
+  - resources/views/restaurant.blade.php (restaurant dashboard shell)  
+  - resources/views/admin.blade.php (admin panel shell)
+  - resources/views/layouts/ (layout templates)
+  - resources/views/components/ (reusable Blade components)
 - Vue apps mount inside Blade containers
 - Each interface has separate entry point
 - Shared assets через @shared alias

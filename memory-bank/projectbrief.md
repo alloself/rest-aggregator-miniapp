@@ -20,10 +20,15 @@ REST Aggregator Miniapp - это Laravel 12 сервис-агрегатор дл
 - Публичный сайт для презентации сервиса и ресторанов
 
 ## Архитектура интерфейсов
-### Three-Blade Architecture
+### Three-Blade Architecture (STANDARD LOCATION)
 1. **Main Site Blade** (`resources/views/site.blade.php`) - публичный сайт сервиса
 2. **Restaurant Dashboard Blade** (`resources/views/restaurant.blade.php`) - ЛК ресторанов  
 3. **Admin Panel Blade** (`resources/views/admin.blade.php`) - админка сервиса
+
+**Blade Templates Structure:**
+- `resources/views/` - стандартная Laravel директория для view файлов
+- `resources/views/layouts/` - базовые layout template
+- `resources/views/components/` - переиспользуемые Blade компоненты
 
 ### Frontend Architecture - FSD (Feature-Sliced Design)
 - **Vue 3 Latest + TypeScript** - основной фреймворк
