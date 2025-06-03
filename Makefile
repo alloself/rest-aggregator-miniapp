@@ -97,6 +97,11 @@ permissions: ## Установить правильные права досту�
 	docker-compose exec app chmod -R 775 /var/www/storage
 	docker-compose exec app chmod -R 775 /var/www/bootstrap/cache
 
+permissions-fix: ## Исправить права доступа на frontend файлы и директории
+	@echo "$(YELLOW)Исправление прав доступа...$(NC)"
+	sudo chown -R $$USER:$$USER resources/ node_modules/ package*.json components*.json
+	@echo "$(GREEN)Права доступа исправлены!$(NC)"
+
 vite-fix: ## Исправить проблемы с Vite (перезапустить Node контейнер)
 	@echo "$(YELLOW)Перезапуск Node контейнера для исправления Vite...$(NC)"
 	docker-compose restart node
