@@ -7,12 +7,13 @@ export interface Category {
   color?: string | null
   icon?: string | null
   parent_id?: string | null
+  depth: number
   created_at?: Date | null
   updated_at?: Date | null
   // relations
+  dishes?: Dish[]
   parent?: Category
   children?: Category[]
-  dishes?: Dish[]
 }
 
 export interface CollectionItem {
@@ -51,6 +52,7 @@ export interface Dish {
   id: string
   menu_id: string
   name: string
+  slug: string
   description?: string | null
   price: number
   image_path?: string | null
@@ -94,6 +96,14 @@ export interface Event {
 }
 
 export interface File {
+  // columns
+  id: number
+  name: string
+  path: string
+  mime_type?: string | null
+  size?: number | null
+  created_at?: Date | null
+  updated_at?: Date | null
 }
 
 export interface Like {
@@ -168,6 +178,7 @@ export interface Restaurant {
   // columns
   id: string
   name: string
+  slug: string
   description?: string | null
   address?: string | null
   phone?: string | null

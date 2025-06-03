@@ -5,9 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Traits\HasNestedSet;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 
 class Category extends BaseModel
 {
+    use HasNestedSet, HasSlug;
+
+    protected $hidden = [
+        '_lft',
+        '_rgt', 
+    ];
+
     protected $fillable = [
         'name',
         'slug',
@@ -15,6 +25,9 @@ class Category extends BaseModel
         'color',
         'icon',
         'parent_id',
+        '_lft',
+        '_rgt',
+        'depth',
     ];
 
     protected function casts(): array
@@ -25,19 +38,22 @@ class Category extends BaseModel
     }
 
     /**
-     * Get the parent category.
+     * Get the options for generating the slug.
      */
-    public function parent(): BelongsTo
+    public function getSlugOptions(): SlugOptions
     {
-        return $this->belongsTo(Category::class, 'parent_id');
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->saveSlugsTo('slug')
+            ->doNotGenerateSlugsOnUpdate();
     }
 
     /**
-     * Get the child categories.
+     * Get the route key for the model.
      */
-    public function children(): HasMany
+    public function getRouteKeyName(): string
     {
-        return $this->hasMany(Category::class, 'parent_id');
+        return 'slug';
     }
 
     /**
@@ -70,13 +86,5 @@ class Category extends BaseModel
     public function scopeCustom($query)
     {
         return $query->where('type', 'custom');
-    }
-
-    /**
-     * Scope a query to only include root categories (no parent).
-     */
-    public function scopeRoot($query)
-    {
-        return $query->whereNull('parent_id');
     }
 }

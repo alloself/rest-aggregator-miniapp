@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->uuid('menu_id');
             $table->string('name');
+            $table->string('slug'); // SEO-friendly URL
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
             $table->string('image_path')->nullable();
@@ -26,6 +27,7 @@ return new class extends Migration
             
             // Indexes
             $table->index(['menu_id', 'is_available']);
+            $table->index(['menu_id', 'slug']); // Unique slug within menu
             $table->index('price');
             $table->index('sort_order');
             

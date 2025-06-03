@@ -6,13 +6,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 
 class Restaurant extends BaseModel
 {
-    use SoftDeletes;
+    use SoftDeletes, HasSlug;
 
     protected $fillable = [
         'name',
+        'slug',
         'description',
         'address',
         'phone',
@@ -29,6 +32,25 @@ class Restaurant extends BaseModel
             'settings' => 'json',
             'is_active' => 'boolean',
         ]);
+    }
+
+    /**
+     * Get the options for generating the slug.
+     */
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->saveSlugsTo('slug')
+            ->doNotGenerateSlugsOnUpdate();
+    }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
     }
 
     /**

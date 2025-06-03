@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 
 class Dish extends BaseModel
 {
-    use SoftDeletes;
+    use SoftDeletes, HasSlug;
 
     /**
      * Custom interfaces for ModelTyper - исправляем типы
@@ -25,6 +27,7 @@ class Dish extends BaseModel
     protected $fillable = [
         'menu_id',
         'name',
+        'slug',
         'description',
         'price',
         'image_path',
@@ -41,6 +44,25 @@ class Dish extends BaseModel
             'allergens' => 'json',
             'sort_order' => 'integer',
         ]);
+    }
+
+    /**
+     * Get the options for generating the slug.
+     */
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->saveSlugsTo('slug')
+            ->doNotGenerateSlugsOnUpdate();
+    }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
     }
 
     /**

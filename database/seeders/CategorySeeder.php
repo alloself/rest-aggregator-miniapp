@@ -12,6 +12,11 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
+        // Очищаем существующие категории
+        if (Category::count() > 0) {
+            return; // Если уже есть категории, пропускаем seeding
+        }
+
         // Основные категории кухни
         $cuisineCategories = [
             ['name' => 'Европейская кухня', 'slug' => 'european', 'type' => 'cuisine', 'color' => '#3B82F6'],
@@ -59,8 +64,8 @@ class CategorySeeder extends Seeder
                 ['name' => 'Паста', 'slug' => 'pasta', 'type' => 'custom', 'color' => '#92400E', 'parent_id' => $mainCoursesCategory->id],
             ];
 
-            foreach ($subCategories as $category) {
-                Category::create($category);
+            foreach ($subCategories as $categoryData) {
+                Category::create($categoryData);
             }
         }
     }

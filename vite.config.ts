@@ -7,15 +7,12 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
-                // Site (Публичный сайт)
                 'resources/site/scss/app.scss',
                 'resources/site/ts/main.ts',
                 
-                // Account (ЛК ресторанов)
                 'resources/account/scss/app.scss', 
                 'resources/account/ts/main.ts',
                 
-                // Admin (Админка)
                 'resources/admin/scss/app.scss',
                 'resources/admin/ts/main.ts',
             ],

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('restaurants', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
+            $table->string('slug')->unique(); // SEO-friendly URL
             $table->text('description')->nullable();
             $table->string('address')->nullable();
             $table->string('phone', 20)->nullable();
@@ -27,6 +28,7 @@ return new class extends Migration
             // Indexes
             $table->index('is_active');
             $table->index('created_by_admin_id');
+            $table->index('slug'); // Для быстрого поиска по slug
             
             // Foreign key будет добавлен отдельной миграцией после создания users
         });
