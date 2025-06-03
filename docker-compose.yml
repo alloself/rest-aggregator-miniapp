@@ -69,7 +69,7 @@ services:
 
   # Node.js для frontend разработки
   node:
-    image: node:20-alpine
+    image: node:23-alpine
     container_name: rest-aggregator-miniapp-node
     restart: unless-stopped
     working_dir: /var/www

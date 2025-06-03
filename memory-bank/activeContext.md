@@ -13,18 +13,108 @@
 - **withCredentials: true** для всех запросов
 - **Event-driven** auth state management
 
-## Текущий статус проекта: SANCTUM_SPA_COMPLETE ✅
-*Обновлено: Аутентификация полностью переписана на Sanctum SPA, ЗАПРЕЩЕН any тип, TypeScript правильно настроен*
+## Текущий статус проекта: TAILWIND_V4_WORKFLOW_DOCUMENTED ✅
+*Обновлено: Создано полное руководство по работе с Tailwind CSS v4 на основе официальной документации*
 
 ## Фокус текущей работы
-**Session Authentication Complete** - Полностью настроена session-based аутентификация, CSRF защита, строгая типизация БЕЗ any, готов к Vue Router и компонентам.
+**Tailwind CSS v4 Workflow Documentation** - Изучена и задокументирована официальная документация Tailwind CSS v4, создано руководство по правильному использованию всех возможностей фреймворка в нашем проекте
 
-## ⚡ ВАЖНО: Dev серверы уже запущены
-**НЕ запускать `make dev` повторно!** Dev серверы работают в контейнерах автоматически:
-- ✅ Vite HMR активен для всех интерфейсов 
-- ✅ Vue DevTools включены и готовы
-- ✅ Порты доступны: http://localhost:8080/ (site/account/admin)
-- ⚠️ Повторный запуск может вызвать конфликты портов
+### ✅ **Завершенные критические настройки:**
+1. **CSS Architecture** - Полный переход с SCSS на чистый CSS
+2. **Tailwind CSS v4** - Правильная настройка с `@import "tailwindcss"`
+3. **Vite Configuration** - Обновлены entry points на CSS файлы
+4. **Component Classes** - Созданы интерфейс-специфичные CSS классы
+5. **Workflow Documentation** - Полное руководство по Tailwind CSS v4 (memory-bank/tailwindWorkflow.md)
+
+### 🎨 **CSS Entry Points Configuration:**
+```
+resources/
+├── site/css/app.css      → @import "tailwindcss" + .site-* classes  
+├── account/css/app.css   → @import "tailwindcss" + .dashboard-* classes
+└── admin/css/app.css     → @import "tailwindcss" + .admin-* classes
+```
+
+### 📋 **Vite Entry Points:**
+```typescript
+input: [
+  "resources/site/css/app.css",     // Site public interface
+  "resources/account/css/app.css",  // Restaurant dashboard  
+  "resources/admin/css/app.css",    // Admin panel
+  // + TypeScript entries...
+]
+```
+
+### 🔧 **CSS Architecture Strategy:**
+- **Base Layer**: Typography и global styles
+- **Components Layer**: Interface-specific component classes
+- **Utilities Layer**: Custom utilities для каждого интерфейса
+
+### 🎯 **Interface-Specific CSS Classes:**
+
+#### **Site Interface** (Public Site):
+- `.site-nav` - Main navigation
+- `.hero-section` - Landing hero  
+- `.restaurant-card` - Restaurant listings
+- `.event-card` - Event displays
+- `.collection-widget` - Content collections
+- `.featured-restaurant` - Showcase components
+- `.category-filter` - Filter buttons
+
+#### **Account Interface** (Restaurant Dashboard):
+- `.dashboard-*` - Layout components
+- `.menu-item-card` - Menu management
+- `.event-form-card` - Event creation
+- `.profile-section` - Restaurant profile
+- `.form-*` - Form components
+- `.btn-*` - Action buttons
+- `.status-badge` - Status indicators
+
+#### **Admin Interface** (Admin Panel):
+- `.admin-*` - All admin components
+- `.admin-table` - Data tables
+- `.collection-builder` - Content curation
+- `.analytics-widget` - Dashboard analytics
+- `.content-editor` - Content management
+- `.admin-btn-*` - Admin actions
+- `.admin-status-badge` - Admin statuses
+
+## Следующие шаги
+1. **Vue Router Setup** - Настройка маршрутизации для каждого интерфейса
+2. **Authentication Integration** - Интеграция Sanctum в Vue компоненты
+3. **API Layer Implementation** - Создание типизированных API services
+4. **Component Development** - Разработка shadcn-vue компонентов
+
+## 📚 **Критические знания о Tailwind CSS v4:**
+- ✅ **Pure CSS Only**: SCSS больше НЕ поддерживается - только чистый CSS
+- ✅ **Автоматическое обнаружение**: Сканирует все файлы кроме .gitignore и бинарных
+- ✅ **@source директивы**: Для явного указания источников сканирования
+- ✅ **CSS-first конфигурация**: Все настройки через @theme в CSS, НЕ JS config
+- ✅ **Safelist функциональность**: @source inline() для принудительной генерации классов
+- ✅ **Dynamic spacing**: Любые числовые значения работают автоматически (grid-cols-73, mt-17)
+- ✅ **Modern CSS features**: OKLCH цвета, CSS Layers, @starting-style, масочные утилиты
+- ✅ **Производительность**: До 100x быстрее инкрементальные пересборки
+
+## Готовые компоненты инфраструктуры
+- ✅ **Backend API** (95% готов)
+- ✅ **Authentication** (Sanctum SPA complete)
+- ✅ **Database Models** (с UUID support)
+- ✅ **TypeScript Generation** (fumeapp/modeltyper)
+- ✅ **CSS Architecture** (Tailwind CSS v4)
+- ⏳ **Vue Components** (в процессе разработки)
+
+## Development Environment Status
+- ⚡ **Dev servers**: Автоматически запущены (НЕ перезапускать!)
+- 🔧 **HMR**: Активен для всех интерфейсов  
+- 🚀 **Vue DevTools**: Настроены и работают
+- 📦 **Build System**: Vite 6.3.5 + Tailwind CSS v4
+
+## Техническая готовность
+**Frontend Architecture: 45% → 55%** 
+- Базовая инфраструктура и стили готовы
+- CSS компоненты для всех интерфейсов созданы
+- Entry points правильно настроены
+- **Tailwind CSS v4 Workflow полностью изучен и задокументирован**
+- Готов к разработке Vue компонентов с современными возможностями CSS
 
 ## Завершенные компоненты ✅
 

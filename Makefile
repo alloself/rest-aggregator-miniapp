@@ -44,7 +44,11 @@ logs-node: ## Показать логи Node.js контейнера
 	docker-compose logs -f node
 
 shell: ## Войти в контейнер приложения
-	docker-compose exec app bash
+	docker-compose exec app bash	
+	
+shell-node: ## Войти в контейнер Node.js
+	docker-compose exec node sh
+
 
 shell-mysql: ## Войти в контейнер MySQL
 	docker-compose exec mysql mysql -u laravel_user -p rest-aggregator-miniapp
