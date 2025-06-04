@@ -35,7 +35,7 @@ REST Aggregator Miniapp - это Laravel 12 сервис-агрегатор дл
 - **Pinia** - state management
 - **Vue Router** - маршрутизация  
 - **VeeValidate + Zod** - валидация форм
-- **Tailwind CSS v4** - стилизация
+- **SCSS + БЭМ** - стилизация
 - **shadcn-vue** - UI компоненты (https://github.com/unovue/shadcn-vue)
 - **SCSS + БЭМ** - дополнительная стилизация
 

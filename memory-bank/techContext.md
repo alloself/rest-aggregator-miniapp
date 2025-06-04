@@ -19,7 +19,7 @@
 - **Vue Router**: Клиентский роутинг
 - **VeeValidate**: Валидация форм для Vue
 - **Zod**: Schema validation library
-- **Tailwind CSS v4.1.8**: Utility-first CSS фреймворк
+- **SCSS**: CSS препроцессор для кастомных стилей
 - **shadcn-vue**: UI компоненты для Vue (https://github.com/unovue/shadcn-vue)
 - **mdi-icons**: Единственная иконочная библиотека (НЕ lucide-vue-next)
 - **SCSS**: CSS preprocessor
@@ -195,7 +195,7 @@ export default defineConfig({
     "vee-validate": "^4.12.0",
     "zod": "^3.22.0",
     "sass": "^1.70.0",
-    "@tailwindcss/forms": "^0.5.7"
+    "sass": "^1.77.0"
   },
   "dependencies": {
     "axios": "^1.9.0"

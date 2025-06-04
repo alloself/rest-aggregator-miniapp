@@ -19,8 +19,7 @@
 - **Pinia**: State management
 - **Vue Router**: Client-side routing
 - **VeeValidate + Zod**: Type-safe form validation
-- **Tailwind CSS v4**: Utility-first styling
-- **SCSS + БЭМ**: Additional styling methodology
+- **SCSS + БЭМ**: Custom styling methodology
 
 ### Development Environment
 - **Make Commands**: Comprehensive automation для всех операций
@@ -173,7 +172,7 @@ admin → curated_collections → items (polymorphic)
 - **Props/Events** for parent-child communication
 
 ### Styling Approach
-- **Tailwind v4** as primary styling system
+- **SCSS + БЭМ** as primary styling system
 - **shadcn-vue** for consistent component design
 - **SCSS modules** for custom components
 - **БЭМ methodology** for CSS class naming

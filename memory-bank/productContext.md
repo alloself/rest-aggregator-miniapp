@@ -192,7 +192,7 @@ src/
 - **shadcn-vue**: Готовые доступные компоненты для быстрой разработки
 - **Pinia**: Complex state management для меню, событий, лайков
 - **VeeValidate + Zod**: Type-safe валидация для сложных форм меню
-- **Tailwind v4**: Utility-first CSS для быстрой стилизации
+- **SCSS + БЭМ**: Кастомная система стилизации
 - **БЭМ + SCSS**: Для custom компонентов calendar, menu layouts
 
 ## Метрики успеха

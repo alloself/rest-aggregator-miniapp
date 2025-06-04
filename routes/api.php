@@ -141,8 +141,3 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('v1/admin')->group(fun
         Route::get('likes/trends', [LikeController::class, 'trends']);
     });
 });
-
-// Маршрут для получения пользователя (для тестирования)
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-}); 
