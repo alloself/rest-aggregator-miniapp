@@ -176,6 +176,7 @@ admin → curated_collections → items (polymorphic)
 - **SCSS + БЭМ** for consistent styling
 - **SCSS modules** for custom components
 - **БЭМ methodology** for CSS class naming
+- **ЗАПРЕТ `<style scoped>`**: В *.vue файлах ЗАПРЕЩЕНО использовать scoped стили
 
 ### Custom UI Components Architecture
 - **Native Drag-Drop** на HTML5 Drag API для category assignment
