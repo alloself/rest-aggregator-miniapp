@@ -153,22 +153,22 @@ class SocialFeaturesService {
 ```
 resources/js/
 ├── shared/                          # Общие ресурсы
-│   ├── ui/                         # UI компоненты (UPDATED STRATEGY)
-│   │   ├── shadcn/                 # Базовые shadcn-vue компоненты
+│   ├── ui/                         # UI компоненты
+│   │   ├── base/                   # Базовые UI компоненты
 │   │   │   ├── button/             # Button, ButtonGroup
 │   │   │   ├── card/               # Card, CardHeader, CardContent
 │   │   │   ├── input/              # Input, Textarea, Select
 │   │   │   ├── dialog/             # Modal, Sheet, Popover
 │   │   │   └── table/              # Table, DataTable
-│   │   ├── forms/                  # Form components (НОВЫЙ СЛОЙ)
+│   │   ├── forms/                  # Form components
 │   │   │   ├── smart-form/         # SmartForm генератор
 │   │   │   ├── field-wrapper/      # Wrapper для field validation
 │   │   │   └── form-schemas/       # Переиспользуемые схемы форм
-│   │   ├── custom/                 # Custom компоненты НА ОСНОВЕ shadcn
-│   │   │   ├── calendar/           # Calendar (shadcn Card + Button)
-│   │   │   ├── image-upload/       # Image upload (shadcn Input + Card)
-│   │   │   ├── like-button/        # Like system (shadcn Button)
-│   │   │   └── drag-drop/          # Drag-drop (shadcn Card + List)
+│   │   ├── custom/                 # Custom компоненты
+│   │   │   ├── calendar/           # Calendar component
+│   │   │   ├── image-upload/       # Image upload
+│   │   │   ├── like-button/        # Like system
+│   │   │   └── drag-drop/          # Drag-drop functionality
 │   │   └── icons/                  # mdi-icons integration
 │   ├── api/                        # API clients
 │   │   ├── restaurants.ts          
@@ -242,14 +242,14 @@ resources/js/
         └── platform-analytics/     # Global metrics
 ```
 
-### 2. UI Component Architecture Principles (UPDATED)
+### 2. UI Component Architecture Principles
 
 #### **Component Layering Strategy**
 ```
 UI Architecture Layers:
-1. Base Layer: shadcn-vue компоненты (Button, Card, Input, Dialog, Table)
+1. Base Layer: Базовые UI компоненты (Button, Card, Input, Dialog, Table)
 2. Form Layer: SmartForm генератор для schema-based форм
-3. Custom Layer: Специфичные компоненты НА ОСНОВЕ shadcn
+3. Custom Layer: Специфичные компоненты проекта
 4. Feature Layer: Бизнес-логика компонентов
 5. Page Layer: Композиция для страниц
 ```
@@ -301,37 +301,39 @@ const dishFormFields: ISmartFormField[] = [
 ```
 
 #### **Custom Component Development Rules**
-- ✅ **ВСЕГДА базируйтесь на shadcn-vue компонентах**
-- ✅ **Icons: только mdi-icons** (НЕ lucide-vue-next)
+- ✅ **Icons: только mdi-icons**
 - ❌ **ЗАПРЕЩЕНО**: vue-draggable-plus, vue-datepicker, vue-toastification
-- ✅ **Консистентность**: Все custom компоненты наследуют стиль shadcn
-- ✅ **Доступность**: Автоматически через shadcn базу
+- ✅ **SCSS + БЭМ**: Для всех custom компонентов
+- ✅ **Доступность**: Правильная семантика HTML
 
 #### **Example Custom Component Pattern**
 ```typescript
-// ✅ ПРАВИЛЬНО: Calendar на основе shadcn Card + Button
+// ✅ ПРАВИЛЬНО: Custom Calendar с SCSS
 <template>
-  <Card class="calendar-widget">
-    <CardHeader>
-      <CardTitle>Event Calendar</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div class="calendar-grid">
-        <Button 
+  <div class="calendar-widget">
+    <div class="calendar-widget__header">
+      <h3 class="calendar-widget__title">Event Calendar</h3>
+    </div>
+    <div class="calendar-widget__content">
+      <div class="calendar-widget__grid">
+        <button 
           v-for="date in dates" 
           :key="date" 
-          variant="ghost"
+          class="calendar-widget__date"
           @click="selectDate(date)"
         >
           {{ date }}
-        </Button>
+        </button>
       </div>
-    </CardContent>
-  </Card>
+    </div>
+  </div>
 </template>
 
-// ❌ НЕПРАВИЛЬНО: Внешняя библиотека
-import { VueDatePicker } from '@vuepic/vue-datepicker'
+<style lang="scss">
+.calendar-widget {
+  // Custom SCSS styles
+}
+</style>
 ```
 
 ### 3. State Management Patterns

@@ -82,13 +82,13 @@ input: [
 1. **Vue Router Setup** - Настройка маршрутизации для каждого интерфейса
 2. **Authentication Integration** - Интеграция Sanctum в Vue компоненты
 3. **API Layer Implementation** - Создание типизированных API services
-4. **Component Development** - Разработка shadcn-vue компонентов
+4. **Component Development** - Разработка UI компонентов
 
 ## 📚 **Критические знания о SCSS + БЭМ архитектуре:**
 - ✅ **SCSS Support**: SCSS модули для кастомных компонентов
 - ✅ **БЭМ Methodology**: Структурированное именование классов
 - ✅ **Component Isolation**: Каждый компонент имеет собственные стили
-- ✅ **shadcn-vue Integration**: Использование UI библиотеки без конфликтов
+- ✅ **UI Component Architecture**: Структурированная система компонентов
 - ✅ **Performance**: Минимальный размер бандла без утилитарных классов
 - ✅ **Maintainability**: Читаемые и поддерживаемые стили
 - ✅ **Custom Properties**: CSS переменные для темизации
@@ -232,21 +232,21 @@ make types
 - [ ] **Menu Management**: Первый CRUD интерфейс с lodash утилитами
 - [ ] **API Integration**: Подключение к готовым endpoints
 
-### Этап 3: Shared UI Components (UPDATED STRATEGY)
-- [ ] **shadcn-vue Installation**: UI library setup  
+### Этап 3: Shared UI Components
+- [ ] **Base UI Components**: Создание базовых компонентов  
 - [ ] **mdi-icons Integration**: Единственная иконочная библиотека
 - [ ] **SmartForm Component**: Schema-based генератор форм (VeeValidate + TypeScript)
-- [ ] **Form Field Components**: Input, Select, Textarea на основе shadcn с валидацией
-- [ ] **Table Components**: For data display с lodash сортировкой на основе shadcn Table
-- [ ] **Modal Components**: For CRUD operations на основе shadcn Dialog
-- [ ] **Custom Components**: Calendar, drag-drop, image-upload НА ОСНОВЕ shadcn компонентов
+- [ ] **Form Field Components**: Input, Select, Textarea с валидацией
+- [ ] **Table Components**: For data display с lodash сортировкой
+- [ ] **Modal Components**: For CRUD operations
+- [ ] **Custom Components**: Calendar, drag-drop, image-upload
 
 ### 🎨 UI Component Strategy
-**Принцип**: Все custom компоненты строятся на базе shadcn-vue для консистентности
-- **Base Layer**: shadcn-vue (Button, Card, Input, Dialog, Table)
-- **Custom Layer**: Calendar, Drag-Drop, Image Upload на основе shadcn компонентов
+- **Base Layer**: Базовые компоненты (Button, Card, Input, Dialog, Table)
+- **Custom Layer**: Calendar, Drag-Drop, Image Upload компоненты
 - **Form Layer**: SmartForm генератор для динамических форм (VeeValidate + схемы)
-- **Icons**: mdi-icons (НЕ lucide-vue-next)
+- **Icons**: mdi-icons
+- **SCSS + БЭМ**: Для всех кастомных стилей
 - **No External UI**: НЕТ vue-draggable-plus, vue-datepicker и др.
 
 ### 📋 Smart Form Generator (НОВЫЙ КОМПОНЕНТ)
@@ -254,7 +254,7 @@ make types
 ```typescript
 interface ISmartFormField {
   key: string;                    // Field name
-  component: string;              // shadcn-vue компонент (Input, Select, etc.)
+  component: string;              // Базовый компонент (Input, Select, etc.)
   rule?: ValidationRule;          // Zod валидация
   props?: Record<string, any>;    // Props для компонента
   events?: Record<string, any>;   // Event handlers
@@ -310,24 +310,24 @@ export const stringUtils = {}  // Типизированные утилиты с
 export const restaurantUtils = {} // Специфичные для ресторанов
 
 // resources/shared/ui/ - НОВАЯ СТРУКТУРА
-├── shadcn/                     // Базовые shadcn-vue компоненты
+├── base/                       // Базовые UI компоненты
 │   ├── button/                 // Button, ButtonGroup
 │   ├── card/                   // Card, CardHeader, CardContent
 │   ├── input/                  // Input, Textarea, Select
 │   ├── dialog/                 // Modal, Sheet, Popover
 │   └── table/                  // Table, DataTable
-├── forms/                      // Form components (НОВЫЙ СЛОЙ)
+├── forms/                      // Form components
 │   ├── smart-form/             // SmartForm генератор
 │   ├── field-wrapper/          // Wrapper для field validation
 │   └── form-schemas/           // Переиспользуемые схемы
 │       ├── dish-form.ts        // Схема для создания блюд
 │       ├── event-form.ts       // Схема для событий
 │       └── restaurant-form.ts  // Схема профиля ресторана
-├── custom/                     // Custom компоненты НА ОСНОВЕ shadcn
-│   ├── calendar/               // Event calendar (shadcn Card + Button)
-│   ├── image-upload/           // Image handling (shadcn Input + Card)
-│   ├── drag-drop/              // Category management (shadcn Card + List)
-│   └── like-button/            // Social features (shadcn Button)
+├── custom/                     // Custom компоненты
+│   ├── calendar/               // Event calendar
+│   ├── image-upload/           // Image handling
+│   ├── drag-drop/              // Category management
+│   └── like-button/            // Social features
 └── icons/                      // mdi-icons integration
     └── index.ts                // Icon component wrapper
 ```

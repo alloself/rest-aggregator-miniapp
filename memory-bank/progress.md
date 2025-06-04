@@ -84,7 +84,7 @@
 - ✅ **Dev Servers Running**: Vite HMR работает автоматически в контейнерах
 - ⏳ **Vue 3 Applications**: Настройка отдельных приложений
 - ⏳ **FSD Structure**: Feature-Sliced Design архитектура
-- ⏳ **shadcn-vue Integration**: UI компоненты
+- ⏳ **UI Components**: Базовые UI компоненты
 
 #### Frontend Structure (PLANNED)
 ```
@@ -93,7 +93,7 @@ resources/js/
 ├── restaurant/    # Restaurant dashboard Vue app  
 ├── admin/         # Admin panel Vue app
 └── shared/        # Common components & utilities
-    ├── ui/        # shadcn-vue + custom components
+    ├── ui/        # UI компоненты
     ├── api/       # API clients
     └── stores/    # Pinia stores
 ```
@@ -105,7 +105,7 @@ resources/js/
 - [ ] **Auth Composables**: useAuth, usePermissions, useApi
 - [ ] **Route Guards**: Защита маршрутов по ролям
 - [ ] **API Client**: Axios с автоматическими токенами
-- [ ] **Login Forms**: shadcn-vue формы входа
+- [ ] **Login Forms**: формы входа
 
 ### 8. Restaurant Dashboard (PRIORITY)
 - [ ] **Menu Management UI**: CRUD интерфейс для блюд

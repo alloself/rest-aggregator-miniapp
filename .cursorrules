@@ -15,7 +15,7 @@
 - **Vue 3 Latest + TypeScript**: Основной фреймворк с полной типизацией
 - **Feature-Sliced Design (FSD)**: Структурирование кода по фичам
 - **Multiple Vue Apps**: Отдельное Vue приложение для каждого интерфейса
-- **shadcn-vue Components**: UI library (https://github.com/unovue/shadcn-vue)
+
 - **Pinia**: State management
 - **Vue Router**: Client-side routing
 - **VeeValidate + Zod**: Type-safe form validation
@@ -96,7 +96,7 @@ resources/js/
 ├── restaurant/    # Restaurant dashboard Vue app  
 ├── admin/         # Admin panel Vue app
 └── shared/        # Common components & utilities
-    ├── ui/        # shadcn-vue + custom components
+    ├── ui/        # UI компоненты
     │   ├── calendar/      # Event calendar components
     │   ├── image-upload/  # Image handling
     │   ├── like-button/   # Social features
@@ -146,7 +146,7 @@ admin → curated_collections → items (polymorphic)
 1. **Component Isolation**: Each interface has independent Vue app
 2. **Shared Resources**: Common utilities в shared/ directory
 3. **Type Safety**: Full TypeScript coverage с Zod validation
-4. **Accessibility**: shadcn-vue ensures accessible components
+4. **Accessibility**: Правильная семантика HTML
 5. **Performance**: Code splitting и lazy loading
 6. **Real-time Updates**: WebSocket для лайков и notifications
 7. **Image Optimization**: Multiple formats и sizes для performance
@@ -173,7 +173,7 @@ admin → curated_collections → items (polymorphic)
 
 ### Styling Approach
 - **SCSS + БЭМ** as primary styling system
-- **shadcn-vue** for consistent component design
+- **SCSS + БЭМ** for consistent styling
 - **SCSS modules** for custom components
 - **БЭМ methodology** for CSS class naming
 

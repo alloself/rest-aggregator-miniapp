@@ -20,9 +20,7 @@
 - **VeeValidate**: Валидация форм для Vue
 - **Zod**: Schema validation library
 - **SCSS**: CSS препроцессор для кастомных стилей
-- **shadcn-vue**: UI компоненты для Vue (https://github.com/unovue/shadcn-vue)
-- **mdi-icons**: Единственная иконочная библиотека (НЕ lucide-vue-next)
-- **SCSS**: CSS preprocessor
+- **mdi-icons**: Единственная иконочная библиотека
 - **БЭМ Methodology**: CSS naming convention
 
 ### Архитектурные паттерны
@@ -97,7 +95,7 @@ resources/js/
 │   ├── shared/
 │   └── main.ts
 └── shared/                    # Общие компоненты между приложениями
-    ├── ui/                    # shadcn-vue компоненты
+    ├── ui/                    # UI компоненты
     ├── api/                   # API клиенты
     ├── stores/                # Pinia stores
     ├── composables/           # Vue composables
@@ -403,11 +401,7 @@ make types         # Генерация TypeScript типов из моделе�
 
 ## External Integrations
 
-### shadcn-vue Integration
-- **Component Library**: Готовые accessible компоненты
-- **Customization**: Адаптация под наш design system
-- **Tree Shaking**: Импорт только используемых компонентов
-- **TypeScript Support**: Полная типизация компонентов
+
 
 ### Telegram Mini Apps
 - **Multiple Bot Tokens**: Поддержка разных ресторанов

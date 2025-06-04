@@ -36,8 +36,6 @@ REST Aggregator Miniapp - это Laravel 12 сервис-агрегатор дл
 - **Vue Router** - маршрутизация  
 - **VeeValidate + Zod** - валидация форм
 - **SCSS + БЭМ** - стилизация
-- **shadcn-vue** - UI компоненты (https://github.com/unovue/shadcn-vue)
-- **SCSS + БЭМ** - дополнительная стилизация
 
 ## Технические требования
 - Laravel 12 (PHP 8.2+) - backend framework
@@ -52,7 +50,6 @@ REST Aggregator Miniapp - это Laravel 12 сервис-агрегатор дл
 - **Telegram Mini Apps Integration**: Персональные боты для каждого ресторана
 - **Blade + Vue Hybrid**: Laravel Blade как оболочка, Vue как SPA внутри
 - **Feature-Sliced Design**: Структурирование frontend кода по фичам
-- **Component-Based UI**: Использование shadcn-vue для консистентного UI
 - **Type-Safe Development**: TypeScript + Zod для безопасности типов
 
 ## Основные сущности
