@@ -46,7 +46,6 @@ export const useAuthStore = defineStore('auth', () => {
       await apiClient.logout();
     } catch (err) {
       // Игнорируем ошибки при выходе
-      console.warn('Logout error:', err);
     } finally {
       // Очищаем пользователя
       clearAuth();

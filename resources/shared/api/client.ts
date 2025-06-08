@@ -11,7 +11,7 @@ class ApiClient {
 
   constructor() {
     this.instance = axios.create({
-      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -56,7 +56,6 @@ class ApiClient {
         return this.instance.request(error.config);
       }
     } catch (csrfError) {
-      console.error('Failed to refresh CSRF token:', csrfError);
     }
     
     return Promise.reject(this.formatError(error));
@@ -82,7 +81,6 @@ class ApiClient {
     try {
       await this.instance.get('/sanctum/csrf-cookie');
     } catch (error) {
-      console.error('Failed to get CSRF cookie:', error);
       throw error;
     }
   }

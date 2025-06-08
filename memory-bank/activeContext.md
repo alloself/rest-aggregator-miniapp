@@ -1,403 +1,320 @@
-# Active Context - REST Aggregator Miniapp
+# Active Context - Текущий фокус работы
 
-## ⚡ КРИТИЧЕСКИЕ ПРАВИЛА РАЗРАБОТКИ
+## Текущее состояние проекта
 
-### 🚫 СТРОГИЙ ЗАПРЕТ `any` типа
-- **НИ В КОЕМ СЛУЧАЕ не используйте `any` тип!**
-- Используйте `unknown`, конкретные типы или type guards
-- При API запросах указывайте generic: `apiClient.get<User>('/api/user')`
+### Архитектурная основа ✅ ГОТОВО
+- **BaseModel pattern** реализован с UUID поддержкой
+- **Three-interface strategy** настроена (site, account, admin)
+- **Vite configuration** с multiple entry points
+- **Docker environment** полностью настроен
+- **TypeScript integration** с FumeApp/ModelTyper
 
-### 🔐 Session-based Authentication (Sanctum SPA)
-- **БЕЗ токенов в localStorage** - только HttpOnly cookies
-- **Автоматическая CSRF защита** через cookies
-- **withCredentials: true** для всех запросов
-- **Event-driven** auth state management
+### Backend Foundation ✅ ГОТОВО
+- **Laravel 12** с современными пакетами
+- **Database schema** с UUID primary keys
+- **Authentication** через Laravel Sanctum SPA
+- **Role-based access** с Spatie/Laravel-Permission
+- **API routes** структурированы по ролям
 
-## Текущий статус проекта: TAILWIND_4_CONFIGURED ✅
-*Обновлено: Установлен и настроен Tailwind CSS 4 с PostCSS*
+### Frontend Infrastructure ✅ ГОТОВО
+- **Vue 3 + TypeScript** настроен для всех интерфейсов
+- **PrimeVue UI library** интегрирована
+- **Shared resources** структура создана
+- **Type generation** автоматизирована
 
-## Текущий контекст проекта
+### 🆕 UI/UX Design System ✅ ГОТОВО
+- **Figma макет проанализирован** - страница ресторана для Telegram Mini App
+- **SCSS дизайн-система настроена** - CSS variables, БЭМ компоненты, типографика
+- **Tailwind удален** - заменен на кастомную SCSS архитектуру
+- **Inter шрифт интегрирован** - Google Fonts с variable weight поддержкой
+- **Telegram Mini App стили** - viewport 440px, touch-friendly элементы
+- **Компонентная архитектура** - готовые CSS классы для всех Figma компонентов
 
-## Статус: PRIMEVUE_INTEGRATED ✅
-*Обновлено: Интеграция PrimeVue 4 с демо страницей*
+## Текущий фокус разработки
 
-## Фокус текущей работы
-**Tailwind CSS 4 + PostCSS Multi-App Architecture** - Современная система стилизации с изолированными темами для каждого интерфейса
+### 1. Frontend Applications Development 🔄 В ПРОЦЕССЕ
 
-**PrimeVue 4 Integration** - Успешная интеграция современной UI библиотеки с полным набором компонентов для Restaurant Aggregator Platform
+#### Site Application (Публичный сайт)
+**Статус**: Дизайн-система настроена, готова к компонентам
+**Приоритет**: Высокий (готов к реализации Figma макета)
+**Задачи**:
+- [x] Дизайн-система SCSS настроена (resources/site/css/app.scss)
+- [x] CSS variables для всех Figma токенов
+- [x] БЭМ структура для restaurant page компонентов
+- [ ] **RestaurantPage Vue компонент** - реализация с новыми стилями
+- [ ] Каталог ресторанов с фильтрацией
+- [ ] Страницы ресторанов с меню и событиями
+- [ ] Регистрация новых ресторанов
 
-### ✅ **Завершенные критические настройки:**
-1. **Tailwind CSS 4 Installation** - Установлена next версия с PostCSS плагином
-2. **PostCSS Configuration** - Настроена поддержка nested CSS синтаксиса
-3. **Multi-Theme Architecture** - Отдельные темы для site, account, admin
-4. **CSS Entry Points** - Настроены @theme блоки для каждого интерфейса
-5. **SCSS-like Syntax** - Поддержка nested CSS через postcss-nested
+#### Account Application (ЛК ресторанов) 
+**Статус**: Базовая аутентификация реализована
+**Приоритет**: Высокий
+**Задачи**:
+- [x] Аутентификация и базовая структура
+- [ ] Dashboard с аналитикой ресторана
+- [ ] Menu Management с drag-and-drop категориями
+- [ ] Event Planning с календарем
+- [ ] News Publishing система
+- [ ] Image upload и optimization
 
-### 🎨 **Tailwind 4 Entry Points Configuration:**
+#### Admin Application (Админ панель)
+**Статус**: Базовая структура создана  
+**Приоритет**: Высокий
+**Задачи**:
+- [ ] Dashboard с общей аналитикой
+- [ ] Restaurant Management (CRUD)
+- [ ] Content Moderation система
+- [ ] User Management с ролями
+- [ ] Curated Collections builder
+
+### 2. Core Features Implementation 🔄 В ПРОЦЕССЕ
+
+#### UI Components Library (основано на Figma анализе)
+**Приоритет**: Критический
+**Компоненты из Figma макета**:
+- [ ] **RestaurantHero** - основное фото с индикаторами слайдов
+- [ ] **RestaurantCard** - информационная карточка с деталями
+- [ ] **RestaurantDescription** - блок описания ресторана
+- [ ] **ChefRecommendations** - рекомендации с фотогалереей
+- [ ] **CategoryFilter** - кнопки фильтрации (Новости/События/Предложения)
+- [ ] **NewsCard** - карточка новости с изображением
+- [ ] **ActionButtons** - кнопки меню/бар/фото/бронирование
+
+#### Content Management System
+**Приоритет**: Критический
+**Компоненты**:
+- [ ] **SmartForm Generator** - универсальные формы на VeeValidate + Zod
+- [ ] **Image Upload Component** - с preview и cropping
+- [ ] **Category Manager** - drag-and-drop для many-to-many отношений
+- [ ] **Rich Text Editor** - для описаний блюд и событий
+
+#### Social Features
+**Приоритет**: Высокий
+**Компоненты**:
+- [ ] **Like System** - polymorphic лайки с real-time счетчиками
+- [ ] **Favorites System** - избранные рестораны и блюда
+- [ ] **Recommendation Engine** - персональные подборки
+
+#### Event Management
+**Приоритет**: Высокий
+**Компоненты**:
+- [ ] **Custom Calendar** - Vue 3 календарь для событий
+- [ ] **Event Registration** - система записи на события
+- [ ] **Time-based Collections** - автоматические подборки по времени
+
+## Архитектурные решения в работе
+
+### 1. Custom UI Components Strategy (обновлено после Figma анализа)
+**Принцип**: Все custom компоненты на основе PrimeVue базовых элементов + Figma дизайн-система
+**Дизайн-токены из Figma**:
+```scss
+// Цветовая палитра
+$text-primary: #000000;
+$text-secondary: #1C1C1E;
+$text-muted: rgba(0, 0, 0, 0.35);
+$bg-cards: #FFFFFF;
+$bg-buttons: #F4F3F3;
+$bg-accent: rgba(200, 228, 155, 0.35);
+$bg-overlay: rgba(244, 243, 243, 0.68);
+
+// Типографика
+$font-family: 'Inter';
+$font-sizes: (
+  'restaurant-title': 20px,
+  'section-title': 18px,
+  'button': 15px,
+  'body': 15px,
+  'description': 14px,
+  'news-title': 16px
+);
+
+// Скругления
+$border-radius: (
+  'cards': 20px,
+  'buttons': 20px,
+  'photos': 20px,
+  'hero-bottom': 0px 0px 40px 40px
+);
 ```
-resources/
-├── site/css/app.css        → Tailwind 4 + Site theme (brand colors)
-├── account/css/app.css     → Tailwind 4 + Dashboard theme (yellow primary)  
-└── admin/css/app.css       → Tailwind 4 + Admin theme (blue/gray palette)
-```
 
-### 📋 **Vite Entry Points:**
+### 2. Telegram Mini App Constraints
+**Принцип**: Соответствие стандартам Telegram Mini Apps
+**Ограничения**:
 ```typescript
-input: [
-  "resources/site/css/app.css",     // Site public interface
-  "resources/account/css/app.css",  // Restaurant dashboard  
-  "resources/admin/css/app.css",    // Admin panel
-  // + TypeScript entries...
-]
+// Размеры экрана
+const TELEGRAM_VIEWPORT = {
+  width: 440, // фиксированная ширина
+  maxHeight: 'viewport', // вертикальная прокрутка
+  touchTarget: 44 // минимальный размер touch элементов
+};
+
+// Telegram-specific поведение
+const TELEGRAM_BEHAVIOR = {
+  navigation: 'spa', // одностраничное приложение
+  gestures: ['swipe', 'tap'], // поддерживаемые жесты
+  loading: 'progressive' // прогрессивная загрузка контента
+};
 ```
 
-### 🔧 **CSS Architecture Strategy:**
-- **Base Layer**: Typography и global styles
-- **Components Layer**: Interface-specific component classes
-- **Utilities Layer**: Custom utilities для каждого интерфейса
+### 3. Shared Composables Pattern
+**Принцип**: Переиспользуемая логика в shared/composables
+**Структура**:
+```typescript
+// shared/composables/
+├── useAuth.ts          // Аутентификация
+├── useApi.ts           // API запросы
+├── useRestaurant.ts    // Логика ресторана
+├── useMenu.ts          // Управление меню
+├── useEvents.ts        // События
+├── useLikes.ts         // Система лайков
+└── useUI.ts            // UI состояния и взаимодействия (новый)
+```
 
-### 🎯 **Interface-Specific CSS Classes:**
+### 4. Type-Safe API Pattern
+**Принцип**: Все API запросы с generic типами
+**Реализация**:
+```typescript
+// Типизированные API клиенты
+const restaurants = await apiClient.get<Restaurant[]>('/api/v1/restaurants');
+const dish = await apiClient.post<Dish>('/api/v1/restaurant/dishes', data);
 
-#### **Site Interface** (Public Site):
-- `.site-nav` - Main navigation
-- `.hero-section` - Landing hero  
-- `.restaurant-card` - Restaurant listings
-- `.event-card` - Event displays
-- `.collection-widget` - Content collections
-- `.featured-restaurant` - Showcase components
-- `.category-filter` - Filter buttons
+// Error handling с типизацией
+interface ApiError {
+  message: string;
+  errors?: Record<string, string[]>;
+}
+```
 
-#### **Account Interface** (Restaurant Dashboard):
-- `.dashboard-*` - Layout components
-- `.menu-item-card` - Menu management
-- `.event-form-card` - Event creation
-- `.profile-section` - Restaurant profile
-- `.form-*` - Form components
-- `.btn-*` - Action buttons
-- `.status-badge` - Status indicators
+## Ближайшие приоритеты (обновлено)
 
-#### **Admin Interface** (Admin Panel):
-- `.admin-*` - All admin components
-- `.admin-table` - Data tables
-- `.collection-builder` - Content curation
-- `.analytics-widget` - Dashboard analytics
-- `.content-editor` - Content management
-- `.admin-btn-*` - Admin actions
-- `.admin-status-badge` - Admin statuses
+### Неделя 1: Telegram Mini App UI Foundation
+1. **RestaurantPage Implementation**
+   - RestaurantHero компонент с слайдер функциональностью
+   - RestaurantCard с полной информацией
+   - News система с карточками
+   - CategoryFilter для фильтрации контента
+
+2. **Design System Setup**
+   - CSS variables из Figma токенов
+   - PrimeVue theme customization
+   - Responsive utilities для 440px ширины
+   - Typography система (Inter font)
+
+### Неделя 2: Core Components Library
+1. **Image & Media Components**
+   - ChefRecommendations галерея
+   - Image upload с preview
+   - Progressive loading для изображений
+   - Placeholder states
+
+2. **Navigation & Interaction**
+   - ActionButtons компонент
+   - CategoryFilter с состояниями
+   - Page Control (слайдер индикаторы)
+   - Touch gesture support
+
+### Неделя 3-4: Account Application Core
+1. **Menu Management Interface**
+   - CRUD операции для блюд
+   - Category assignment с drag-and-drop
+   - Image upload с preview
+   - Real-time validation
+
+2. **Event Planning System**
+   - Custom calendar компонент
+   - Event creation форма
+   - Participant management
+   - Time-based filtering
+
+### Неделя 5-6: Social Features
+1. **Like System Implementation**
+   - Polymorphic like API
+   - Real-time UI updates
+   - Like counters и analytics
+   - User like history
+
+2. **News & Recommendations**
+   - News publishing система
+   - Chef recommendations управление
+   - Content discovery алгоритмы
+   - Featured content curation
+
+## Технические долги и улучшения
+
+### Code Quality
+- [ ] **ESLint configuration** для строгой типизации
+- [ ] **Prettier setup** для консистентного форматирования
+- [ ] **Vue DevTools** оптимизация для development
+- [ ] **Error boundaries** для graceful error handling
+
+### Performance Optimizations
+- [ ] **Image optimization** pipeline (критично для Telegram Mini App)
+- [ ] **Lazy loading** для больших списков и изображений
+- [ ] **Bundle size optimization** - особенно важно для мобильного
+- [ ] **Progressive loading** - постепенная загрузка контента
+
+### Telegram Mini App Specific
+- [ ] **Telegram SDK integration** - взаимодействие с Telegram API
+- [ ] **Theme adaptation** - поддержка темной/светлой тем Telegram
+- [ ] **Haptic feedback** - тактильная обратная связь
+- [ ] **Telegram sharing** - кнопки поделиться контентом
+
+### Testing Strategy
+- [ ] **Unit tests** для composables
+- [ ] **Component testing** с Vue Test Utils
+- [ ] **Visual regression testing** для UI компонентов
+- [ ] **Telegram Mini App testing** в реальной среде
+
+## Блокеры и риски
+
+### Текущие блокеры
+- **Нет блокеров** - все зависимости настроены
+
+### Потенциальные риски
+1. **Telegram Mini App Constraints** - ограничения платформы
+   - *Митигация*: Строгое следование Telegram guidelines
+
+2. **Image Loading Performance** - медленная загрузка в мобильных сетях
+   - *Митигация*: Progressive loading, WebP format, lazy loading
+
+3. **UI Component Complexity** - custom компоненты согласно Figma
+   - *Митигация*: Модульная архитектура на основе PrimeVue
+
+4. **Type Safety Maintenance** - синхронизация типов между backend и frontend
+   - *Митигация*: Автоматизированная генерация через ModelTyper
 
 ## Следующие шаги
-1. **Vue Router Setup** - Настройка маршрутизации для каждого интерфейса
-2. **Authentication Integration** - Интеграция Sanctum в Vue компоненты
-3. **API Layer Implementation** - Создание типизированных API services
-4. **Component Development** - Разработка UI компонентов
 
-## 📚 **Критические знания о SCSS + БЭМ архитектуре:**
-- ✅ **SCSS Support**: SCSS модули для кастомных компонентов
-- ✅ **БЭМ Methodology**: Структурированное именование классов
-- ✅ **Component Isolation**: Каждый компонент имеет собственные стили
-- ✅ **UI Component Architecture**: Структурированная система компонентов
-- ✅ **Performance**: Минимальный размер бандла без утилитарных классов
-- ✅ **Maintainability**: Читаемые и поддерживаемые стили
-- ✅ **Custom Properties**: CSS переменные для темизации
+### Immediate Actions (эта неделя)
+1. **Анализ Figma компонентов** - детальная декомпозиция UI элементов
+2. **RestaurantPage scaffold** - базовая структура страницы ресторана
+3. **Design tokens setup** - CSS variables из Figma дизайн-системы
+4. **PrimeVue theme customization** - адаптация под Figma макет
 
-## Готовые компоненты инфраструктуры
-- ✅ **Backend API** (95% готов)
-- ✅ **Authentication** (Sanctum SPA complete)
-- ✅ **Database Models** (с UUID support)
-- ✅ **TypeScript Generation** (fumeapp/modeltyper)
-- ✅ **CSS Architecture** (SCSS + БЭМ)
-- ⏳ **Vue Components** (в процессе разработки)
+### Short-term Goals (2-4 недели)
+1. **Полнофункциональная RestaurantPage** согласно Figma макету
+2. **Complete UI components library** - все компоненты из Figma
+3. **Account dashboard** с управлением контентом
+4. **News и recommendations** система
 
-## Development Environment Status
-- ⚡ **Dev servers**: Автоматически запущены (НЕ перезапускать!)
-- 🔧 **HMR**: Активен для всех интерфейсов  
-- 🚀 **Vue DevTools**: Настроены и работают
-- 📦 **Build System**: Vite 6.3.5 с SCSS поддержкой
+### Medium-term Objectives (1-3 месяца)
+1. **Полная реализация всех трех интерфейсов**
+2. **Telegram Mini App deployment** - интеграция с Telegram
+3. **Advanced analytics и reporting**
+4. **Production deployment готовность**
 
-## Техническая готовность
-**Frontend Architecture: 45% → 55%** 
-- Базовая инфраструктура и стили готовы
-- CSS компоненты для всех интерфейсов созданы
-- Entry points правильно настроены
-- **SCSS + БЭМ архитектура настроена и готова к использованию**
-- Готов к разработке Vue компонентов с современными возможностями CSS
+## 🆕 Figma Integration Notes
 
-## Завершенные компоненты ✅
+### Ключевые инсайты из макета
+1. **Контент-первый подход** - акцент на фото и описания
+2. **Минималистичный дизайн** - чистые линии, много белого пространства
+3. **Функциональная навигация** - четкие кнопки действий
+4. **Социальные элементы** - система рекомендаций и новостей
+5. **Mobile-first** - оптимизация для touch взаимодействий
 
-### 1. Database Architecture (OPTIMIZED)
-- ✅ **BaseModel с UUID**: Все модели используют UUID primary keys
-- ✅ **Correct Migration Order**: Исправлен порядок миграций для правильных foreign keys
-- ✅ **Complex Relations**: Many-to-many (dishes↔categories), polymorphic (likes, news)
-- ✅ **Permission System**: Spatie Permission с UUID совместимостью
-- ✅ **Sanctum Tables**: Personal access tokens с UUID поддержкой
-- ✅ **Test Data**: Полные seeders с реальными данными
-
-### 2. Authentication System (COMPLETE & TESTED)
-- ✅ **Laravel Sanctum**: API токены с expiration и abilities
-- ✅ **Laravel Fortify**: Password reset, profile updates (без views)
-- ✅ **Role-Based Access**: admin, restaurant_owner роли
-- ✅ **Custom Middleware**: CheckRestaurantOwner для ограничения доступа
-- ✅ **Token Abilities**: Разные права для админов и владельцев
-- ✅ **Migration Dependencies**: Циклические зависимости решены
-
-### 3. Frontend Setup (OPTIMIZED)
-- ✅ **Vite Configuration**: Multiple entry points для трех интерфейсов
-- ✅ **SCSS Architecture**: Правильное подключение без дублирования
-- ✅ **TypeScript Entry Points**: Чистые точки входа без лишних импортов
-- ✅ **Alias Configuration**: Удобные пути для shared компонентов
-
-### 4. API Endpoints (COMPLETE & TESTED)
-- ✅ **Auth API**: login, logout, user info, token management
-- ✅ **Public API**: рестораны, меню, блюда, события (без auth)
-- ✅ **Restaurant API**: управление собственным контентом
-- ✅ **Admin API**: полное управление платформой
-- ✅ **Like System**: работает без auth через telegram_user_id
-
-### 5. Models & Controllers (COMPLETE)
-- ✅ **9 Core Models**: Restaurant, Menu, Dish, Category, Event, News, Like, etc.
-- ✅ **API Controllers**: полный CRUD для всех сущностей
-- ✅ **API Resources**: правильная сериализация данных
-- ✅ **Form Requests**: валидация входящих данных
-
-### 6. ModelTyper Integration (FIXED) ✅
-- ✅ **Configuration**: Правильная настройка config/modeltyper.php
-- ✅ **Type Generation**: Автоматическая генерация TypeScript типов
-- ✅ **Type Fixes**: Исправление int → number, bool → boolean
-- ✅ **Make Command**: `make types` для автоматической генерации и исправления
-- ✅ **Lodash Integration**: Добавлен lodash с типизированными утилитами
-
-## Исправленные проблемы ✅
-
-### Types Structure & Session Auth (ПОЛНОСТЬЮ РЕШЕНО)
-✅ **Дублирующие файлы удалены**: Убраны `models.ts` и `api.ts` 
-✅ **Type guards исправлены**: Красивые guards без `obj is import('./api').ApiError`
-✅ **Session-based auth**: Переписаны Auth типы под Sanctum SPA (без токенов)
-✅ **Центральный импорт**: Все типы через `resources/shared/types/index.ts`
-✅ **ANY тип ЗАПРЕЩЕН**: Строгие правила типизации БЕЗ any
-✅ **Vite env typing**: Правильная типизация переменных окружения  
-✅ **CSRF protection**: Автоматическая защита через cookies
-✅ **API Client**: Session-based axios instance с auto retry
-
-```typescript
-// ✅ Красивые type guards
-export function isApiError(obj: any): obj is ApiError
-export function isPaginatedResponse<T>(obj: any): obj is PaginatedResponse<T>
-export function isUser(obj: any): obj is User
-
-// ✅ Session-based аутентификация (БЕЗ токенов)
-export interface AuthUser extends Omit<User, 'roles'> {
-  roles: string[];              // ["admin", "restaurant_owner"]
-  restaurant?: Restaurant;      // для владельцев ресторанов
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-  remember?: boolean;           // "Remember me" - НЕТ токенов!
-}
-```
-
-### Lodash Integration (ДОБАВЛЕНО)
-```typescript
-// Доступные утилиты
-import { _, arrayUtils, objectUtils, stringUtils, restaurantUtils } from '@shared/utils'
-
-// Примеры использования
-arrayUtils.groupBy(dishes, 'category')
-objectUtils.cloneDeep(restaurant)
-stringUtils.kebabCase('Restaurant Name')
-restaurantUtils.groupDishesByCategory(dishes)
-```
-
-### Automated Type Generation (НАСТРОЕНО)
-```bash
-# Команда для генерации типов
-make types
-
-# Что происходит:
-1. php artisan model:typer          # Генерация базовых типов
-2. sed замены int → number          # Автоматическое исправление
-3. sed замены bool → boolean        # Автоматическое исправление
-4. Исправление News type collision  # Фикс конфликтов типов
-5. Удаление tokens из User          # Удаление Sanctum связей
-6. Удаление notifications из User   # Удаление Laravel Notifications
-```
-
-## Следующие приоритеты
-
-### Этап 1: Vue Authentication Implementation (COMPLETED) ✅
-- [x] **Auth Types**: Session-based типы для Sanctum SPA (ГОТОВО)
-- [x] **Auth Store**: Pinia store БЕЗ токенов, с session handling (ГОТОВО)  
-- [x] **Auth API Client**: Sanctum SPA client с CSRF защитой (ГОТОВО)
-- [x] **TypeScript Strict Mode**: ЗАПРЕТ any типа (ГОТОВО)
-- [x] **Environment Types**: Vite env с proper typing (ГОТОВО)
-- [x] **Session Authentication**: HttpOnly cookies, auto CSRF (ГОТОВО)
-
-### Этап 2: Restaurant Dashboard Foundation
-- [ ] **Vue Router Setup**: Маршруты для dashboard
-- [ ] **Layout Components**: Sidebar, header, navigation
-- [ ] **Menu Management**: Первый CRUD интерфейс с lodash утилитами
-- [ ] **API Integration**: Подключение к готовым endpoints
-
-### Этап 3: Shared UI Components
-- [ ] **Base UI Components**: Создание базовых компонентов  
-- [ ] **mdi-icons Integration**: Единственная иконочная библиотека
-- [ ] **SmartForm Component**: Schema-based генератор форм (VeeValidate + TypeScript)
-- [ ] **Form Field Components**: Input, Select, Textarea с валидацией
-- [ ] **Table Components**: For data display с lodash сортировкой
-- [ ] **Modal Components**: For CRUD operations
-- [ ] **Custom Components**: Calendar, drag-drop, image-upload
-
-### 🎨 UI Component Strategy
-- **Base Layer**: Базовые компоненты (Button, Card, Input, Dialog, Table)
-- **Custom Layer**: Calendar, Drag-Drop, Image Upload компоненты
-- **Form Layer**: SmartForm генератор для динамических форм (VeeValidate + схемы)
-- **Icons**: mdi-icons
-- **SCSS + БЭМ**: Для всех кастомных стилей
-- **No External UI**: НЕТ vue-draggable-plus, vue-datepicker и др.
-
-### 📋 Smart Form Generator (НОВЫЙ КОМПОНЕНТ)
-**Schema-based формы** на VeeValidate + TypeScript:
-```typescript
-interface ISmartFormField {
-  key: string;                    // Field name
-  component: string;              // Базовый компонент (Input, Select, etc.)
-  rule?: ValidationRule;          // Zod валидация
-  props?: Record<string, any>;    // Props для компонента
-  events?: Record<string, any>;   // Event handlers
-  readonly?: boolean;             // Read-only режим
-}
-
-// Использование в Menu Management, Event Creation, Restaurant Profile
-<SmartForm 
-  :fields="dishFormFields" 
-  :initial-values="dish"
-  @update:form="handleFormContext"
-/>
-```
-
-## Технические детали
-
-### Blade Templates Structure (UPDATED)
-```
-resources/views/                 # СТАНДАРТНАЯ Laravel директория
-├── site.blade.php              # Public site template
-├── restaurant.blade.php        # Restaurant dashboard template  
-├── admin.blade.php             # Admin panel template
-├── layouts/                    # Layout templates
-│   ├── app.blade.php           # Основной layout
-│   └── guest.blade.php         # Layout для неавторизованных
-└── components/                 # Переиспользуемые Blade компоненты
-    ├── navigation.blade.php    # Навигация
-    └── footer.blade.php        # Подвал
-```
-
-### ModelTyper Configuration (FINAL)
-```php
-// config/modeltyper.php
-'output-file' => true,
-'output-file-path' => './resources/shared/types/models.d.ts',
-'plurals' => true,
-'optional-relations' => true,
-'timestamps-date' => true,
-'custom_mappings' => [
-    'int' => 'number',
-    'bool' => 'boolean',
-    // ... другие маппинги
-],
-```
-
-### Lodash Utilities Structure
-```typescript
-// resources/shared/utils/index.ts
-export { _ }                    // Прямой экспорт lodash
-export const arrayUtils = {}   // Типизированные утилиты массивов
-export const objectUtils = {}  // Типизированные утилиты объектов
-export const stringUtils = {}  // Типизированные утилиты строк
-export const restaurantUtils = {} // Специфичные для ресторанов
-
-// resources/shared/ui/ - НОВАЯ СТРУКТУРА
-├── base/                       // Базовые UI компоненты
-│   ├── button/                 // Button, ButtonGroup
-│   ├── card/                   // Card, CardHeader, CardContent
-│   ├── input/                  // Input, Textarea, Select
-│   ├── dialog/                 // Modal, Sheet, Popover
-│   └── table/                  // Table, DataTable
-├── forms/                      // Form components
-│   ├── smart-form/             // SmartForm генератор
-│   ├── field-wrapper/          // Wrapper для field validation
-│   └── form-schemas/           // Переиспользуемые схемы
-│       ├── dish-form.ts        // Схема для создания блюд
-│       ├── event-form.ts       // Схема для событий
-│       └── restaurant-form.ts  // Схема профиля ресторана
-├── custom/                     // Custom компоненты
-│   ├── calendar/               // Event calendar
-│   ├── image-upload/           // Image handling
-│   ├── drag-drop/              // Category management
-│   └── like-button/            // Social features
-└── icons/                      // mdi-icons integration
-    └── index.ts                // Icon component wrapper
-```
-
-### Ready for Integration
-```typescript
-// Типы готовы к использованию
-import type { Restaurant, Dish, Event, User } from '@shared/types/models'
-
-// Утилиты готовы к использованию
-import { arrayUtils, restaurantUtils } from '@shared/utils'
-
-// API структура готова
-interface AuthUser {
-  id: string;              // UUID
-  name: string;
-  email: string; 
-  roles: string[];         // ["admin"] | ["restaurant_owner"]
-  restaurant_id?: string;  // UUID для владельцев
-  restaurant?: Restaurant; // Типизированная связь
-}
-```
-
-## Development Workflow
-
-### Essential Commands
-```bash
-make up            # Start all containers
-make shell         # Enter app container
-# make dev         # ⚠️ НЕ ЗАПУСКАТЬ! Уже работает автоматически
-make types         # Generate TypeScript types (НОВАЯ КОМАНДА)
-make npm-install   # Install frontend dependencies
-
-# Database commands
-php artisan migrate:fresh --seed  # Recreate with test data
-```
-### Next Session Focus
-1. **Vue Auth Store**: Pinia store с tokens и user state
-2. **API Client Setup**: Axios interceptors для автоматических токенов
-3. **Route Protection**: Navigation guards для protected routes
-4. **First Dashboard Page**: Базовый интерфейс restaurant owner с lodash
-
-## Критические решения принятые
-
-### ModelTyper Integration Strategy
-- ✅ Конфигурация для правильного output path
-- ✅ Custom mappings для основных типов
-- ✅ Автоматические sed замены для accessor методов
-- ✅ Make команда для воспроизводимой генерации
-
-### Lodash Integration Pattern
-- ✅ Типизированные wrapper функции
-- ✅ Restaurant-specific утилиты
-- ✅ Экспорт через shared/utils для переиспользования
-- ✅ TypeScript constraints для type safety
-
-### Frontend Asset Strategy  
-- ✅ Vite как единственный источник для CSS входов
-- ✅ TypeScript файлы без CSS импортов для чистоты
-- ✅ Alias система для удобной работы с shared компонентами
-- ✅ Lodash доступен через @shared/utils alias
-
-**Статус: Backend готов, типы исправлены, lodash добавлен. Переходим к Vue интеграции** 🚀 
-
-## Статус интеграции: УСПЕШНО ✨
-PrimeVue 4 полностью интегрирован в site интерфейс с демонстрацией всех основных компонентов, готовых для использования в Restaurant Aggregator Platform.
+### Приоритетные компоненты для реализации
+1. **RestaurantHero** - первое впечатление пользователя
+2. **RestaurantCard** - ключевая информация о ресторане
+3. **NewsCard** - система контента и взаимодействия
+4. **CategoryFilter** - навигация по контенту
+5. **ActionButtons** - основные действия пользователя 

@@ -22,7 +22,6 @@ export function useApi() {
       error.value = apiError.message;
       
       if (options?.showError !== false) {
-        console.error('API Error:', apiError.message);
       }
       
       throw err;

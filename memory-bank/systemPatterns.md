@@ -1,574 +1,217 @@
-# System Patterns - REST Aggregator Miniapp
+# System Patterns - Архитектурные решения
 
-## Архитектурные принципы
+## Архитектурная стратегия
 
-### 1. Domain-Driven Design (DDD) - Enhanced
-- **Rich Domain Models**: Restaurant, Menu, Dish, Event как бизнес-объекты
-- **Aggregate Roots**: Restaurant как корневая сущность для меню и событий  
-- **Value Objects**: Price, Location, DateRange для событий
-- **Repository Pattern**: Абстракция доступа к сложным данным
-- **Service Layer**: Бизнес-логика для рекомендаций и агрегации
-- **Event-Driven**: Domain events для лайков, booking, content creation
+### Three-Interface Strategy
+Проект использует уникальную архитектуру с тремя отдельными интерфейсами:
 
-### 2. Multi-Tenant Restaurant Platform
+- **Public Site (`/`)** - Презентация сервиса, каталог ресторанов, регистрация
+- **Restaurant Dashboard (`/account`)** - Личный кабинет для владельцев ресторанов  
+- **Admin Panel (`/admin`)** - Административное управление платформой
+
+### Hybrid Architecture Pattern
+- **Backend**: Laravel 12 с полным API
+- **Frontend**: Blade templates как shell + Vue 3 SPA applications
+- **Build System**: Vite с multiple entry points для каждого интерфейса
+
+## Ключевые архитектурные решения
+
+### 1. BaseModel Pattern
+```php
+abstract class BaseModel extends Model
+{
+    use HasUuids;
+    public $incrementing = false;
+    protected $keyType = 'string';
+}
 ```
-Platform Layer (Admin)
-    ↓
-Aggregation Layer (Collections, Recommendations)  
-    ↓
-Restaurant Layer (Menus, Events, News)
-    ↓
-Content Layer (Dishes, Categories, User Interactions)
-    ↓
-Mini App Layer (Telegram Integration)
+
+**Принципы:**
+- Все модели наследуются от BaseModel
+- UUID primary keys для всех сущностей
+- Единообразные casts для дат
+- Общие model events
+
+### 2. Multi-Tenant Architecture
+- **Restaurant-centric**: Все данные привязаны к ресторанам
+- **Role-based access**: admin, restaurant_owner роли
+- **Data isolation**: Владельцы видят только свои данные
+- **Centralized management**: Админы управляют всей платформой
+
+### 3. Polymorphic Relations Pattern
+```php
+// Лайки для любых сущностей
+$dish->likes()->create(['telegram_user_id' => $userId]);
+$event->likes()->create(['telegram_user_id' => $userId]);
+
+// Новости от разных авторов
+$restaurant->news()->create([...]);
+$admin->news()->create([...]);
 ```
 
-### 3. Content Management Architecture
-- **Flexible Categorization**: Many-to-many отношения для контента
-- **Polymorphic Relationships**: Unified system для лайков, комментариев
-- **Content Moderation**: Workflow для approval/rejection
-- **Versioning**: История изменений для меню и событий
+### 4. Frontend Architecture Patterns
+
+#### Feature-Sliced Design (FSD)
+```
+resources/
+├── site/          # Public site Vue app
+├── account/       # Restaurant dashboard Vue app  
+├── admin/         # Admin panel Vue app
+└── shared/        # Common components & utilities
+    ├── api/       # API clients
+    ├── composables/ # Reusable logic
+    ├── stores/    # Pinia stores
+    ├── types/     # TypeScript definitions
+    └── utils/     # Helper functions
+```
+
+#### Component Isolation Strategy
+- Каждый интерфейс имеет независимое Vue приложение
+- Shared ресурсы в `resources/shared/`
+- Alias пути для удобного импорта
+- Отдельные entry points в Vite
+
+### 5. Type Safety Pattern
+- **FumeApp/ModelTyper**: Автоматическая генерация TS типов из Laravel моделей
+- **Строгая типизация**: Запрет на `any` тип
+- **API типизация**: Generic типы для всех API запросов
+- **Form validation**: VeeValidate + Zod для type-safe валидации
 
 ## Database Design Patterns
 
-### 1. Core Domain Tables
+### 1. UUID Strategy
 ```sql
--- Restaurant Aggregate
-restaurants (uuid, name, description, address, phone, telegram_bot_token, settings, created_at, deleted_at)
-
--- Menu Management  
-menus (uuid, restaurant_id, name, description, is_active, sort_order, created_at)
-dishes (uuid, menu_id, name, description, price, image_url, is_available, allergens, created_at)
-categories (uuid, name, slug, type, color, icon, parent_id, created_at) -- Hierarchical
-dish_categories (dish_id, category_id, created_at) -- Many-to-many
-
--- Event System
-events (uuid, restaurant_id, title, description, start_date, end_date, 
-        location_lat, location_lng, location_address, max_participants, 
-        price, status, created_at)
-event_registrations (uuid, event_id, user_id, telegram_user_id, status, 
-                    registered_at, confirmed_at)
-
--- Social Features  
-likes (uuid, user_id, likeable_type, likeable_id, created_at)
-user_favorites (uuid, user_id, favorable_type, favorable_id, created_at) -- Polymorphic
-user_interactions (uuid, user_id, interaction_type, target_type, target_id, 
-                  metadata, created_at) -- View, share, etc.
-
--- Content Aggregation
-curated_collections (uuid, title, description, type, criteria, is_active, 
-                    created_by, created_at)
-collection_items (uuid, collection_id, item_type, item_id, sort_order, created_at)
-
--- News & Announcements
-news (uuid, author_type, author_id, title, content, excerpt, 
-      published_at, is_featured, created_at) -- Polymorphic author
-```
-
-### 2. Advanced Relationships
-```sql
--- Hierarchical Categories (self-referencing)
-categories.parent_id → categories.id
-
--- Polymorphic Likes
-likes.likeable_type → 'App\Models\Dish', 'App\Models\Event', 'App\Models\News'
-likes.likeable_id → dishes.id, events.id, news.id
-
--- Polymorphic Collections  
-collection_items.item_type → 'App\Models\Dish', 'App\Models\Event'
-collection_items.item_id → dishes.id, events.id
-
--- Geospatial Events
-events with POINT(location_lat, location_lng) for spatial queries
-```
-
-### 3. Indexing Strategy
-```sql
--- Performance Critical Indexes
-INDEX idx_restaurants_location ON restaurants(location_lat, location_lng);
-INDEX idx_events_datetime ON events(start_date, end_date);
-INDEX idx_dishes_restaurant_available ON dishes(restaurant_id, is_available);
-INDEX idx_likes_polymorphic ON likes(likeable_type, likeable_id);
-INDEX idx_categories_hierarchy ON categories(parent_id, type);
-
--- Search Optimization
-FULLTEXT idx_dishes_search ON dishes(name, description);
-FULLTEXT idx_events_search ON events(title, description);
-```
-
-## Business Logic Patterns
-
-### 1. Menu Management Service
-```php
-class MenuManagementService {
-    public function createDish(Restaurant $restaurant, array $dishData): Dish
-    public function assignCategories(Dish $dish, array $categoryIds): void
-    public function updateSeasonalAvailability(Restaurant $restaurant, string $season): void
-    public function generateMenuAnalytics(Restaurant $restaurant): MenuAnalytics
-}
-```
-
-#### **Frontend Form Integration:**
-```typescript
-// Menu Management использует SmartForm для:
-// - Создание блюд (DishForm)
-// - Редактирование категорий (CategoryForm) 
-// - Bulk operations (BulkEditForm)
-// - Menu settings (MenuConfigForm)
-```
-
-### 2. Event Planning Service  
-```php
-class EventPlanningService {
-    public function createEvent(Restaurant $restaurant, array $eventData): Event
-    public function registerUserForEvent(Event $event, User $user): EventRegistration
-    public function checkAvailability(Event $event): bool
-    public function sendReminders(Event $event): void
-}
-```
-
-### 3. Content Aggregation Service
-```php
-class ContentAggregationService {
-    public function createCollection(array $criteria): CuratedCollection
-    public function getSeasonalDishes(string $season, ?array $geoBounds = null): Collection
-    public function getTrendingEvents(string $timeframe): Collection
-    public function getPersonalizedRecommendations(User $user): Collection
-}
-```
-
-### 4. Social Features Service
-```php
-class SocialFeaturesService {
-    public function toggleLike(User $user, Likeable $item): bool
-    public function getPopularContent(string $type, string $timeframe): Collection
-    public function trackUserInteraction(User $user, string $interaction, $target): void
-    public function generateEngagementMetrics(Restaurant $restaurant): array
-}
-```
-
-## Frontend Architecture Patterns
-
-### 1. Feature-Sliced Design (FSD) Structure
-```
-resources/js/
-├── shared/                          # Общие ресурсы
-│   ├── ui/                         # UI компоненты
-│   │   ├── base/                   # Базовые UI компоненты
-│   │   │   ├── button/             # Button, ButtonGroup
-│   │   │   ├── card/               # Card, CardHeader, CardContent
-│   │   │   ├── input/              # Input, Textarea, Select
-│   │   │   ├── dialog/             # Modal, Sheet, Popover
-│   │   │   └── table/              # Table, DataTable
-│   │   ├── forms/                  # Form components
-│   │   │   ├── smart-form/         # SmartForm генератор
-│   │   │   ├── field-wrapper/      # Wrapper для field validation
-│   │   │   └── form-schemas/       # Переиспользуемые схемы форм
-│   │   ├── custom/                 # Custom компоненты
-│   │   │   ├── calendar/           # Calendar component
-│   │   │   ├── image-upload/       # Image upload
-│   │   │   ├── like-button/        # Like system
-│   │   │   └── drag-drop/          # Drag-drop functionality
-│   │   └── icons/                  # mdi-icons integration
-│   ├── api/                        # API clients
-│   │   ├── restaurants.ts          
-│   │   ├── menus.ts
-│   │   ├── events.ts
-│   │   └── collections.ts
-│   ├── stores/                     # Pinia stores
-│   │   ├── auth.ts
-│   │   ├── restaurants.ts
-│   │   └── user-preferences.ts
-│   └── utils/                      # Utilities
-│       ├── date-helpers.ts
-│       ├── geo-utils.ts
-│       └── image-utils.ts
-├── entities/                       # Domain entities
-│   ├── restaurant/
-│   │   ├── model/                  # TypeScript types
-│   │   ├── ui/                     # Restaurant components
-│   │   └── api/                    # Restaurant API calls
-│   ├── menu/
-│   │   ├── model/                  # Menu, Dish types
-│   │   ├── ui/                     # Menu components  
-│   │   └── api/                    # Menu CRUD
-│   ├── event/
-│   │   ├── model/                  # Event types
-│   │   ├── ui/                     # Event components
-│   │   └── api/                    # Event API
-│   └── collection/
-│       ├── model/                  # Collection types
-│       ├── ui/                     # Collection display
-│       └── api/                    # Collection API
-├── features/                       # Business features
-│   ├── menu-management/
-│   │   ├── create-dish/            # Dish creation flow
-│   │   ├── category-assignment/    # Category management
-│   │   ├── bulk-operations/        # Batch editing
-│   │   └── analytics/              # Menu analytics
-│   ├── event-planning/
-│   │   ├── create-event/           # Event creation
-│   │   ├── calendar-view/          # Calendar interface
-│   │   ├── registration/           # User registration
-│   │   └── geolocation/            # Maps integration
-│   ├── content-curation/
-│   │   ├── collection-builder/     # Admin collection tools
-│   │   ├── recommendation-engine/  # Smart suggestions
-│   │   └── seasonal-automation/    # Automated collections
-│   └── social-features/
-│       ├── like-system/            # Like functionality
-│       ├── favorites/              # User favorites
-│       └── engagement-tracking/    # Analytics
-├── widgets/                        # Composite UI blocks
-│   ├── restaurant-card/            # Restaurant preview
-│   ├── menu-widget/                # Menu display
-│   ├── event-calendar/             # Calendar widget
-│   ├── collection-carousel/        # Content collections
-│   └── trending-widget/            # Popular content
-└── pages/                          # Page-level components
-    ├── site/                       # Public site pages
-    │   ├── home/                   # Homepage with collections
-    │   ├── restaurant-catalog/     # Restaurant directory
-    │   └── event-calendar/         # Event discovery
-    ├── restaurant/                 # Restaurant dashboard
-    │   ├── dashboard/              # Analytics overview
-    │   ├── menu-management/        # Menu CRUD
-    │   ├── event-management/       # Event planning
-    │   └── analytics/              # Performance metrics
-    └── admin/                      # Admin panel
-        ├── restaurant-management/   # Restaurant oversight
-        ├── content-moderation/     # Content approval
-        ├── collection-management/  # Curated collections
-        └── platform-analytics/     # Global metrics
-```
-
-### 2. UI Component Architecture Principles
-
-#### **Component Layering Strategy**
-```
-UI Architecture Layers:
-1. Base Layer: Базовые UI компоненты (Button, Card, Input, Dialog, Table)
-2. Form Layer: SmartForm генератор для schema-based форм
-3. Custom Layer: Специфичные компоненты проекта
-4. Feature Layer: Бизнес-логика компонентов
-5. Page Layer: Композиция для страниц
-```
-
-#### **Smart Form Generator Pattern**
-```typescript
-// Schema-based форма для Menu Management
-const dishFormFields: ISmartFormField[] = [
-  {
-    key: 'name',
-    component: 'Input',
-    rule: z.string().min(2).max(100),
-    props: { placeholder: 'Название блюда', required: true }
-  },
-  {
-    key: 'price',
-    component: 'NumberInput', 
-    rule: z.number().min(0),
-    props: { placeholder: 'Цена', step: 0.01 }
-  },
-  {
-    key: 'categories',
-    component: 'MultiSelect',
-    rule: z.array(z.string()).min(1),
-    props: { 
-      placeholder: 'Выберите категории',
-      initialItems: categories,
-      multiple: true 
-    },
-    events: {
-      'update:modelValue': (value) => updateCategories(value)
-    }
-  },
-  {
-    key: 'description',
-    component: 'Textarea',
-    rule: z.string().optional(),
-    props: { placeholder: 'Описание блюда', rows: 3 }
-  }
-];
-
-// Использование в компоненте
-<SmartForm 
-  :fields="dishFormFields"
-  :initial-values="selectedDish"
-  :readonly="viewMode"
-  @update:form="(form) => dishForm = form"
-/>
-```
-
-#### **Custom Component Development Rules**
-- ✅ **Icons: только mdi-icons**
-- ❌ **ЗАПРЕЩЕНО**: vue-draggable-plus, vue-datepicker, vue-toastification
-- ✅ **SCSS + БЭМ**: Для всех custom компонентов
-- ✅ **Доступность**: Правильная семантика HTML
-
-#### **Example Custom Component Pattern**
-```typescript
-// ✅ ПРАВИЛЬНО: Custom Calendar с SCSS
-<template>
-  <div class="calendar-widget">
-    <div class="calendar-widget__header">
-      <h3 class="calendar-widget__title">Event Calendar</h3>
-    </div>
-    <div class="calendar-widget__content">
-      <div class="calendar-widget__grid">
-        <button 
-          v-for="date in dates" 
-          :key="date" 
-          class="calendar-widget__date"
-          @click="selectDate(date)"
-        >
-          {{ date }}
-        </button>
-      </div>
-    </div>
-  </div>
-</template>
-
-<style lang="scss">
-.calendar-widget {
-  // Custom SCSS styles
-}
-</style>
-```
-
-### 3. State Management Patterns
-```typescript
-// Pinia Store Architecture
-interface MenuStore {
-  dishes: Dish[]
-  categories: Category[]
-  selectedCategories: string[]
-  
-  // Actions
-  createDish(dishData: CreateDishRequest): Promise<Dish>
-  updateDish(dishId: string, updates: Partial<Dish>): Promise<Dish>
-  assignCategories(dishId: string, categoryIds: string[]): Promise<void>
-  loadMenuAnalytics(restaurantId: string): Promise<MenuAnalytics>
-}
-
-interface EventStore {
-  events: Event[]
-  selectedDate: Date
-  selectedLocation: GeoLocation
-  
-  // Actions  
-  createEvent(eventData: CreateEventRequest): Promise<Event>
-  registerForEvent(eventId: string): Promise<EventRegistration>
-  loadEventsByDateRange(start: Date, end: Date): Promise<Event[]>
-}
-
-interface SocialStore {
-  userLikes: Set<string>
-  favorites: Map<string, any>
-  
-  // Actions
-  toggleLike(itemType: string, itemId: string): Promise<boolean>
-  addToFavorites(item: any): Promise<void>
-  trackInteraction(interaction: UserInteraction): Promise<void>
-}
-```
-
-## API Design Patterns
-
-### 1. RESTful API Structure
-```
-# Menu Management
-GET    /api/restaurants/{id}/menus
-POST   /api/restaurants/{id}/menus
-GET    /api/menus/{id}/dishes
-POST   /api/menus/{id}/dishes
-PUT    /api/dishes/{id}
-DELETE /api/dishes/{id}
-POST   /api/dishes/{id}/categories/{categoryId}
-DELETE /api/dishes/{id}/categories/{categoryId}
-
-# Event Management  
-GET    /api/restaurants/{id}/events
-POST   /api/restaurants/{id}/events
-PUT    /api/events/{id}
-DELETE /api/events/{id}
-POST   /api/events/{id}/register
-DELETE /api/events/{id}/register
-
-# Social Features
-POST   /api/likes
-DELETE /api/likes/{id}
-GET    /api/content/{type}/{id}/analytics
-POST   /api/favorites
-DELETE /api/favorites/{id}
-
-# Content Aggregation
-GET    /api/collections
-POST   /api/collections (Admin only)
-GET    /api/collections/seasonal/{season}
-GET    /api/collections/trending
-GET    /api/recommendations/personalized
-```
-
-### 2. Complex Query Patterns
-```typescript
-// Advanced filtering and search
-interface ContentQuery {
-  type?: 'dish' | 'event' | 'news'
-  categories?: string[]
-  location?: GeoLocation
-  dateRange?: DateRange
-  priceRange?: PriceRange
-  sortBy?: 'popularity' | 'date' | 'distance' | 'price'
-  limit?: number
-  offset?: number
-}
-
-// Geospatial queries for events
-interface EventLocationQuery {
-  center: GeoLocation
-  radius: number // in kilometers
-  dateRange?: DateRange
-}
-```
-
-## Performance Optimization Patterns
-
-### 1. Caching Strategy
-```php
-// Redis cache keys structure
-"restaurant:{id}:menu" => Menu data with dishes
-"restaurant:{id}:events:month:{YYYY-MM}" => Monthly events
-"collections:seasonal:{season}" => Seasonal collections
-"trending:dishes:week" => Weekly trending dishes  
-"user:{id}:likes" => User's liked content
-"user:{id}:recommendations" => Personalized recommendations
-
-// Cache invalidation patterns
-- Menu update → Clear restaurant menu cache
-- New like → Update trending caches
-- Event creation → Clear restaurant events cache
-```
-
-### 2. Database Optimization
-```sql
--- Partitioning for large tables
-PARTITION BY RANGE (YEAR(created_at)) (
-    PARTITION p2024 VALUES LESS THAN (2025),
-    PARTITION p2025 VALUES LESS THAN (2026)
+-- Все основные таблицы используют UUID
+CREATE TABLE restaurants (
+    id UUID PRIMARY KEY,
+    -- ...
 );
+```
 
--- Read replicas for analytics
-SELECT COUNT(*) FROM likes WHERE likeable_type = 'App\Models\Dish' 
-  -- Executed on read replica
+### 2. Soft Deletes Pattern
+- Критически важные сущности используют soft deletes
+- Сохранение истории для аудита
+- Возможность восстановления данных
 
--- Elasticsearch for complex search
+### 3. Many-to-Many Flexibility
+```php
+// Блюда могут быть в нескольких категориях
+$dish->categories()->attach($categoryIds);
+
+// Сезонные категории
+$summerDishes = Category::where('type', 'seasonal')
+    ->where('name', 'Летние блюда')
+    ->first()
+    ->dishes;
+```
+
+### 4. Hierarchical Categories
+```php
+// Nested Set для категорий
+use Kalnoy\Nestedset\NodeTrait;
+
+class Category extends BaseModel
 {
-  "query": {
-    "bool": {
-      "must": [
-        {"match": {"name": "pizza"}},
-        {"geo_distance": {"restaurant.location": {"distance": "5km", "lat": 40.7128, "lon": -74.0060}}}
-      ],
-      "filter": [
-        {"terms": {"categories": ["italian", "fast-food"]}}
-      ]
-    }
-  }
+    use NodeTrait;
+    // Поддержка parent-child отношений
 }
 ```
 
-### 3. Image Optimization
-```typescript
-// Image processing pipeline
-interface ImageProcessingConfig {
-  sizes: {
-    thumbnail: { width: 150, height: 150 }
-    card: { width: 300, height: 200 }
-    detail: { width: 800, height: 600 }
-  }
-  formats: ['webp', 'jpg']
-  quality: 85
-  lazy: true
-}
+## Authentication & Authorization Patterns
 
-// CDN integration
-const imageUrl = generateImageUrl(dish.image_id, 'card', 'webp')
+### 1. Session-Based Auth (Sanctum SPA)
+```javascript
+// Инициализация CSRF
+await apiClient.get('/sanctum/csrf-cookie');
+
+// Все запросы с credentials
+axios.defaults.withCredentials = true;
 ```
 
-## Testing Patterns
-
-### 1. Feature Testing
+### 2. Role-Based Access Control
 ```php
-class MenuManagementTest extends TestCase {
-    public function test_restaurant_can_create_dish_with_categories()
-    public function test_dish_can_be_assigned_to_multiple_categories()  
-    public function test_seasonal_menu_updates_automatically()
-    public function test_menu_analytics_calculation()
-}
+// Spatie/Laravel-Permission интеграция
+Route::middleware(['auth:sanctum', 'role:admin'])->group(...);
 
-class EventPlanningTest extends TestCase {
-    public function test_event_creation_with_geolocation()
-    public function test_user_event_registration_flow()
-    public function test_event_capacity_limits()
+// В моделях
+public function isRestaurantOwner(): bool
+{
+    return $this->hasRole('restaurant_owner') && $this->restaurant_id;
 }
 ```
 
-### 2. Frontend Component Testing
-```typescript
-// Vue component tests
-describe('MenuManagement', () => {
-  it('should create dish with categories', async () => {
-    // Test drag-and-drop category assignment
-  })
-  
-  it('should handle image upload', async () => {
-    // Test image upload flow
-  })
-})
+## Development Patterns
 
-describe('EventCalendar', () => {
-  it('should filter events by date range', async () => {
-    // Test calendar filtering
-  })
-})
+### 1. Docker-First Development
+- Полная контейнеризация среды разработки
+- Make commands для автоматизации
+- Hot Module Replacement для Vue компонентов
+- Отдельные контейнеры для каждого сервиса
+
+### 2. Automated Type Generation
+```bash
+# Автоматическая генерация типов
+make types  # -> php artisan model:typer
 ```
 
-## Security Patterns
+### 3. Multiple Vite Servers Strategy
+```javascript
+// vite.config.ts - Multiple entry points
+input: [
+    "resources/site/css/app.css",
+    "resources/site/ts/main.ts",
+    "resources/account/css/app.css", 
+    "resources/account/ts/main.ts",
+    "resources/admin/css/app.css",
+    "resources/admin/ts/main.ts",
+]
+```
 
-### 1. Authorization Patterns
+## Integration Patterns
+
+### 1. Telegram Bot Integration
 ```php
-// Policy-based authorization
-class DishPolicy {
-    public function create(User $user, Restaurant $restaurant): bool
-    public function update(User $user, Dish $dish): bool
-    public function delete(User $user, Dish $dish): bool
-}
+// DefStudio/Telegraph для Telegram API
+use DefStudio\Telegraph\Facades\Telegraph;
 
-// Middleware for restaurant ownership
-class RestaurantOwnerMiddleware {
-    public function handle(Request $request, Closure $next)
-    {
-        if (!$request->user()->ownsRestaurant($request->route('restaurant'))) {
-            abort(403);
-        }
-        return $next($request);
-    }
+// Encrypted bot tokens в БД
+protected function casts(): array
+{
+    return [
+        'telegram_bot_token' => 'encrypted',
+    ];
 }
 ```
 
-### 2. Data Validation
+### 2. File Management Pattern
+- Laravel Storage с public disk
+- Автоматическая оптимизация изображений
+- Polymorphic file attachments
+
+### 3. Caching Strategy
+- Redis для session storage
+- Query result caching
+- API response caching
+
+## Performance Patterns
+
+### 1. Eager Loading Strategy
 ```php
-// Form Request validation
-class CreateDishRequest extends FormRequest {
-    public function rules(): array {
-        return [
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'categories' => 'required|array|min:1',
-            'categories.*' => 'exists:categories,id',
-            'image' => 'nullable|image|max:2048'
-        ];
-    }
-}
-``` 
+// Предотвращение N+1 проблем
+Restaurant::with(['menus.dishes.categories', 'events'])
+    ->active()
+    ->get();
+```
+
+### 2. Database Indexing
+```php
+// Стратегические индексы
+$table->index(['is_active', 'created_at']);
+$table->index('restaurant_id');
+$table->index(['likeable_type', 'likeable_id']);
+```
+
+### 3. Frontend Optimization
+- Code splitting по интерфейсам
+- Lazy loading компонентов
+- Asset optimization через Vite 

@@ -1,2 +1,30 @@
 @import "tailwindcss";
 
+/* Global styles для предотвращения выхода изображений за край экрана */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Специальные правила для Telegram Mini App */
+@media (max-width: 440px) {
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+  .restaurant-page-content img {
+    max-width: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+}

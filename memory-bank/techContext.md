@@ -1,409 +1,311 @@
-# Technical Context - REST Aggregator Miniapp
+# Technical Context - Технический стек и инфраструктура
 
-## Технологический стек
+## Backend Stack
 
-### Backend Framework
-- **Laravel 12**: Основной фреймворк (требует PHP 8.2+)
-- **PHP 8.2+**: Язык разработки backend
-- **Composer**: Управление PHP зависимостей
+### Core Framework
+- **Laravel 12** - Основной PHP фреймворк
+- **PHP 8.2+** - Современная версия PHP с новыми возможностями
+- **MySQL 8.0** - Основная база данных
+- **Redis 7** - Кеширование и session storage
 
-### Database & Storage
-- **MySQL**: Основная реляционная база данных
-- **Redis**: Кэширование, сессии, очереди
-- **File Storage**: Локальное хранение для development
-
-### Frontend Stack (Updated)
-- **Vue 3 Latest**: Прогрессивный JavaScript фреймворк
-- **TypeScript**: Статическая типизация для JavaScript
-- **Pinia**: State management для Vue 3
-- **Vue Router**: Клиентский роутинг
-- **VeeValidate**: Валидация форм для Vue
-- **Zod**: Schema validation library
-- **SCSS**: CSS препроцессор для кастомных стилей
-- **mdi-icons**: Единственная иконочная библиотека
-- **БЭМ Methodology**: CSS naming convention
-
-### Архитектурные паттерны
-- **Feature-Sliced Design (FSD)**: Архитектурная методология для frontend
-- **Blade + Vue Hybrid**: Laravel Blade как оболочка, Vue SPA внутри
-- **Multi-App Architecture**: Отдельные Vue приложения для каждого интерфейса
-
-### Telegram Integration
-- **DefStudio/Telegraph v1.59**: Laravel пакет для Telegram Bot API
-- **Multiple Bot Support**: Поддержка множества bot токенов
-- **Mini Apps Architecture**: Развертывание персональных Mini Apps
-
-### HTTP Client & API
-- **Guzzle HTTP v7.8**: HTTP клиент для внешних API запросов
-- **Predis v2.2**: Redis клиент для PHP
-
-### Build Tools & Development
-- **Vite v6.3.5**: Build tool и dev server с поддержкой multiple entry points
-- **Laravel Vite Plugin v1.2.0**: Интеграция Vite с Laravel
-- **Axios v1.9.0**: HTTP клиент для frontend
-- **TypeScript Compiler**: Компиляция TypeScript в JavaScript
-
-### Development Tools  
-- **Docker & Docker Compose**: Контейнеризация
-- **Make**: Автоматизация команд разработки
-- **Laravel Pint**: Code style fixer
-- **Laravel Pail**: Log viewing tool
-- **FumeApp/ModelTyper**: Автоматическая генерация TypeScript типов из Laravel моделей
-
-### Testing Framework
-- **PHPUnit v11.0.1**: Unit и feature тестирование backend
-- **Vitest**: Unit тестирование Vue компонентов
-- **Vue Test Utils**: Тестирование Vue компонентов
-- **Faker**: Генерация тестовых данных
-- **Mockery**: Мокирование для тестов
-
-## Архитектура приложения
-
-### Three-Interface Architecture
-```
-Application Root
-├── Site Interface (/)          # Публичный сайт
-├── Restaurant Dashboard (/restaurant) # ЛК ресторанов
-└── Admin Panel (/admin)        # Административная панель
-```
-
-### Frontend Structure (FSD)
-```
-resources/js/
-├── site/                      # Публичный сайт Vue app
-│   ├── app/                   # Конфигурация приложения
-│   ├── pages/                 # Страницы сайта
-│   ├── widgets/               # Составные UI блоки
-│   ├── features/              # Бизнес-фичи
-│   ├── entities/              # Бизнес-сущности
-│   ├── shared/                # Переиспользуемый код
-│   └── main.ts                # Entry point
-├── restaurant/                # ЛК ресторанов Vue app
-│   ├── app/
-│   ├── pages/
-│   ├── widgets/
-│   ├── features/
-│   ├── entities/
-│   ├── shared/
-│   └── main.ts
-├── admin/                     # Админка Vue app
-│   ├── app/
-│   ├── pages/
-│   ├── widgets/
-│   ├── features/
-│   ├── entities/
-│   ├── shared/
-│   └── main.ts
-└── shared/                    # Общие компоненты между приложениями
-    ├── ui/                    # UI компоненты
-    ├── api/                   # API клиенты
-    ├── stores/                # Pinia stores
-    ├── composables/           # Vue composables
-    └── utils/                 # Утилиты
-```
-
-### Blade Templates Structure
-```
-resources/
-├── shared/                   # Общие ресурсы между всеми приложениями
-│   ├── types/                # TypeScript типы (ModelTyper + custom)
-│   │   ├── models.d.ts       # Автогенерируемые типы Laravel моделей
-│   │   └── api.d.ts          # Ручные типы для API responses
-│   ├── api/                  # API клиенты
-│   ├── stores/               # Pinia stores
-│   ├── composables/          # Vue composables
-│   └── utils/                # Утилиты
-├── views/                    # Blade Templates (STANDARD LOCATION)
-│   ├── site.blade.php        # Основной template для сайта
-│   ├── restaurant.blade.php  # Template для ЛК ресторанов  
-│   ├── admin.blade.php       # Template для админки
-│   ├── layouts/              # Layout templates
-│   └── components/           # Переиспользуемые Blade компоненты
-└── js/                       # Vue.js приложения (используют shared/types)
-```
-
-## Инфраструктура разработки
-
-### Development Environment (Docker)
-```yaml
-# Основные сервисы для разработки
-- app: PHP 8.2-FPM + Laravel
-- nginx: Web server + SSL support  
-- mysql: Database server
-- redis: Cache & sessions
-- phpmyadmin: Database admin interface
-- node: Node.js для frontend build
-```
-
-### Production Environment (Standard Hosting)
-```bash
-# Требования к хостингу
-- PHP 8.2+ с расширениями: mysql, redis, gd, fileinfo, mbstring
-- MySQL/MariaDB 8.0+
-- Redis (опционально, fallback на file cache)
-- Apache/Nginx web server
-- SSL сертификат
-- Composer support
-- Node.js для build процесса (на deploy)
-```
-
-### Порты и доступ
-- **8080**: Nginx (основное приложение)
-- **8081**: phpMyAdmin
-- **3306**: MySQL (internal)
-- **6379**: Redis (internal)
-- **5173**: Vite dev server (site)
-- **5174**: Vite dev server (restaurant)
-- **5175**: Vite dev server (admin)
-
-### Vite Configuration (Multiple Entry Points)
-```typescript
-// vite.config.ts
-export default defineConfig({
-  plugins: [
-    laravel({
-      input: [
-        'resources/js/site/main.ts',
-        'resources/js/restaurant/main.ts', 
-        'resources/js/admin/main.ts'
-      ],
-      refresh: true,
-    }),
-    vue(),
-  ],
-  resolve: {
-    alias: {
-      '@': '/resources/js',
-      '@shared': '/resources/js/shared',
-    },
-  },
-});
-```
-
-### Package.json Dependencies (Updated)
+### Key Laravel Packages
 ```json
 {
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.0",
-    "typescript": "^5.0.0",
-    "vue": "^3.4.0",
-    "vue-router": "^4.3.0",
-    "pinia": "^2.1.0",
-    "@vee-validate/zod": "^4.12.0",
-    "vee-validate": "^4.12.0",
-    "zod": "^3.22.0",
-    "sass": "^1.70.0",
-    "sass": "^1.77.0"
-  },
-  "dependencies": {
-    "axios": "^1.9.0"
-  }
+  "defstudio/telegraph": "^1.59",     // Telegram Bot API integration
+  "laravel/fortify": "^1.25",        // Authentication scaffolding
+  "laravel/sanctum": "^4.1",         // API authentication
+  "spatie/laravel-permission": "^6.19", // Role & permission management
+  "spatie/laravel-query-builder": "^6.3", // API query building
+  "spatie/laravel-sluggable": "^3.7", // URL slug generation
+  "kalnoy/nestedset": "^6.0",        // Hierarchical data (categories)
+  "telegram-bot/api": "^2.5"         // Additional Telegram API tools
 }
 ```
 
-## Конфигурация среды
-
-### Development Environment Variables (.env)
-```env
-# Database (Docker containers)
-DB_CONNECTION=mysql
-DB_HOST=mysql
-DB_PORT=3306
-DB_DATABASE=rest_aggregator
-DB_USERNAME=sail
-DB_PASSWORD=password
-
-# Redis (Docker)
-REDIS_HOST=redis
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-CACHE_DRIVER=redis
-
-# Development URLs
-APP_URL=http://localhost:8080
-VITE_APP_URL=${APP_URL}
-
-# Storage (Docker volumes)
-FILESYSTEM_DISK=local
-
-# Frontend Build
-VITE_DEV_SERVER_HOST=0.0.0.0
-VITE_DEV_SERVER_PORT=5173
+### Development Tools
+```json
+{
+  "fumeapp/modeltyper": "^3.1",      // TypeScript type generation
+  "laravel/pail": "^1.2.2",         // Log monitoring
+  "laravel/pint": "^1.13"           // Code formatting
+}
 ```
 
-### Production Environment Variables (.env.production)
-```env
-# Database (Standard hosting)
-DB_CONNECTION=mysql
-DB_HOST=localhost
-DB_PORT=3306
-DB_DATABASE=your_production_db
-DB_USERNAME=your_db_user
-DB_PASSWORD=your_secure_password
+## Frontend Stack
 
-# Redis (fallback to file if unavailable)
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-CACHE_DRIVER=redis
-SESSION_DRIVER=file
+### Core Technologies
+- **Vue 3.5.16** - Reactive frontend framework с Composition API
+- **TypeScript 5.8.3** - Строгая типизация для всего frontend кода
+- **Vite 6.3.5** - Современный build tool с HMR
+- **Pinia 3.0.2** - State management для Vue 3
 
-# Production URLs
-APP_URL=https://yourdomain.com
-VITE_APP_URL=${APP_URL}
-
-# Storage (Public symlink for images)
-FILESYSTEM_DISK=public
-
-# Production optimizations
-APP_ENV=production
-APP_DEBUG=false
-QUEUE_CONNECTION=database
-LOG_CHANNEL=daily
+### UI & Styling
+```json
+{
+  "primevue": "^4.3.5",             // UI component library
+  "primeicons": "^7.0.0",           // Icon set
+  "@primeuix/themes": "^1.1.1",     // Theming system
+  "postcss": "^8.5.4",              // CSS processing
+  "postcss-nested": "^7.0.2",       // Nested CSS support
+  "autoprefixer": "^10.4.21"        // CSS vendor prefixes
+}
 ```
 
-### TypeScript Configuration (ОБНОВЛЕНО)
+### Form Handling & Validation
+```json
+{
+  "vee-validate": "^4.15.0",        // Form validation
+  "@vee-validate/zod": "^4.15.0",   // Zod integration for validation
+  "zod": "^3.25.50"                 // Schema validation
+}
+```
 
-#### СТРОГИЕ ПРАВИЛА:
-- **🚫 ЗАПРЕЩЕНО использовать `any` тип!** 
-- Используйте `unknown`, конкретные типы или type guards
-- При API запросах указывайте generic типы: `apiClient.get<User>('/api/user')`
+### Utilities & Tools
+```json
+{
+  "axios": "^1.9.0",                // HTTP client
+  "lodash": "^4.17.21",             // Utility functions
+  "chart.js": "^4.4.6",             // Data visualization
+  "prettier": "^3.5.3"              // Code formatting
+}
+```
 
-#### Конфигурация tsconfig.json:
+## Development Environment
+
+### Docker Infrastructure
+```yaml
+services:
+  app:        # PHP-FPM + Laravel
+  nginx:      # Web server (port 8080)
+  mysql:      # Database (port 3306)
+  phpmyadmin: # DB management (port 8081)
+  node:       # Frontend development (port 5173)
+  redis:      # Caching & sessions (port 6379)
+```
+
+### Make Commands Automation
+```bash
+make up           # Запуск всех контейнеров
+make shell        # Вход в PHP контейнер
+make dev          # Запуск Vite dev серверов
+make types        # Генерация TypeScript типов
+make fresh        # Пересоздание БД с сидерами
+make build        # Production build
+```
+
+### Vite Configuration
+```typescript
+// Multiple entry points для каждого интерфейса
+input: [
+  "resources/site/css/app.css",
+  "resources/site/ts/main.ts",
+  "resources/account/css/app.css", 
+  "resources/account/ts/main.ts",
+  "resources/admin/css/app.css",
+  "resources/admin/ts/main.ts",
+]
+
+// Alias пути для удобного импорта
+alias: {
+  "@": "./resources",
+  "@shared": "./resources/shared",
+  "@types": "./resources/shared/types",
+  "@site": "./resources/site",
+  "@account": "./resources/account", 
+  "@admin": "./resources/admin"
+}
+```
+
+## Database Architecture
+
+### UUID Strategy
+```php
+// BaseModel для всех сущностей
+abstract class BaseModel extends Model
+{
+    use HasUuids;
+    public $incrementing = false;
+    protected $keyType = 'string';
+}
+```
+
+### Key Tables Structure
+```sql
+-- Основные сущности
+restaurants (id: UUID, name, slug, telegram_bot_token, settings)
+users (id: UUID, name, email, restaurant_id, roles)
+menus (id: UUID, restaurant_id, name, is_active)
+dishes (id: UUID, menu_id, name, price, image_path)
+categories (id: UUID, name, type, parent_id) -- Nested Set
+events (id: UUID, restaurant_id, title, start_date, end_date)
+
+-- Связующие таблицы
+dish_categories (dish_id: UUID, category_id: UUID) -- Many-to-Many
+likes (id: UUID, telegram_user_id, likeable_type, likeable_id) -- Polymorphic
+```
+
+### Relationships Pattern
+```php
+// Many-to-Many
+Dish::class -> categories() -> Category::class
+
+// Polymorphic
+Like::class -> likeable() -> Dish|Event|News
+News::class -> author() -> Restaurant|User
+
+// Hierarchical
+Category::class -> parent() -> Category::class
+Category::class -> children() -> Category::class
+```
+
+## Authentication & Security
+
+### Laravel Sanctum SPA Configuration
+```php
+// Session-based authentication
+'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'localhost')),
+'guard' => ['web'],
+'expiration' => null, // Session-based, no token expiration
+```
+
+### Role-Based Access Control
+```php
+// Spatie/Laravel-Permission
+roles: ['admin', 'restaurant_owner']
+permissions: ['manage-restaurants', 'manage-content', 'moderate-content']
+
+// Middleware защита
+Route::middleware(['auth:sanctum', 'role:admin'])->group(...);
+```
+
+### CSRF Protection
+```javascript
+// Frontend CSRF handling
+await apiClient.get('/sanctum/csrf-cookie');
+axios.defaults.withCredentials = true;
+```
+
+## API Architecture
+
+### RESTful API Design
+```php
+// Публичные маршруты (Telegram Mini Apps)
+GET /api/v1/restaurants
+GET /api/v1/restaurants/{restaurant}/menu
+POST /api/v1/likes/toggle
+
+// Защищенные маршруты (Restaurant owners)
+PATCH /api/v1/restaurant/profile
+POST /api/v1/restaurant/dishes
+PUT /api/v1/restaurant/dishes/{dish}
+
+// Админские маршруты
+GET /api/v1/admin/analytics/restaurants
+POST /api/v1/admin/restaurants
+PATCH /api/v1/admin/moderation/dishes/{dish}/approve
+```
+
+### API Response Format
+```typescript
+// Стандартизированные ответы
+interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  errors?: Record<string, string[]>;
+}
+
+// Пагинация
+interface PaginatedResponse<T> {
+  data: T[];
+  meta: {
+    current_page: number;
+    total: number;
+    per_page: number;
+  };
+}
+```
+
+## Type Safety System
+
+### Automated Type Generation
+```bash
+# FumeApp/ModelTyper configuration
+php artisan model:typer
+# Генерирует resources/shared/types/models.d.ts
+```
+
+### TypeScript Configuration
 ```json
 {
   "compilerOptions": {
     "target": "ES2022",
-    "useDefineForClassFields": true,
     "module": "ESNext",
-    "moduleResolution": "bundler",
     "strict": true,
-    "jsx": "preserve",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "skipLibCheck": true,
-    "allowJs": true,
-    "noEmit": true,
-    "baseUrl": ".",
+    "noImplicitAny": true,
     "paths": {
       "@/*": ["./resources/*"],
       "@shared/*": ["./resources/shared/*"],
-      "@site/*": ["./resources/site/*"],
-      "@account/*": ["./resources/account/*"],
-      "@admin/*": ["./resources/admin/*"]
-    },
-    "types": ["node"],
-    "typeRoots": ["./node_modules/@types/", "./resources/shared/types"]
-  },
-  "include": [
-    "resources/**/*.ts",
-    "resources/**/*.d.ts", 
-    "resources/**/*.tsx",
-    "resources/**/*.vue",
-    "resources/**/*.js"
-  ],
-  "exclude": ["node_modules", "dist", "vendor", "bootstrap/cache"],
-  "references": [{ "path": "./tsconfig.node.json" }]
-}
-```
-
-#### Типизация Vite Environment:
-```typescript
-// resources/shared/types/vite-env.d.ts
-/// <reference types="vite/client" />
-
-// Расширяем стандартный Vite интерфейс нашими переменными
-interface ImportMetaEnv {
-  readonly VITE_API_URL: string;
-  readonly VITE_APP_NAME: string;
-  readonly VITE_APP_ENV: string;
-  // добавьте другие переменные по мере необходимости
-}
-```
-
-#### Принципы типизации:
-1. **Используйте ModelTyper типы**: Автоматически генерируемые типы из Laravel моделей
-2. **Type Guards вместо any**: `isApiError()`, `isPaginationResponse()`  
-3. **Generic API calls**: `apiClient.get<Restaurant[]>('/api/restaurants')`
-4. **Strict mode**: Включен строгий режим TypeScript
-
-## Security Configuration
-
-### CSP Headers для Vue Apps
-```php
-// В каждом Blade template
-<meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src 'self' 'unsafe-eval';
-  style-src 'self' 'unsafe-inline';
-  connect-src 'self' ws: wss:;
-">
-```
-
-### Authentication Strategy
-- **Laravel Sanctum**: API authentication
-- **Session-based**: Web authentication
-- **Role-based access**: Restaurant owners vs Admins
-
-## Performance Configuration
-
-### Frontend Optimization
-```typescript
-// Vite build optimization
-build: {
-  rollupOptions: {
-    output: {
-      manualChunks: {
-        vendor: ['vue', 'vue-router', 'pinia'],
-        ui: ['@headlessui/vue', 'lucide-vue-next']
-      }
+      "@types/*": ["./resources/shared/types/*"]
     }
   }
 }
 ```
 
-### Caching Strategy
-- **Laravel Response Cache**: Для публичных страниц
-- **Redis Cache**: API responses и computed data
-- **Browser Cache**: Static assets через Vite
-- **Vue Keep-Alive**: Кэширование компонентов
+### Frontend Type Usage
+```typescript
+// Импорт сгенерированных типов
+import type { Restaurant, Dish, Event } from '@types/models';
 
-## Development Workflow
-
-### Make Commands (Updated)
-```bash
-make setup         # Первоначальная настройка проекта
-make up            # Запуск всех контейнеров
-make down          # Остановка контейнеров
-make shell         # Вход в app контейнер
-make npm-install   # Установка Node.js зависимостей
-make dev           # Запуск Vite dev серверов
-make build         # Production build всех Vue apps
-make test          # Запуск всех тестов
-make types         # Генерация TypeScript типов из моделей (ModelTyper)
+// Типизированные API запросы
+const restaurants = await apiClient.get<Restaurant[]>('/api/v1/restaurants');
+const dish = await apiClient.post<Dish>('/api/v1/restaurant/dishes', data);
 ```
 
-### Hot Reload Setup
-- **Multiple Vite Servers**: Отдельный dev server для каждого интерфейса
-- **HMR Support**: Hot Module Replacement для Vue компонентов
-- **TypeScript Watch**: Автоматическая проверка типов
-- **SCSS Watch**: Автоматическая компиляция стилей
+## Build & Deployment
 
-### Debugging Tools
-- **Vue DevTools**: Браузерное расширение для Vue
-- **TypeScript Language Service**: IDE support
-- **Vite Inspector**: Анализ bundle composition
-- **Laravel Telescope**: Backend debugging
+### Development Workflow
+1. **Docker containers** - Изолированная среда разработки
+2. **Hot Module Replacement** - Мгновенные обновления Vue компонентов
+3. **Type generation** - Автоматическая синхронизация типов
+4. **Code formatting** - Laravel Pint + Prettier
 
-## External Integrations
+### Production Considerations
+- **Non-Docker deployment** - Стандартный хостинг без контейнеров
+- **Asset optimization** - Vite production build с минификацией
+- **Database migrations** - Автоматическое применение при развертывании
+- **Environment configuration** - Отдельные настройки для production
 
+## Performance Optimizations
 
+### Backend Optimizations
+- **Eager loading** - Предотвращение N+1 запросов
+- **Database indexing** - Стратегические индексы для частых запросов
+- **Redis caching** - Кеширование API ответов и сессий
+- **Query optimization** - Использование Spatie/Laravel-Query-Builder
 
-### Telegram Mini Apps
-- **Multiple Bot Tokens**: Поддержка разных ресторанов
-- **Webhook Management**: Автоматическое управление webhook
-- **Real-time Updates**: WebSocket connections для live updates 
+### Frontend Optimizations
+- **Code splitting** - Отдельные бандлы для каждого интерфейса
+- **Lazy loading** - Динамическая загрузка компонентов
+- **Tree shaking** - Удаление неиспользуемого кода
+- **Asset optimization** - Сжатие изображений и CSS/JS
+
+## Monitoring & Debugging
+
+### Development Tools
+- **Laravel Pail** - Real-time log monitoring
+- **Vue DevTools** - Vue component debugging
+- **phpMyAdmin** - Database management interface
+- **Vite HMR** - Hot module replacement для быстрой разработки
+
+### Error Handling
+```typescript
+// Централизованная обработка ошибок
+interface ApiError {
+  message: string;
+  errors?: Record<string, string[]>;
+  status: number;
+}
+
+// Error boundaries в Vue компонентах
+const { handleError } = useErrorHandler();
+``` 

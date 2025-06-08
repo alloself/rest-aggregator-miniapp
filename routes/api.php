@@ -22,34 +22,42 @@ use App\Http\Controllers\Api\AuthController;
 |
 */
 
-// Аутентификация (публичные маршруты)
-Route::prefix('v1/auth')->group(function () {
-    Route::post('login', [AuthController::class, 'login']);
-    
-    // Защищенные маршруты аутентификации
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::get('user', [AuthController::class, 'user']);
-        Route::post('logout', [AuthController::class, 'logout']);
-        Route::post('logout-all', [AuthController::class, 'logoutAll']);
-        Route::get('tokens', [AuthController::class, 'tokens']);
-        Route::delete('tokens/{token_id}', [AuthController::class, 'revokeToken']);
-    });
-    
-    // Администраторские маршруты создания пользователей
-    Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
-        Route::post('create-restaurant-owner', [AuthController::class, 'createRestaurantOwner']);
-        Route::post('create-admin', [AuthController::class, 'createAdmin']);
-    });
-});
+
 
 // Публичные маршруты для Telegram Mini Apps
 Route::prefix('v1')->group(function () {
+
+// Аутентификация (публичные маршруты)
+    Route::prefix('auth')->group(function () {
+        Route::post('login', [AuthController::class, 'login']);
+        
+        // Защищенные маршруты аутентификации
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::get('user', [AuthController::class, 'user']);
+            Route::post('logout', [AuthController::class, 'logout']);
+            Route::post('logout-all', [AuthController::class, 'logoutAll']);
+            Route::get('tokens', [AuthController::class, 'tokens']);
+            Route::delete('tokens/{token_id}', [AuthController::class, 'revokeToken']);
+        });
+        
+        // Администраторские маршруты создания пользователей
+        Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+            Route::post('create-restaurant-owner', [AuthController::class, 'createRestaurantOwner']);
+            Route::post('create-admin', [AuthController::class, 'createAdmin']);
+        });
+    });
     
-    // Рестораны (только чтение)
+    // Рестораны (только чтение) - используем slug для SEO-friendly URLs
     Route::get('restaurants', [RestaurantController::class, 'index']);
-    Route::get('restaurants/{restaurant}', [RestaurantController::class, 'show']);
-    Route::get('restaurants/{restaurant}/menu', [RestaurantController::class, 'menu']);
-    Route::get('restaurants/{restaurant}/events', [RestaurantController::class, 'events']);
+    Route::get('restaurants/{slug}', [RestaurantController::class, 'show']);
+    Route::get('restaurants/{slug}/menu', [RestaurantController::class, 'menu']);
+    Route::get('restaurants/{slug}/events', [RestaurantController::class, 'events']);
+    Route::get('restaurants/{slug}/news', [RestaurantController::class, 'news']);
+    Route::get('restaurants/{slug}/chef-recommendations', [RestaurantController::class, 'chefRecommendations']);
+    
+    // Интерактивные функции (работают без аутентификации для Telegram Mini Apps)
+    Route::post('restaurants/{slug}/favorite', [RestaurantController::class, 'toggleFavorite']);
+    Route::post('restaurants/{restaurantSlug}/dishes/{dishId}/like', [RestaurantController::class, 'toggleDishLike']);
     
     // Меню (только чтение)
     Route::get('menus', [MenuController::class, 'index']);

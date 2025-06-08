@@ -62,13 +62,11 @@ const pinia = createPinia();
 
 app.use(pinia);
 
-console.log('Account Vue app initializing...');
 
 // Mount when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   const mountPoint = document.getElementById('account-app');
   if (mountPoint) {
     app.mount(mountPoint);
-    console.log('Account Vue app mounted');
   }
 }); 
