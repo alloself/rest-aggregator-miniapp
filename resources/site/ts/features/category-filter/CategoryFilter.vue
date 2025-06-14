@@ -1,7 +1,18 @@
+/**
+ * CategoryFilter - Универсальный компонент фильтрации по категориям
+ * 
+ * Особенности:
+ * - Автоматическое добавление опции "Все" (includeAllOption)
+ * - Настраиваемый текст и иконка для опции "Все"
+ * - Подсчет общего количества элементов для опции "Все"
+ * - Поддержка счетчиков для каждой категории
+ * - Touch-friendly дизайн для Telegram Mini App
+ */
+
 <template>
   <div class="category-filter">
     <button
-      v-for="category in categories"
+      v-for="category in categoriesWithAll"
       :key="category.id"
       :class="[
         'category-filter__item',
@@ -38,18 +49,45 @@ interface CategoryFilterProps {
   categories: Category[]
   activeCategory: string
   showCounts?: boolean
+  includeAllOption?: boolean
+  allOptionLabel?: string
+  allOptionIcon?: string
 }
 
 const props = withDefaults(defineProps<CategoryFilterProps>(), {
-  showCounts: false
+  showCounts: false,
+  includeAllOption: true,
+  allOptionLabel: 'Все',
+  allOptionIcon: 'pi-apps'
 })
 
 const emit = defineEmits<{
   categoryChange: [categoryId: string, category: Category]
 }>()
 
+const categoriesWithAll = computed(() => {
+  const allCategories = [...props.categories]
+  
+  if (props.includeAllOption) {
+    const totalCount = props.showCounts 
+      ? props.categories.reduce((sum, cat) => sum + (cat.count || 0), 0)
+      : undefined
+
+    const allCategory: Category = {
+      id: 'all',
+      label: props.allOptionLabel,
+      icon: props.allOptionIcon,
+      count: totalCount
+    }
+    
+    allCategories.unshift(allCategory)
+  }
+  
+  return allCategories
+})
+
 const selectCategory = (categoryId: string) => {
-  const category = props.categories.find(cat => cat.id === categoryId)
+  const category = categoriesWithAll.value.find(cat => cat.id === categoryId)
   if (category && !category.disabled) {
     emit('categoryChange', categoryId, category)
   }
@@ -57,105 +95,105 @@ const selectCategory = (categoryId: string) => {
 </script>
 
 <style>
-/* Category Filter Component - PostCSS Nested */
+/* Category Filter Component - Standard CSS */
 .category-filter {
   display: flex;
-  gap: var(--spacing-sm);
-  padding: 0 var(--content-padding);
-  margin-bottom: var(--spacing-xl);
+  gap: 6px;
+  padding: 0 15px;
+  margin-bottom: 24px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
+}
 
-  &::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
-  }
+.category-filter::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
 
-  /* Scrolling indicators - опционально */
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 20px;
-    pointer-events: none;
-    z-index: 1;
-  }
+/* Scrolling indicators - опционально */
+.category-filter::before,
+.category-filter::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  pointer-events: none;
+  z-index: 1;
+}
 
-  &::before {
-    left: 0;
-    background: linear-gradient(to right, var(--color-white), transparent);
-  }
+.category-filter::before {
+  left: 0;
+  background: linear-gradient(to right, #ffffff, transparent);
+}
 
-  &::after {
-    right: 0;
-    background: linear-gradient(to left, var(--color-white), transparent);
-  }
+.category-filter::after {
+  right: 0;
+  background: linear-gradient(to left, #ffffff, transparent);
+}
 
-  &__item {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-md) var(--spacing-xl);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-secondary);
-    background-color: var(--color-surface);
-    border-radius: var(--border-radius-xl);
-    border: none;
-    cursor: pointer;
-    transition: all var(--transition-base);
-    white-space: nowrap;
-    min-height: var(--touch-target-min);
-    user-select: none;
-    animation: fadeInCategory 0.3s ease-out;
-    
-    &:hover:not(:disabled) {
-      background-color: var(--color-gray-light);
-      transform: translateY(-1px);
-    }
-    
-    &:active {
-      transform: translateY(0);
-    }
-    
-    &--active {
-      background-color: var(--color-accent);
-      color: var(--color-text-primary);
-      box-shadow: var(--shadow-sm);
-      
-      &:hover {
-        background-color: var(--color-accent);
-      }
-    }
-    
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      
-      &:hover {
-        transform: none;
-        background-color: var(--color-surface);
-      }
-    }
+.category-filter__item {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #000000;
+  background-color: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  min-height: 39px;
+  user-select: none;
+  letter-spacing: -0.05em;
+}
 
-    /* Icon styling */
-    .pi {
-      font-size: var(--font-size-sm);
-    }
+.category-filter__item:hover:not(:disabled) {
+  background-color: rgba(244, 243, 243, 0.5);
+}
 
-    /* Badge styling внутри кнопки */
-    :deep(.p-badge) {
-      font-size: 10px;
-      min-width: 16px;
-      height: 16px;
-      line-height: 1;
-      padding: 0 4px;
-    }
-  }
+.category-filter__item:active {
+  transform: translateY(0);
+}
+
+.category-filter__item--active {
+  background-color: #F4F3F3;
+  border: none;
+  color: #000000;
+}
+
+.category-filter__item--active:hover {
+  background-color: #F4F3F3;
+}
+
+.category-filter__item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.category-filter__item:disabled:hover {
+  transform: none;
+  background-color: transparent;
+}
+
+/* Icon styling */
+.category-filter__item .pi {
+  font-size: 15px;
+}
+
+/* Badge styling внутри кнопки */
+.category-filter__item :deep(.p-badge) {
+  font-size: 10px;
+  min-width: 16px;
+  height: 16px;
+  line-height: 1;
+  padding: 0 4px;
 }
 
 /* Анимация для smooth transition */
@@ -173,13 +211,13 @@ const selectCategory = (categoryId: string) => {
 /* Responsive для маленьких экранов */
 @media (max-width: 375px) {
   .category-filter {
-    padding: 0 var(--spacing-md);
-    gap: var(--spacing-xs);
+    padding: 0 12px;
+    gap: 4px;
+  }
 
-    &__item {
-      padding: var(--spacing-sm) var(--spacing-md);
-      font-size: 12px;
-    }
+  .category-filter__item {
+    padding: 8px 12px;
+    font-size: 12px;
   }
 }
 </style> 

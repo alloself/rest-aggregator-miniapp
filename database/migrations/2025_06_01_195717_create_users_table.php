@@ -12,19 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('name');
+            $table->uuid('id')->primary()->unique();
+            $table->string('first_name');
+            $table->string('last_name')->nullable();
+            $table->string('middle_name')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->uuid('restaurant_id')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
-            
-            // Теперь можем добавить foreign key, так как restaurants уже создана
-            $table->foreign('restaurant_id')->references('id')->on('restaurants')->onDelete('set null');
-            $table->index('restaurant_id');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -34,7 +31,7 @@ return new class extends Migration
         });
 
         Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->string('id')->primary()->unique();
             $table->uuid('user_id')->nullable()->index();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();

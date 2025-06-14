@@ -1,19 +1,15 @@
 <template>
   <section class="news-feed">
-    <!-- Category Tabs -->
-    <div class="news-feed__tabs">
-      <button 
-        v-for="category in categories"
-        :key="category.key"
-        :class="[
-          'news-feed__tab',
-          { 'news-feed__tab--active': activeCategory === category.key }
-        ]"
-        @click="setActiveCategory(category.key)"
-      >
-        {{ category.label }}
-      </button>
-    </div>
+    <!-- Category Filter -->
+    <CategoryFilter
+      :categories="categories"
+      :active-category="activeCategory"
+      :include-all-option="true"
+      :all-option-label="'Все'"
+      :all-option-icon="'pi-apps'"
+      :show-counts="false"
+      @category-change="onCategoryChange"
+    />
 
     <!-- News List with Infinite Scroll -->
     <div 
@@ -37,23 +33,23 @@
                 />
               </div>
               
-                             <!-- News Content -->
-               <div class="news-card__text">
-                 <h3 class="news-card__title">
-                   {{ item.title }}
-                 </h3>
-                 
-                 <!-- Description with collapse/expand -->
-                 <div class="news-card__description-container">
-                   <CollapsibleText 
-                     :text="item.description"
-                     :character-limit="120"
-                     expand-button-text="еще"
-                     collapse-button-text="свернуть"
-                     :animation-duration="300"
-                   />
-                 </div>
-               </div>
+              <!-- News Content -->
+              <div class="news-card__text">
+                <h3 class="news-card__title">
+                  {{ item.title }}
+                </h3>
+                
+                <!-- Description with collapse/expand -->
+                <div class="news-card__description-container">
+                  <CollapsibleText 
+                    :text="item.description"
+                    :character-limit="120"
+                    expand-button-text="еще"
+                    collapse-button-text="свернуть"
+                    :animation-duration="300"
+                  />
+                </div>
+              </div>
             </div>
           </template>
         </Card>
@@ -83,6 +79,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import Card from 'primevue/card'
 import Image from 'primevue/image'
 import CollapsibleText from './CollapsibleText.vue'
+import CategoryFilter from '../features/category-filter/CategoryFilter.vue'
 
 // Types
 interface NewsItem {
@@ -95,8 +92,9 @@ interface NewsItem {
 }
 
 interface Category {
-  key: string
+  id: string
   label: string
+  icon?: string
 }
 
 // Props
@@ -110,7 +108,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 // Reactive data
 const scrollContainer = ref<HTMLElement>()
-const activeCategory = ref('news')
+const activeCategory = ref('all')
 const newsItems = ref<NewsItem[]>([])
 const isLoading = ref(false)
 const hasReachedEnd = ref(false)
@@ -119,9 +117,9 @@ const itemsPerPage = 10
 
 // Categories configuration
 const categories: Category[] = [
-  { key: 'news', label: 'Новости' },
-  { key: 'events', label: 'События' },
-  { key: 'offers', label: 'Предложения' }
+  { id: 'news', label: 'Новости', icon: 'pi-megaphone' },
+  { id: 'events', label: 'События', icon: 'pi-calendar' },
+  { id: 'offers', label: 'Предложения', icon: 'pi-percentage' }
 ]
 
 // Mock data
@@ -162,29 +160,20 @@ const mockNewsItems: NewsItem[] = [
 
 // Computed
 const filteredItems = computed(() => {
-  if (activeCategory.value === 'news') {
-    return mockNewsItems.filter(item => item.category === 'news')
+  if (activeCategory.value === 'all') {
+    return mockNewsItems
   }
-  if (activeCategory.value === 'events') {
-    return mockNewsItems.filter(item => item.category === 'events')
-  }
-  if (activeCategory.value === 'offers') {
-    return mockNewsItems.filter(item => item.category === 'offers')
-  }
-  return mockNewsItems
+  return mockNewsItems.filter(item => item.category === activeCategory.value)
 })
 
-
-
 // Methods
-const setActiveCategory = async (categoryKey: string) => {
-  activeCategory.value = categoryKey
+const onCategoryChange = async (categoryId: string) => {
+  activeCategory.value = categoryId
   // Reset pagination
   currentPage.value = 1
   hasReachedEnd.value = false
   newsItems.value = []
 
-  
   await nextTick()
   loadMoreItems()
 }
@@ -235,70 +224,40 @@ onUnmounted(() => {
 /* News Feed Component */
 .news-feed {
   margin-bottom: 24px;
+}
 
-  &__tabs {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 24px;
-    padding: 0 15px;
-  }
+.news-feed__content {
+  padding: 0 15px;
+}
 
-  &__tab {
-    background-color: transparent;
-    color: #000000;
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    border-radius: 20px;
-    padding: 10px 16px;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-weight: 500;
-    font-size: 15px;
-    letter-spacing: -0.05em;
-    cursor: pointer;
-    transition: all 0.25s ease;
+.news-feed__item {
+  margin-bottom: 16px;
+}
 
-    &:hover {
-      background-color: rgba(244, 243, 243, 0.5);
-    }
+.news-feed__item:last-child {
+  margin-bottom: 0;
+}
 
-    &--active {
-      background-color: #F4F3F3;
-      border: none;
-    }
-  }
+.news-feed__loading {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
 
-  &__content {
-    padding: 0 15px;
-  }
+.news-feed__spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-left: 2px solid #000000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
 
-  &__item {
-    margin-bottom: 16px;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  &__loading {
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-  }
-
-  &__spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid rgba(0, 0, 0, 0.1);
-    border-left: 2px solid #000000;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  &__end-message {
-    text-align: center;
-    padding: 20px;
-    color: rgba(0, 0, 0, 0.5);
-    font-size: 14px;
-  }
+.news-feed__end-message {
+  text-align: center;
+  padding: 20px;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 14px;
 }
 
 /* News Card (соответствует макету Figma) */
@@ -310,72 +269,68 @@ onUnmounted(() => {
   border: none;
   width: 100%;
   max-width: 100%; /* Убираем фиксированную ширину чтобы карточка не выходила за край */
+}
 
-  &__content {
-    position: relative;
-    padding: 0;
-  }
+.news-card__content {
+  position: relative;
+  padding: 0;
+}
 
-  &__image-container {
-    width: 100%;
-    height: 238px;
-    overflow: hidden;
-    border-radius: 20px 20px 0 0;
-  }
+.news-card__image-container {
+  width: 100%;
+  height: 238px;
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+}
 
-  &__image {
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-  }
+.news-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
-  &__text {
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 11px;
-  }
+.news-card__text {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
 
-  &__title {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    color: #000000;
-    line-height: 0.95;
-    letter-spacing: -0.01em;
-    margin: 0;
-  }
+.news-card__title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #000000;
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
 
-  &__description-container {
-    /* Override CollapsibleText styles for news cards */
-    .collapsible-text__text {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 14px;
-      font-weight: 400;
-      color: #000000;
-      line-height: 1.1;
-      margin: 0;
-    }
+/* Override CollapsibleText styles for news cards */
+.news-card__description-container .collapsible-text__text {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #000000;
+  line-height: 1.1;
+  margin: 0;
+}
 
-    .collapsible-text__toggle-inline {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 14px;
-      font-weight: 400;
-    }
+.news-card__description-container .collapsible-text__toggle-inline {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+}
 
-    .collapsible-text__toggle-collapse {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 14px;
-      font-weight: 400;
-    }
+.news-card__description-container .collapsible-text__toggle-collapse {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+}
 
-    .collapsible-text__collapse-container {
-      margin-top: 8px;
-    }
-  }
+.news-card__description-container .collapsible-text__collapse-container {
+  margin-top: 8px;
 }
 
 /* Animations */

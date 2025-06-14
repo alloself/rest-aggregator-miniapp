@@ -50,7 +50,11 @@
       <CategoryFilter
         :categories="categories"
         :active-category="activeCategory"
-                 @category-change="(categoryId, category) => $emit('categoryChange', categoryId, category)"
+        :include-all-option="true"
+        :all-option-label="'Все'"
+        :all-option-icon="'pi-apps'"
+        :show-counts="false"
+        @category-change="(categoryId, category) => $emit('categoryChange', categoryId, category)"
       />
     </section>
     
@@ -178,6 +182,9 @@ const mockContent = reactive([
 ])
 
 const filteredContent = computed(() => {
+  if (props.activeCategory === 'all') {
+    return mockContent
+  }
   return mockContent.filter(item => item.category === props.activeCategory)
 })
 
@@ -186,68 +193,70 @@ const handleImageChange = (index: number, image: RestaurantImage) => {
 </script>
 
 <style>
-/* Restaurant Page Widget Component - PostCSS Nested */
+/* Restaurant Page Widget Component - Standard CSS */
 .restaurant-page-widget {
   width: 100%;
-  background-color: var(--color-background);
+  background-color: #FFFFFF;
 }
 
 .chef-recommendations {
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: 24px;
+}
 
-  &__title {
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-semibold);
-    margin-bottom: var(--spacing-lg);
-    padding: 0 var(--content-padding);
-  }
+.chef-recommendations__title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  padding: 0 16px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #000000;
+  letter-spacing: -0.04em;
+}
 
-  &__gallery {
-    display: flex;
-    gap: var(--spacing-md);
-    overflow-x: auto;
-    padding: 0 var(--content-padding);
-    -webkit-overflow-scrolling: touch;
+.chef-recommendations__gallery {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
 
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
+.chef-recommendations__gallery::-webkit-scrollbar {
+  display: none;
+}
 
-  &__item {
-    flex: 0 0 auto;
-    width: 120px;
-    height: 120px;
-    border-radius: var(--border-radius-lg);
-    overflow: hidden;
-  }
+.chef-recommendations__item {
+  flex: 0 0 auto;
+  width: 120px;
+  height: 120px;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 .content-list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: 16px;
 }
 
 .footer {
-  padding: var(--spacing-3xl) var(--content-padding);
-  background-color: var(--color-surface);
-  margin-top: var(--spacing-4xl);
+  padding: 32px 16px;
+  background-color: #F4F3F3;
+  margin-top: 40px;
   text-align: center;
+}
 
-  &__text {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-  }
+.footer__text {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.5);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* Responsive adjustments */
 @media (max-width: 375px) {
-  .chef-recommendations {
-    &__item {
-      width: 100px;
-      height: 100px;
-    }
+  .chef-recommendations__item {
+    width: 100px;
+    height: 100px;
   }
 }
 </style> 

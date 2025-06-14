@@ -14,7 +14,6 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasUuids, HasRoles, SoftDeletes, HasApiTokens, TwoFactorAuthenticatable;
 
     /**
@@ -32,20 +31,6 @@ class User extends Authenticatable
     ];
 
     /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = false;
-
-    /**
-     * The "type" of the primary key ID.
-     *
-     * @var string
-     */
-    protected $keyType = 'string';
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -54,7 +39,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'restaurant_id', // Связь с рестораном для владельцев
     ];
 
     /**
@@ -82,37 +66,5 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    /**
-     * Relationship with restaurant (for restaurant owners).
-     */
-    public function restaurant()
-    {
-        return $this->belongsTo(Restaurant::class);
-    }
-
-    /**
-     * Check if user is admin.
-     */
-    public function isAdmin(): bool
-    {
-        return $this->hasRole('admin');
-    }
-
-    /**
-     * Check if user is restaurant owner.
-     */
-    public function isRestaurantOwner(): bool
-    {
-        return $this->hasRole('restaurant_owner') && $this->restaurant_id;
-    }
-
-    /**
-     * Get user's restaurant if owner.
-     */
-    public function ownedRestaurant()
-    {
-        return $this->isRestaurantOwner() ? $this->restaurant : null;
     }
 }

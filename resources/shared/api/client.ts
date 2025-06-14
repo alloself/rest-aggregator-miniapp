@@ -4,10 +4,12 @@ import type { ApiError } from '../types/api';
 interface LoginCredentials {
   email: string;
   password: string;
+  remember?: boolean;
 }
 
 class ApiClient {
   private instance: AxiosInstance;
+  private initialized: boolean = false;
 
   constructor() {
     this.instance = axios.create({
@@ -19,16 +21,33 @@ class ApiClient {
       },
       timeout: 10000,
       withCredentials: true, // Критично для session-based auth
+      xsrfCookieName: 'XSRF-TOKEN', // Laravel по умолчанию использует этот cookie
+      xsrfHeaderName: 'X-XSRF-TOKEN', // Laravel ожидает токен в этом заголовке
     });
 
     this.setupInterceptors();
+  }
+
+  // Инициализация API клиента - получение CSRF cookie
+  async init(): Promise<void> {
+    if (this.initialized) return;
+    
+    try {
+      console.log('API Client: initializing with CSRF cookie...');
+      await this.getCSRFCookie();
+      this.initialized = true;
+      console.log('API Client: initialized successfully');
+    } catch (error) {
+      console.error('API Client: failed to initialize', error);
+      throw error;
+    }
   }
 
   private setupInterceptors() {
     // Response interceptor - обработка ошибок
     this.instance.interceptors.response.use(
       (response: AxiosResponse) => response,
-      (error: AxiosError<ApiError>) => {
+      async (error: AxiosError<ApiError>) => {
         // 419 - CSRF Token Mismatch
         if (error.response?.status === 419) {
           // Обновляем CSRF токен и пытаемся снова
@@ -56,6 +75,7 @@ class ApiClient {
         return this.instance.request(error.config);
       }
     } catch (csrfError) {
+      console.error('Failed to refresh CSRF token:', csrfError);
     }
     
     return Promise.reject(this.formatError(error));
@@ -81,6 +101,7 @@ class ApiClient {
     try {
       await this.instance.get('/sanctum/csrf-cookie');
     } catch (error) {
+      console.error('Failed to get CSRF cookie:', error);
       throw error;
     }
   }
@@ -111,20 +132,23 @@ class ApiClient {
     return response.data;
   }
 
-  // Аутентификация через session cookies
+  // Аутентификация через session cookies (Laravel Fortify)
   async login(credentials: LoginCredentials): Promise<void> {
-    // Сначала получаем CSRF cookie
-    await this.getCSRFCookie();
+    // CSRF cookie уже должен быть получен при инициализации
+    // Но на всякий случай проверяем
+    if (!this.initialized) {
+      await this.init();
+    }
     
-    // Затем логинимся (Laravel возвращает просто статус, не данные)
-    await this.post<void>('/login', credentials);
+    // Логинимся через Laravel Fortify
+    await this.post<void>('/auth/login', credentials);
   }
 
   async logout(): Promise<void> {
-    await this.post<void>('/logout');
+    await this.post<void>('/auth/logout');
   }
 
-  // Получение данных текущего пользователя
+  // Получение данных текущего пользователя через API
   async user<T = unknown>(): Promise<T> {
     return this.get<T>('/api/user');
   }

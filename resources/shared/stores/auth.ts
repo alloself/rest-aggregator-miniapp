@@ -17,23 +17,29 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Actions
   async function login(credentials: LoginRequest) {
+    console.log('Auth store: starting login...');
     isLoading.value = true;
     error.value = null;
 
     try {
       // API client автоматически получает CSRF cookie и логинит
+      console.log('Auth store: calling API login...');
       await apiClient.login(credentials);
       
       // Получаем данные пользователя после успешного логина
+      console.log('Auth store: fetching user data...');
       const userData = await apiClient.user<AuthUser>();
       user.value = userData;
       
+      console.log('Auth store: login successful', userData);
       return { user: userData, message: 'Login successful' };
     } catch (err) {
+      console.error('Auth store: login error', err);
       const apiError = err as ApiError;
       error.value = apiError.message;
       throw err;
     } finally {
+      console.log('Auth store: setting isLoading to false');
       isLoading.value = false;
     }
   }
@@ -54,12 +60,13 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function fetchUser() {
-    isLoading.value = true;
+    console.log('Auth store: fetching user...');
     error.value = null;
 
     try {
       const userData = await apiClient.user<AuthUser>();
       user.value = userData;
+      console.log('Auth store: user fetched successfully', userData);
       return userData;
     } catch (err) {
       const apiError = err as ApiError;
@@ -67,12 +74,11 @@ export const useAuthStore = defineStore('auth', () => {
       
       // Если не аутентифицирован, очищаем данные пользователя
       if (apiError.message.includes('Unauthenticated')) {
+        console.log('Auth store: user not authenticated, clearing auth');
         clearAuth();
       }
       
       throw err;
-    } finally {
-      isLoading.value = false;
     }
   }
 
@@ -98,6 +104,7 @@ export const useAuthStore = defineStore('auth', () => {
   function clearAuth() {
     user.value = null;
     error.value = null;
+    isLoading.value = false;
   }
 
   // Проверка роли пользователя
@@ -116,22 +123,6 @@ export const useAuthStore = defineStore('auth', () => {
     if (!isRestaurantOwner.value) return false;
     
     return user.value?.restaurant_id === restaurantId;
-  }
-
-  // Инициализация при запуске приложения
-  async function initAuth() {
-    try {
-      // Пытаемся получить текущего пользователя из session
-      await fetchUser();
-    } catch {
-      // Если session недействительна, пользователь не залогинен
-      clearAuth();
-    }
-
-    // Слушаем события потери аутентификации от API client
-    window.addEventListener('auth:unauthorized', () => {
-      clearAuth();
-    });
   }
 
   return {
@@ -154,6 +145,5 @@ export const useAuthStore = defineStore('auth', () => {
     hasRole,
     hasAnyRole,
     canAccessRestaurant,
-    initAuth,
   };
 }); 

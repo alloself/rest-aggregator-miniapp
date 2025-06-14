@@ -121,21 +121,25 @@ class AuthController extends Controller
      */
     public function user(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+        
         $user->load(['roles', 'restaurant']);
 
         return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'roles' => $user->roles->pluck('name'),
-                'restaurant_id' => $user->restaurant_id,
-                'restaurant' => $user->restaurant ? [
-                    'id' => $user->restaurant->id,
-                    'name' => $user->restaurant->name,
-                ] : null,
-            ],
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->roles->pluck('name'),
+            'restaurant_id' => $user->restaurant_id,
+            'restaurant' => $user->restaurant ? [
+                'id' => $user->restaurant->id,
+                'name' => $user->restaurant->name,
+                'slug' => $user->restaurant->slug,
+            ] : null,
         ]);
     }
 

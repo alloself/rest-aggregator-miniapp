@@ -18,16 +18,6 @@
       
       <!-- Pagination dots -->
       <div class="swiper-pagination restaurant-hero-carousel__pagination"></div>
-      
-      <!-- Fallback pagination if Swiper doesn't initialize -->
-      <div v-if="showPagination && images.length > 1" class="restaurant-hero-carousel__fallback-pagination">
-        <span 
-          v-for="(image, index) in images" 
-          :key="index"
-          class="restaurant-hero-carousel__fallback-bullet"
-          :class="{ 'restaurant-hero-carousel__fallback-bullet--active': index === 0 }"
-        ></span>
-      </div>
     </div>
   </div>
 </template>

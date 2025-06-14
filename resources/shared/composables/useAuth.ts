@@ -7,7 +7,6 @@ export function useAuth() {
   return {
     // State
     user: authStore.user,
-    token: authStore.token,
     isLoading: authStore.isLoading,
     error: authStore.error,
     
@@ -23,6 +22,5 @@ export function useAuth() {
     clearAuth: () => authStore.clearAuth(),
     hasRole: (role: string) => authStore.hasRole(role),
     hasAnyRole: (roles: string[]) => authStore.hasAnyRole(roles),
-    initAuth: () => authStore.initAuth(),
   };
 } 

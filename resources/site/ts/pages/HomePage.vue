@@ -16,8 +16,12 @@
       
       <!-- Фильтры категорий -->
       <CategoryFilter
-        :categories="categories"
-        :active-category="filters.category"
+        :categories="restaurantCategories"
+        :active-category="filters.category || 'all'"
+        :include-all-option="true"
+        :all-option-label="'Все рестораны'"
+        :all-option-icon="'pi-apps'"
+        :show-counts="true"
         @category-change="onCategoryChange"
       />
     </section>
@@ -116,17 +120,16 @@ import RestaurantCard from '../features/restaurant-info/RestaurantCard.vue'
 const loading = ref(true)
 const error = ref<string | null>(null)
 const restaurants = ref<Restaurant[]>([])
-const categories = ref([
-  { id: 'all', name: 'Все', slug: '', count: 0 },
-  { id: '1', name: 'Итальянская', slug: 'italian', count: 12 },
-  { id: '2', name: 'Японская', slug: 'japanese', count: 8 },
-  { id: '3', name: 'Европейская', slug: 'european', count: 15 },
-  { id: '4', name: 'Кафе', slug: 'cafe', count: 20 }
+const restaurantCategories = ref([
+  { id: '1', label: 'Итальянская', count: 12 },
+  { id: '2', label: 'Японская', count: 8 },
+  { id: '3', label: 'Европейская', count: 15 },
+  { id: '4', label: 'Кафе', count: 20 }
 ])
 
 // Фильтры и пагинация
 const filters = reactive<RestaurantFilters>({
-  category: '',
+  category: 'all',
   search: '',
   min_rating: undefined,
   sort_by: 'rating',
@@ -179,8 +182,8 @@ async function loadPage(page: number) {
 /**
  * Обработка смены категории
  */
-function onCategoryChange(categorySlug: string) {
-  filters.category = categorySlug
+function onCategoryChange(categoryId: string) {
+  filters.category = categoryId === 'all' ? '' : categoryId
   filters.page = 1
   loadRestaurants()
 }
