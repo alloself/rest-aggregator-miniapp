@@ -1,10 +1,9 @@
 export interface File {
   // columns
-  id: number
+  id: string
+  url: string
   name: string
-  path: string
-  mime_type?: string | null
-  size?: number | null
+  extension: string
   created_at?: Date | null
   updated_at?: Date | null
 }

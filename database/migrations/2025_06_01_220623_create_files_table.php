@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('files', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
-            $table->string('name');
-            $table->string('path');
-            $table->string('mime_type')->nullable();
-            $table->unsignedBigInteger('size')->nullable();
-            $table->timestamps();
+			$table->string('url');
+			$table->string('name');
+			$table->string('extension');
+			$table->timestamps();
         });
     }
 
