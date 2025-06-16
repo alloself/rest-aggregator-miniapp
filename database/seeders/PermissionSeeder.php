@@ -19,7 +19,7 @@ class PermissionSeeder extends Seeder
         $role = Role::create(['name' => 'root', 'guard_name' => 'web']);
         $permission = Permission::create(['name' => 'root', 'guard_name' => 'web']);
 
-        $user = Role::create(['name' => 'user', 'guard_name' => 'web']);
+        $role = Role::create(['name' => 'user', 'guard_name' => 'web']);
         $userPermission = Permission::create(['name' => 'user', 'guard_name' => 'web']);
     }
 }

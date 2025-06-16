@@ -14,7 +14,15 @@ return new class extends Migration
         Schema::create('offers', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
             $table->string('slug');
-            $table->string('name');
+            $table->string('name');         
+               
+            $table->uuid('restaurant_id');
+            $table->foreign('restaurant_id')->references('id')->on('restaurants');
+
+            $table->integer('order')->default(0);
+
+
+            $table->index(['slug', 'restaurant_id']);
             $table->timestamps();
         });
     }

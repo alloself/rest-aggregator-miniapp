@@ -15,6 +15,14 @@ return new class extends Migration
             $table->uuid('id')->primary()->unique();
             $table->string('slug');
             $table->string('name');
+
+            $table->uuid('category_id');
+            $table->foreign('category_id')->references('id')->on('categories');
+
+            $table->integer('order')->default(0);
+
+
+            $table->index(['slug', 'category_id']);
             $table->timestamps();
         });
     }

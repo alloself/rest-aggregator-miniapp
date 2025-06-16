@@ -15,7 +15,19 @@ return new class extends Migration
             $table->uuid('id')->primary()->unique();
             $table->string('slug');
             $table->string('name');
+            $table->integer('order')->default(0);
+
+            $table->uuid('restaurant_id');
+            $table->foreign('restaurant_id')->references('id')->on('restaurants');
+
+            $table->unsignedInteger('_lft')->default(0);
+            $table->unsignedInteger('_rgt')->default(0);
+            $table->uuid('parent_id')->nullable();
+            $table->foreign('parent_id')->references('id')->on('categories');
+
             $table->timestamps();
+
+            $table->index(['slug', 'parent_id']);
         });
     }
 
