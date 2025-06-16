@@ -1,9 +1,54 @@
+export interface Category {
+  // columns
+  id: number
+  slug: string
+  name: string
+  created_at?: Date | null
+  updated_at?: Date | null
+}
+
+export interface Dish {
+  // columns
+  id: number
+  slug: string
+  name: string
+  created_at?: Date | null
+  updated_at?: Date | null
+}
+
+export interface Event {
+  // columns
+  id: number
+  slug: string
+  name: string
+  created_at?: Date | null
+  updated_at?: Date | null
+}
+
 export interface File {
   // columns
   id: string
   url: string
   name: string
   extension: string
+  created_at?: Date | null
+  updated_at?: Date | null
+}
+
+export interface News {
+  // columns
+  id: number
+  slug: string
+  name: string
+  created_at?: Date | null
+  updated_at?: Date | null
+}
+
+export interface Offer {
+  // columns
+  id: number
+  slug: string
+  name: string
   created_at?: Date | null
   updated_at?: Date | null
 }
@@ -17,14 +62,29 @@ export interface Permission {
   updated_at?: Date | null
   // relations
   roles?: Role[]
+  roles_count: number
+  roles_exists: boolean
   users?: User[]
+  users_count: number
+  users_exists: boolean
   permissions?: Permission[]
+  permissions_count: number
+  permissions_exists: boolean
 }
 
 export interface Fileable {
   // relations
   fileable?: Fileable
   file?: File
+}
+
+export interface Restaurant {
+  // columns
+  id: number
+  slug: string
+  name: string
+  created_at?: Date | null
+  updated_at?: Date | null
 }
 
 export interface Role {
@@ -36,7 +96,11 @@ export interface Role {
   updated_at?: Date | null
   // relations
   permissions?: Permission[]
+  permissions_count: number
+  permissions_exists: boolean
   users?: User[]
+  users_count: number
+  users_exists: boolean
 }
 
 export interface User {
@@ -55,5 +119,9 @@ export interface User {
   notifications: never
   // relations
   roles?: Role[]
+  roles_count: number
+  roles_exists: boolean
   permissions?: Permission[]
+  permissions_count: number
+  permissions_exists: boolean
 }
