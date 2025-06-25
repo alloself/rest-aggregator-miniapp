@@ -231,22 +231,6 @@ defineExpose({
     }
   }
 
-  /* Fallback Pagination */
-  &__fallback-pagination {
-    position: absolute !important;
-    bottom: 20px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    display: flex !important;
-    gap: 8px !important;
-    padding: 8px 12px !important;
-    background: rgba(0, 0, 0, 0.2) !important;
-    border-radius: 50px !important;
-    backdrop-filter: blur(4px) !important;
-    z-index: 1001 !important;
-    pointer-events: auto !important;
-  }
-
   &__fallback-bullet {
     width: 8px !important;
     height: 8px !important;

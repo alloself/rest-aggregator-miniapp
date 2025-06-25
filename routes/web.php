@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TelegramBotController;
+use App\Http\Controllers\AggregatorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -10,6 +10,8 @@ use App\Http\Controllers\TelegramBotController;
 |
 */
 
-Route::get('/', function () {
-    return view('site');
-})->name('site.index');
+Route::get('/', [AggregatorController::class, 'site'])->name('site');
+
+Route::get('/account/{any?}', [AggregatorController::class, 'account'])->where('any', '.*')->name('account');
+
+Route::get('/admin', [AggregatorController::class, 'admin'])->name('admin');
