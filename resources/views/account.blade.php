@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @csrf
-    <title>Личный кабинет ресторана  | Eat.Drink.Repeat</title>
+    <title>Личный кабинет ресторана | Eat.Drink.Repeat</title>
 
     <meta name="robots" content="noindex, nofollow">
 
