@@ -1,155 +1,151 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-import type { ApiError } from '../types/api';
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
+import type { ApiError } from "../types/api";
 
 interface LoginCredentials {
-  email: string;
-  password: string;
-  remember?: boolean;
+    email: string;
+    password: string;
+    remember?: boolean;
 }
 
 class ApiClient {
-  private instance: AxiosInstance;
-  private initialized: boolean = false;
+    private instance: AxiosInstance;
 
-  constructor() {
-    this.instance = axios.create({
-      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-      withCredentials: true, 
-    });
+    constructor() {
+        this.instance = axios.create({
+            baseURL: import.meta.env.VITE_API_URL,
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            withCredentials: true,
+        });
 
-    this.setupInterceptors();
-  }
-
-  // Инициализация API клиента - получение CSRF cookie
-  async init(): Promise<void> {
-    if (this.initialized) return;
-    
-    try {
-      console.log('API Client: initializing with CSRF cookie...');
-      await this.getCSRFCookie();
-      this.initialized = true;
-      console.log('API Client: initialized successfully');
-    } catch (error) {
-      console.error('API Client: failed to initialize', error);
-      throw error;
+        this.setupInterceptors();
     }
-  }
 
-  private setupInterceptors() {
-    // Response interceptor - обработка ошибок
-    this.instance.interceptors.response.use(
-      (response: AxiosResponse) => response,
-      async (error: AxiosError<ApiError>) => {
-        // 419 - CSRF Token Mismatch
-        if (error.response?.status === 419) {
-          // Обновляем CSRF токен и пытаемся снова
-          return this.refreshCSRFAndRetry(error);
+    async init() {
+        try {
+            await this.getCSRFCookie();
+        } catch (error) {
+            throw error;
         }
-        
-        // 401 - Unauthorized (сессия истекла)
-        if (error.response?.status === 401) {
-          // Очищаем состояние аутентификации
-          this.handleAuthenticationError();
+    }
+
+    private setupInterceptors() {
+        this.instance.interceptors.response.use(
+            (response: AxiosResponse) => response,
+            async (error: AxiosError<ApiError>) => {
+                if (error.response?.status === 419) {
+                    return this.refreshCSRFAndRetry(error);
+                }
+
+                if (error.response?.status === 401) {
+                    this.handleAuthenticationError();
+                }
+
+                return Promise.reject(this.formatError(error));
+            },
+        );
+    }
+
+    private async refreshCSRFAndRetry(
+        error: AxiosError<ApiError>,
+    ): Promise<any> {
+        try {
+            // Получаем новый CSRF токен
+            await this.getCSRFCookie();
+
+            // Повторяем исходный запрос
+            if (error.config) {
+                return this.instance.request(error.config);
+            }
+        } catch (csrfError) {
+            console.error("Failed to refresh CSRF token:", csrfError);
         }
-        
+
         return Promise.reject(this.formatError(error));
-      }
-    );
-  }
-
-  private async refreshCSRFAndRetry(error: AxiosError<ApiError>): Promise<any> {
-    try {
-      // Получаем новый CSRF токен
-      await this.getCSRFCookie();
-      
-      // Повторяем исходный запрос
-      if (error.config) {
-        return this.instance.request(error.config);
-      }
-    } catch (csrfError) {
-      console.error('Failed to refresh CSRF token:', csrfError);
     }
-    
-    return Promise.reject(this.formatError(error));
-  }
 
-  private handleAuthenticationError() {
-    // Можно отправить событие для обновления состояния аутентификации
-    window.dispatchEvent(new CustomEvent('auth:unauthorized'));
-  }
+    private async handleAuthenticationError() {
+        try {
+            // Выполняем logout для очистки сессии на сервере
+            await this.post<void>("/auth/logout");
+        } catch (error) {
+            // Игнорируем ошибки logout, так как пользователь уже не авторизован
+            console.warn(
+                "Logout failed during authentication error handling:",
+                error,
+            );
+        }
 
-  private formatError(error: AxiosError<ApiError>): ApiError {
-    if (error.response?.data) {
-      return error.response.data;
+        const currentPath = window.location.pathname;
+        let loginUrl = "/";
+
+        if (currentPath.startsWith("/account")) {
+            loginUrl = "/account/login";
+        } else if (currentPath.startsWith("/admin")) {
+            loginUrl = "/admin/login";
+        } else {
+            loginUrl = "/";
+        }
+
+        window.location.href = loginUrl;
     }
-    
-    return {
-      message: error.message || 'Произошла неизвестная ошибка',
-    };
-  }
 
-  // Получение CSRF cookie (обязательно перед первым POST запросом)
-  async getCSRFCookie(): Promise<void> {
-    try {
-      await this.instance.get('/sanctum/csrf-cookie');
-    } catch (error) {
-      console.error('Failed to get CSRF cookie:', error);
-      throw error;
+    private formatError(error: AxiosError<ApiError>): ApiError {
+        if (error.response?.data) {
+            return error.response.data;
+        }
+
+        return {
+            message: error.message || "Произошла неизвестная ошибка",
+        };
     }
-  }
 
-  // Методы для HTTP запросов
-  async get<T>(url: string, config = {}) {
-    const response = await this.instance.get<T>(url, config);
-    return response.data;
-  }
-
-  async post<T>(url: string, data = {}, config = {}) {
-    const response = await this.instance.post<T>(url, data, config);
-    return response.data;
-  }
-
-  async put<T>(url: string, data = {}, config = {}) {
-    const response = await this.instance.put<T>(url, data, config);
-    return response.data;
-  }
-
-  async patch<T>(url: string, data = {}, config = {}) {
-    const response = await this.instance.patch<T>(url, data, config);
-    return response.data;
-  }
-
-  async delete<T>(url: string, config = {}) {
-    const response = await this.instance.delete<T>(url, config);
-    return response.data;
-  }
-
-  // Аутентификация через session cookies (Laravel Fortify)
-  async login(credentials: LoginCredentials): Promise<void> {
-    // CSRF cookie уже должен быть получен при инициализации
-    // Но на всякий случай проверяем
-    if (!this.initialized) {
-      await this.init();
+    async getCSRFCookie(): Promise<void> {
+        try {
+            await this.instance.get("/sanctum/csrf-cookie");
+        } catch (error) {
+            console.error("Failed to get CSRF cookie:", error);
+            throw error;
+        }
     }
-    
-    // Логинимся через Laravel Fortify
-    await this.post<void>('/auth/login', credentials);
-  }
 
-  async logout(): Promise<void> {
-    await this.post<void>('/auth/logout');
-  }
+    async get<T>(url: string, config = {}) {
+        const response = await this.instance.get<T>(url, config);
+        return response.data;
+    }
 
-  // Получение данных текущего пользователя через API
-  async user<T = unknown>(): Promise<T> {
-    return this.get<T>('/api/user');
-  }
+    async post<T>(url: string, data = {}, config = {}) {
+        const response = await this.instance.post<T>(url, data, config);
+        return response.data;
+    }
+
+    async put<T>(url: string, data = {}, config = {}) {
+        const response = await this.instance.put<T>(url, data, config);
+        return response.data;
+    }
+
+    async patch<T>(url: string, data = {}, config = {}) {
+        const response = await this.instance.patch<T>(url, data, config);
+        return response.data;
+    }
+
+    async delete<T>(url: string, config = {}) {
+        const response = await this.instance.delete<T>(url, config);
+        return response.data;
+    }
+
+    async login(credentials: LoginCredentials) {
+        await this.post<void>("/auth/login", credentials);
+    }
+
+    async logout() {
+        await this.post<void>("/auth/logout");
+    }
+    async user<T = unknown>() {
+        return this.get<T>("/api/user");
+    }
 }
 
-// Создаем единственный экземпляр API client
-export const apiClient = new ApiClient(); 
+export const apiClient = new ApiClient();

@@ -1,20 +1,35 @@
 import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
-import LoginPage from "../../pages/Login.vue";
 
 const routes: RouteRecordRaw[] = [
     {
         path: "/account/login",
         name: "login",
-        component: LoginPage,
+        component: () => import("@account/ts/pages/Login.vue"),
         meta: {
-            requiresAuth: false,
             title: "Вход в систему",
         },
     },
+    {
+        path: "/account/dashboard",
+        name: "dashboard",
+        component: () => import("@account/ts/pages/Dashboard.vue"),
+        meta: {
+            title: "Главная",
+            requiresAuth: true,
+        },
+    },
+    {
+        path: "/account",
+        redirect: "/account/dashboard",
+    },
+    {
+        path: "/:pathMatch(.*)*",
+        name: "404",
+        redirect: "/account/dashboard",
+    },
 ];
 
-// Создание роутера
 const router = createRouter({
     history: createWebHistory(),
     routes,
@@ -26,5 +41,17 @@ const router = createRouter({
         }
     },
 });
+
+// TODO: Add authentication guard
+// router.beforeEach((to, from, next) => {
+//     const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+//     const isAuthenticated = false; // Check from auth store
+    
+//     if (requiresAuth && !isAuthenticated) {
+//         next('/account/login');
+//     } else {
+//         next();
+//     }
+// });
 
 export default router;
