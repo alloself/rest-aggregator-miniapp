@@ -12,57 +12,72 @@
                 :validate-on-input="false"
                 v-slot="{ value, handleChange }"
             >
-                <component
-                    :is="schemeField.component"
-                    :model-value="value"
-                    @update:modelValue="handleChange"
-                    :error-messages="getFieldErrors(schemeField)"
-                    v-bind="schemeField.props"
-                    v-on="schemeField.events"
-                    class="mb-1"
-                ></component>
+                <div class="mb-1">
+                    <component
+                        :is="schemeField.component"
+                        :model-value="value"
+                        @update:modelValue="handleChange"
+                        :invalid="!!getFieldErrors(schemeField)"
+                        v-bind="schemeField.props"
+                        v-on="schemeField.events"
+                    ></component>
+                    <div class="h-6 mt-1">
+                        <Transition name="error-fade">
+                            <Message
+                                v-if="getFieldErrors(schemeField)"
+                                severity="error"
+                                size="small"
+                                variant="simple"
+                                class="mb-0 text-xs"
+                                >{{ getFieldErrors(schemeField) }}</Message
+                            >
+                        </Transition>
+                    </div>
+                </div>
             </Field>
         </slot>
     </form>
 </template>
 
 <script lang="ts" setup>
-import { computed, watch } from "vue";
-import {
-    useForm,
-    Field,
-    type FormContext,
-    type GenericObject,
-} from "vee-validate";
+import { computed, watch, Transition } from "vue";
+import { useForm, Field, type FormContext } from "vee-validate";
+import { toTypedSchema } from "@vee-validate/zod";
+import { z } from "zod";
+import Message from "primevue/message";
 import type { ISmartFormField, ISmartFormProps } from "@/shared/types";
 
 const {
     fields = [],
     initialValues = {},
-    readonly = false,
     initialItems = {},
 } = defineProps<ISmartFormProps>();
 
-const emits = defineEmits<{
-    "update:form": [value: FormContext];
-}>();
+const form = defineModel<FormContext>("form");
 
-const mergedValidationSchema = computed(() => {
-    return fields.reduce((schema, field) => {
+const validationSchema = computed(() => {
+    const schemaFields: Record<string, any> = {};
+
+    fields.forEach((field) => {
         if (field.rule) {
-            schema[field.key] = field.rule;
+            schemaFields[field.key] = field.rule;
         }
-        return schema;
-    }, {} as GenericObject);
+    });
+
+    if (Object.keys(schemaFields).length === 0) {
+        return toTypedSchema(z.object({}));
+    }
+
+    return toTypedSchema(z.object(schemaFields));
 });
 
 const formContext = useForm({
-    validationSchema: mergedValidationSchema,
-    initialValues: initialValues,
+    validationSchema,
+    initialValues,
     keepValuesOnUnmount: true,
     validateOnMount: false,
 });
-emits("update:form", formContext);
+form.value = formContext;
 
 const getInitialItems = (field: ISmartFormField) => {
     return field.key in initialItems
@@ -101,4 +116,19 @@ watch(
 );
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+/* Переходы для ошибок */
+.error-fade-enter-active, .error-fade-leave-active {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.error-fade-enter-from, .error-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-4px);
+}
+
+.error-fade-enter-to, .error-fade-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>

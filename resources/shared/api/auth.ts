@@ -17,7 +17,7 @@ export class AuthAPI {
 
   // Логин пользователя (session-based)
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    return apiClient.post<LoginResponse>('login', credentials);
+    return apiClient.post<LoginResponse>('auth/login', credentials);
   }
 
   // Получение информации о текущем пользователе

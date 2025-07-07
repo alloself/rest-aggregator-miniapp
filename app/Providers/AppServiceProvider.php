@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use Laravel\Fortify\Fortify;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,13 +26,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->configureRateLimiting();
+        $this->configureModels();
     }
 
     /**
-     * Configure the rate limiters for the application.
+     * Configure model settings.
      */
-    protected function configureRateLimiting(): void
+    protected function configureModels(): void
     {
         DB::disableQueryLog();  
         Model::preventLazyLoading(true);

@@ -19,10 +19,7 @@ class ApiClient {
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
       },
-      timeout: 10000,
-      withCredentials: true, // Критично для session-based auth
-      xsrfCookieName: 'XSRF-TOKEN', // Laravel по умолчанию использует этот cookie
-      xsrfHeaderName: 'X-XSRF-TOKEN', // Laravel ожидает токен в этом заголовке
+      withCredentials: true, 
     });
 
     this.setupInterceptors();

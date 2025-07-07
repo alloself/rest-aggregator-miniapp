@@ -1,4 +1,8 @@
 @import "tailwindcss";
 @import "tailwindcss-primeui";
 @import "primeicons/primeicons.css";
+
+@source "../ts/**/*.{vue,js,ts,jsx,tsx}";
+@source "../../views/**/*.blade.php";
+
 @custom-variant dark (&:where(.p-dark, .p-dark *));
