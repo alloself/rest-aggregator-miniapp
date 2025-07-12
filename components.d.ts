@@ -11,6 +11,7 @@ declare module 'vue' {
     AutoComplete: typeof import('primevue/autocomplete')['default']
     Button: typeof import('primevue/button')['default']
     Card: typeof import('primevue/card')['default']
+    Dropdown: typeof import('primevue/dropdown')['default']
     Message: typeof import('primevue/message')['default']
     OverlayPanel: typeof import('primevue/overlaypanel')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

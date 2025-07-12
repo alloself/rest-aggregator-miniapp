@@ -3,6 +3,8 @@ import PrimeVue from "primevue/config";
 import Lara from "@primeuix/themes/lara";
 import { definePreset } from "@primeuix/themes";
 import Tooltip from "primevue/tooltip";
+import ConfirmationService from "primevue/confirmationservice";
+import ToastService from "primevue/toastservice";
 
 // Создаем кастомную тему с синими цветами вместо зеленых
 const BluePreset = definePreset(Lara, {
@@ -47,6 +49,10 @@ export function setupPrimeVue(app: App): void {
             },
         },
     });
+    
+    // Регистрируем сервисы PrimeVue
+    app.use(ConfirmationService);
+    app.use(ToastService);
     
     // Регистрируем директивы PrimeVue
     app.directive('tooltip', Tooltip);

@@ -3,7 +3,7 @@ import type { RouteRecordRaw } from "vue-router";
 
 const routes: RouteRecordRaw[] = [
     {
-        path: "/account/login",
+        path: "/login",
         name: "login",
         component: () => import("@account/ts/pages/Login.vue"),
         meta: {
@@ -11,27 +11,50 @@ const routes: RouteRecordRaw[] = [
         },
     },
     {
-        path: "/account/dashboard",
+        path: "/dashboard",
         name: "dashboard",
         component: () => import("@account/ts/pages/Dashboard.vue"),
         meta: {
             title: "Главная",
-            requiresAuth: true,
         },
     },
     {
-        path: "/account",
-        redirect: "/account/dashboard",
+        path: `/category`,
+        name: `category`,
+        meta: {
+            title: "Категории",
+        },
+        component: () => import("@account/ts/pages/Category/List.vue"),
+    },
+    {
+        path: `/category/create`,
+        name: `categoryCreate`,
+        meta: {
+            title: "Создание категории",
+        },
+        component: () => import("@account/ts/pages/Category/Detail.vue"),
+    },
+    {
+        path: `/category/:id`,
+        name: `categoryDetail`,
+        meta: {
+            title: "Категория",
+        },
+        component: () => import("@account/ts/pages/Category/Detail.vue"),
+    },
+    {
+        path: "/",
+        redirect: "/dashboard",
     },
     {
         path: "/:pathMatch(.*)*",
         name: "404",
-        redirect: "/account/dashboard",
+        redirect: "/dashboard",
     },
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory("/account"),
     routes,
     scrollBehavior(to, from, savedPosition) {
         if (savedPosition) {
@@ -46,7 +69,7 @@ const router = createRouter({
 // router.beforeEach((to, from, next) => {
 //     const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 //     const isAuthenticated = false; // Check from auth store
-    
+
 //     if (requiresAuth && !isAuthenticated) {
 //         next('/account/login');
 //     } else {

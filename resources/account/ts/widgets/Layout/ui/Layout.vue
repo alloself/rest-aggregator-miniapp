@@ -112,19 +112,25 @@ const sidebarCollapsed = ref(false);
 const navigationItems = [
     {
         name: "dashboard",
-        path: "/account/dashboard",
+        path: "/dashboard",
         label: "Главная",
         icon: "pi pi-home",
     },
     {
+        name: "category",
+        path: "/category",
+        label: "Категории",
+        icon: "pi pi-tags",
+    },
+    {
         name: "orders",
-        path: "/account/orders",
+        path: "/orders",
         label: "Заказы",
         icon: "pi pi-shopping-cart",
     },
     {
         name: "settings",
-        path: "/account/settings",
+        path: "/settings",
         label: "Настройки",
         icon: "pi pi-cog",
     },

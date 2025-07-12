@@ -1,10 +1,26 @@
 export interface Category {
   // columns
-  id: number
+  id: string
   slug: string
   name: string
+  order: number
+  restaurant_id: string
+  _lft: number
+  _rgt: number
+  parent_id?: string | null
   created_at?: Date | null
   updated_at?: Date | null
+  // mutators
+  full_path: string
+  // relations
+  restaurant?: Restaurant
+  dishes?: Dish[]
+  dishes_count: number
+  dishes_exists: boolean
+  parent?: Category
+  children?: Category[]
+  children_count: number
+  children_exists: boolean
 }
 
 export interface Dish {
@@ -12,6 +28,8 @@ export interface Dish {
   id: number
   slug: string
   name: string
+  category_id: string
+  order: number
   created_at?: Date | null
   updated_at?: Date | null
 }
@@ -21,6 +39,8 @@ export interface Event {
   id: number
   slug: string
   name: string
+  restaurant_id: string
+  order: number
   created_at?: Date | null
   updated_at?: Date | null
 }
@@ -40,6 +60,8 @@ export interface News {
   id: number
   slug: string
   name: string
+  restaurant_id: string
+  order: number
   created_at?: Date | null
   updated_at?: Date | null
 }
@@ -49,6 +71,8 @@ export interface Offer {
   id: number
   slug: string
   name: string
+  restaurant_id: string
+  order: number
   created_at?: Date | null
   updated_at?: Date | null
 }
