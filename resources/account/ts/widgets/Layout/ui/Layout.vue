@@ -106,8 +106,7 @@ import { UserMenu } from "@account/ts/widgets/UserMenu";
 
 const route = useRoute();
 
-// Sidebar state - восстанавливаем из localStorage
-const sidebarCollapsed = ref(false);
+const sidebarCollapsed = ref(true);
 
 const navigationItems = [
     {
@@ -138,7 +137,6 @@ const navigationItems = [
 
 const toggleSidebar = () => {
     sidebarCollapsed.value = !sidebarCollapsed.value;
-    // Сохраняем состояние в localStorage
     localStorage.setItem(
         "account-sidebar-collapsed",
         sidebarCollapsed.value.toString(),
