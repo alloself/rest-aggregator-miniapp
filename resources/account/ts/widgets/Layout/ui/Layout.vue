@@ -152,7 +152,6 @@ const getNavItemClass = (path: string) => {
         : "text-gray-700 hover:bg-gray-100 hover:text-gray-900";
 };
 
-// Восстанавливаем состояние сайдбара при загрузке
 onMounted(() => {
     const saved = localStorage.getItem("account-sidebar-collapsed");
     if (saved !== null) {
@@ -160,7 +159,3 @@ onMounted(() => {
     }
 });
 </script>
-
-<style scoped>
-/* Additional custom styles if needed */
-</style>
