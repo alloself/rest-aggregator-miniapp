@@ -24,7 +24,7 @@
             <aside
                 class="sticky top-16 bg-white shadow-sm border-r border-gray-200 transition-all duration-300 ease-in-out flex flex-col z-40 self-start"
                 :class="sidebarCollapsed ? 'w-16' : 'w-64'"
-                style="height: calc(100vh - 4rem);"
+                style="height: calc(100vh - 4rem)"
             >
                 <!-- Navigation - Scrollable -->
                 <nav class="flex-1 p-3 overflow-hidden">
@@ -87,11 +87,11 @@
             </aside>
 
             <!-- Main Content -->
-            <main
-                class="flex-1 transition-all duration-300 ease-in-out"
-            >
+            <main class="flex-1 transition-all duration-300 ease-in-out">
                 <div class="p-4">
-                    <slot />
+                    <router-view v-slot="{ Component, route }">
+                        <component :is="Component" :key="route.name" />
+                    </router-view>
                 </div>
             </main>
         </div>
@@ -112,7 +112,7 @@ const sidebarCollapsed = ref(false);
 const navigationItems = [
     {
         name: "dashboard",
-        path: "/dashboard",
+        path: "/",
         label: "Главная",
         icon: "pi pi-home",
     },

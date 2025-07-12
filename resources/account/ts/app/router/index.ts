@@ -11,40 +11,46 @@ const routes: RouteRecordRaw[] = [
         },
     },
     {
-        path: "/dashboard",
-        name: "dashboard",
-        component: () => import("@account/ts/pages/Dashboard.vue"),
+        path: "/",
+        name: "App",
+        component: () => import("@account/ts/widgets/Layout/ui/Layout.vue"),
         meta: {
             title: "Главная",
         },
-    },
-    {
-        path: `/category`,
-        name: `category`,
-        meta: {
-            title: "Категории",
-        },
-        component: () => import("@account/ts/pages/Category/List.vue"),
-    },
-    {
-        path: `/category/create`,
-        name: `categoryCreate`,
-        meta: {
-            title: "Создание категории",
-        },
-        component: () => import("@account/ts/pages/Category/Detail.vue"),
-    },
-    {
-        path: `/category/:id`,
-        name: `categoryDetail`,
-        meta: {
-            title: "Категория",
-        },
-        component: () => import("@account/ts/pages/Category/Detail.vue"),
-    },
-    {
-        path: "/",
-        redirect: "/dashboard",
+        children: [
+            {
+                path: "/dashboard",
+                alias: "/",
+                name: "dashboard",
+                component: () => import("@account/ts/pages/Dashboard.vue"),
+            },
+            {
+                path: `/category`,
+                name: `category`,
+                meta: {
+                    title: "Категории",
+                },
+                component: () => import("@account/ts/pages/Category/List.vue"),
+            },
+            {
+                path: `/category/create`,
+                name: `categoryCreate`,
+                meta: {
+                    title: "Создание категории",
+                },
+                component: () =>
+                    import("@account/ts/pages/Category/Detail.vue"),
+            },
+            {
+                path: `/category/:id`,
+                name: `categoryDetail`,
+                meta: {
+                    title: "Категория",
+                },
+                component: () =>
+                    import("@account/ts/pages/Category/Detail.vue"),
+            },
+        ],
     },
     {
         path: "/:pathMatch(.*)*",
