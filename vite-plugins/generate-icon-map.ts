@@ -40,11 +40,6 @@ export default function generateIconMapPlugin(options: GenerateIconMapOptions = 
 export const customIconMap = {} as const
 
 export type CustomIconName = keyof typeof customIconMap
-
-// Helper function to check if icon exists
-export const hasCustomIcon = (name: string): name is CustomIconName => {
-  return name in customIconMap
-}
 `
         const resolvedOutputPath = path.resolve(process.cwd(), outputPath)
         await fse.ensureDir(path.dirname(resolvedOutputPath))
@@ -82,11 +77,6 @@ ${customMap.join(',\n')}
 } as const
 
 export type CustomIconName = keyof typeof customIconMap
-
-// Helper function to check if icon exists
-export const hasCustomIcon = (name: string): name is CustomIconName => {
-  return name in customIconMap
-}
 `
 
       // Проверяем, изменился ли контент (кеширование)
