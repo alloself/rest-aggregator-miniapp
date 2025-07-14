@@ -37,7 +37,7 @@ export default function generateIconMapPlugin(options: GenerateIconMapOptions = 
         const emptyContent = `// AUTO-GENERATED FILE. DO NOT EDIT.
 // Generated from: ${svgDir}
 
-export const customIconMap = {} as const
+export const customIconMap = {}
 
 export type CustomIconName = keyof typeof customIconMap
 `
@@ -74,7 +74,7 @@ export type CustomIconName = keyof typeof customIconMap
 
 export const customIconMap = {
 ${customMap.join(',\n')}
-} as const
+}
 
 export type CustomIconName = keyof typeof customIconMap
 `

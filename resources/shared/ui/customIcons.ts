@@ -3,6 +3,6 @@
 
 export const customIconMap = {
   "star": () => import('~icons/custom/star')
-} as const
+}
 
 export type CustomIconName = keyof typeof customIconMap
