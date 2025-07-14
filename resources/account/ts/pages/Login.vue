@@ -33,15 +33,16 @@ import { type FormContext } from "vee-validate";
 import SmartForm from "@/shared/components/SmartForm.vue";
 import Button from "primevue/button";
 import Card from "primevue/card";
-import { authAPI } from "@/shared/api/auth";
 import { useFormSubmit } from "@/shared/composables/useFormSubmit";
 import { useLoginFormFields } from "../entities/user/forms/login";
+import { useAuthStore } from "@/shared";
 
 const router = useRouter();
 const isLoading = ref(false);
 const formContext = ref<FormContext>();
 
 const { fields } = useLoginFormFields();
+const { login } = useAuthStore();
 
 const submitLogin = async () => {
     if (!formContext.value) return;
@@ -50,7 +51,7 @@ const submitLogin = async () => {
 
     try {
         isLoading.value = true;
-        const response = await authAPI.login({
+        await login({
             email: values.email,
             password: values.password,
         });

@@ -4,7 +4,10 @@ import { fileURLToPath } from "node:url";
 import vue from "@vitejs/plugin-vue";
 import Components from "unplugin-vue-components/vite";
 import { PrimeVueResolver } from "@primevue/auto-import-resolver";
-import tailwindcss from '@tailwindcss/vite'
+import tailwindcss from "@tailwindcss/vite";
+import Icons from "unplugin-icons/vite";
+import { FileSystemIconLoader } from "unplugin-icons/loaders";
+import generateIconMapPlugin from "./vite-plugins/generate-icon-map";
 
 export default defineConfig({
     plugins: [
@@ -31,6 +34,19 @@ export default defineConfig({
         }),
         Components({
             resolvers: [PrimeVueResolver()],
+        }),
+        Icons({
+            compiler: "vue3",
+            autoInstall: true,
+            customCollections: {
+                custom: FileSystemIconLoader("./resources/shared/svg"),
+            },
+        }),
+        generateIconMapPlugin({
+            svgDir: 'resources/shared/svg',
+            outputPath: 'resources/shared/ui/customIcons.ts',
+            prefix: '',
+            debounceMs: 200
         }),
         tailwindcss(),
     ],

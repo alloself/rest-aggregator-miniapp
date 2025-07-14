@@ -8,28 +8,30 @@
         >
             <!-- Avatar -->
             <div class="relative">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-medium text-sm">
+                <div
+                    class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-medium text-sm"
+                >
                     {{ initials }}
                 </div>
-                <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 border-2 border-white rounded-full"></div>
             </div>
-            
+
             <!-- User Info (hidden on small screens) -->
             <div class="hidden sm:block text-left">
-                <p class="text-sm font-medium text-gray-900">{{ displayName }}</p>
-                <p class="text-xs text-gray-500">{{ userRole }}</p>
+                <p class="text-sm font-medium text-gray-900">
+                    {{ displayName }}
+                </p>
             </div>
-            
+
             <!-- Chevron -->
-            <svg 
-                class="w-4 h-4 text-gray-400 transition-transform duration-200"
-                :class="{ 'rotate-180': isOpen }"
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-            >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
+            <Icon
+                name="mdi:chevron-down"
+                :size="16"
+                color="#9CA3AF"
+                :class="[
+                    'transition-transform duration-200',
+                    { 'rotate-180': isOpen },
+                ]"
+            />
         </button>
 
         <!-- Dropdown Menu -->
@@ -48,59 +50,38 @@
                 <!-- User Header -->
                 <div class="p-4 border-b border-gray-100">
                     <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold">
+                        <div
+                            class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold"
+                        >
                             {{ initials }}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-medium text-gray-900 truncate">{{ fullName }}</p>
-                            <p class="text-sm text-gray-500 truncate">{{ userEmail }}</p>
+                            <p class="font-medium text-gray-900 truncate">
+                                {{ fullName }}
+                            </p>
+                            <p class="text-sm text-gray-500 truncate">
+                                {{ userEmail }}
+                            </p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Menu Items -->
                 <div class="py-2">
-                    <!-- Account Section -->
-                    <div class="px-2 mb-2">
-                        <p class="px-3 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            Аккаунт
-                        </p>
-                        <MenuItem 
-                            v-for="item in accountItems" 
-                            :key="item.label"
-                            :icon="item.icon"
-                            :label="item.label"
-                            @click="handleItemClick(item.route)"
-                        />
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="px-2 mb-2">
-                        <p class="px-3 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            Действия
-                        </p>
-                        <MenuItem 
-                            v-for="item in actionItems" 
-                            :key="item.label"
-                            :icon="item.icon"
-                            :label="item.label"
-                            @click="handleItemClick(item.route)"
-                        />
-                    </div>
-
-                    <!-- Divider -->
-                    <hr class="border-gray-100 my-2">
-
                     <!-- Logout -->
                     <div class="px-2">
                         <button
                             @click="handleLogout"
                             class="w-full flex items-center space-x-3 px-3 py-2 text-left rounded-lg hover:bg-red-50 transition-colors group cursor-pointer"
                         >
-                            <div class="w-8 h-8 rounded-lg bg-red-100 group-hover:bg-red-200 flex items-center justify-center transition-colors">
-                                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                </svg>
+                            <div
+                                class="w-8 h-8 rounded-lg bg-red-100 group-hover:bg-red-200 flex items-center justify-center transition-colors"
+                            >
+                                <Icon
+                                    name="mdi:logout"
+                                    :size="16"
+                                    color="#DC2626"
+                                />
                             </div>
                             <span class="font-medium text-red-700">Выйти</span>
                         </button>
@@ -112,82 +93,65 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { apiClient } from '@shared/api/client'
-import MenuItem from './UserMenuItem.vue'
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import { onClickOutside } from "@vueuse/core";
+import { useAuthStore } from "@/shared/stores/auth";
+import Icon from "@shared/ui/Icon.vue";
+import { storeToRefs } from "pinia";
 
-const router = useRouter()
-const userMenuRef = ref<HTMLElement>()
-const isOpen = ref(false)
+const router = useRouter();
+const userMenuRef = ref<HTMLElement>();
+const isOpen = ref(false);
 
-// User data (replace with actual user store/composable)
-const fullName = ref('Иван Петров')
-const userEmail = ref('ivan.petrov@example.com')
-const userRole = ref('Владелец ресторана')
+const authStore = useAuthStore();
+
+const { user } = storeToRefs(authStore);
+
+const fullName = computed(() => {
+    if (!user.value) return "";
+    const firstName = user.value.first_name || "";
+    const lastName = user.value.last_name || "";
+    return `${firstName} ${lastName}`.trim();
+});
+
+const userEmail = computed(() => {
+    return user.value?.email || "";
+});
 
 const displayName = computed(() => {
-    const names = fullName.value.split(' ')
-    return names.length > 1 ? `${names[0]} ${names[1][0]}.` : names[0]
-})
+    const names = fullName.value.split(" ");
+    return names.length > 1 ? `${names[0]} ${names[1][0]}.` : names[0];
+});
 
 const initials = computed(() => {
     return fullName.value
-        .split(' ')
+        .split(" ")
         .slice(0, 2)
-        .map(name => name.charAt(0))
-        .join('')
-        .toUpperCase()
-})
-
-const accountItems = [
-    { icon: '👤', label: 'Профиль', route: '/account/profile' },
-    { icon: '⚙️', label: 'Настройки', route: '/account/settings' },
-    { icon: '💳', label: 'Платежи', route: '/account/billing' }
-]
-
-const actionItems = [
-    { icon: '📦', label: 'Мои заказы', route: '/account/orders' },
-    { icon: '🔔', label: 'Уведомления', route: '/account/notifications' },
-    { icon: '❓', label: 'Помощь', route: '/account/help' }
-]
+        .map((name) => name.charAt(0))
+        .join("")
+        .toUpperCase();
+});
 
 const toggleMenu = () => {
-    isOpen.value = !isOpen.value
-}
+    isOpen.value = !isOpen.value;
+};
 
 const closeMenu = () => {
-    isOpen.value = false
-}
-
-const handleItemClick = (route: string) => {
-    router.push(route)
-    closeMenu()
-}
+    isOpen.value = false;
+};
 
 const handleLogout = async () => {
     try {
-        await apiClient.logout()
-        closeMenu()
-        router.push('/account/login')
+        await authStore.logout();
+        closeMenu();
+        router.push({ name: "login" });
     } catch (error) {
-        console.error('Logout failed:', error)
-        router.push('/account/login')
+        console.error("Logout failed:", error);
+        router.push({ name: "login" });
     }
-}
+};
 
-// Close menu when clicking outside
-const handleClickOutside = (event: Event) => {
-    if (userMenuRef.value && !userMenuRef.value.contains(event.target as Node)) {
-        closeMenu()
-    }
-}
-
-onMounted(() => {
-    document.addEventListener('click', handleClickOutside)
-})
-
-onUnmounted(() => {
-    document.removeEventListener('click', handleClickOutside)
-})
+// Закрытие меню при клике вне его области
+onClickOutside(userMenuRef, closeMenu);
 </script>

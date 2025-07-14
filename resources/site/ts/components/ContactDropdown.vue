@@ -5,10 +5,9 @@
       @click="toggleDropdown"
       class="contact-dropdown__trigger"
     >
-      <MdiIcon 
-        name="phone" 
-        size="custom"
-        :custom-size="19"
+      <Icon 
+        name="mdi:phone" 
+        size="19"
         color="black"
         class="contact-dropdown__icon"
       />
@@ -63,7 +62,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { MdiIcon } from '@shared/ui'
+import { Icon } from '@shared/ui'
 import SvgIcon from './SvgIcon.vue'
 
 // Props

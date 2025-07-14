@@ -71,16 +71,4 @@ const router = createRouter({
     },
 });
 
-// TODO: Add authentication guard
-// router.beforeEach((to, from, next) => {
-//     const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-//     const isAuthenticated = false; // Check from auth store
-
-//     if (requiresAuth && !isAuthenticated) {
-//         next('/account/login');
-//     } else {
-//         next();
-//     }
-// });
-
 export default router;

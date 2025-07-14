@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,6 +15,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    //todo: Create user controller
+$accountResources = [];
+
+Route::middleware(['auth:sanctum'])->get('me', [AuthController::class, 'me']);
+
+Route::prefix('account')->middleware(['auth:sanctum', 'role:restaurant'])->group(function () use ($accountResources) {
+
+    Route::apiResources($accountResources);
+
+    Route::prefix('destroy')->group(function () use ($accountResources) {
+        foreach ($accountResources as $route => $controller) {
+            Route::post($route, [$controller, 'deleteMany']);
+        }
+    });
 });

@@ -21,7 +21,11 @@
       @click="selectCategory(category.id)"
       :aria-label="`Фильтр ${category.label}`"
     >
-      <i v-if="category.icon" :class="['pi', category.icon]"></i>
+      <Icon 
+        v-if="category.icon" 
+        :name="getMdiIconName(category.icon)" 
+        size="15px" 
+      />
       {{ category.label }}
       <Badge
         v-if="category.count !== undefined"
@@ -36,6 +40,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import Badge from 'primevue/badge'
+import Icon from '@shared/ui/Icon.vue'
 
 interface Category {
   id: string
@@ -91,6 +96,39 @@ const selectCategory = (categoryId: string) => {
   if (category && !category.disabled) {
     emit('categoryChange', categoryId, category)
   }
+}
+
+// Маппинг PrimeIcons на MDI иконки
+const getMdiIconName = (primeIcon: string): string => {
+  const iconMap: Record<string, string> = {
+    'pi-apps': 'mdi:apps',
+    'pi-home': 'mdi:home',
+    'pi-star': 'mdi:star',
+    'pi-heart': 'mdi:heart',
+    'pi-user': 'mdi:account',
+    'pi-cog': 'mdi:cog',
+    'pi-search': 'mdi:magnify',
+    'pi-calendar': 'mdi:calendar',
+    'pi-shopping-cart': 'mdi:cart',
+    'pi-bell': 'mdi:bell',
+    'pi-envelope': 'mdi:email',
+    'pi-phone': 'mdi:phone',
+    'pi-map-marker': 'mdi:map-marker',
+    'pi-clock': 'mdi:clock',
+    'pi-check': 'mdi:check',
+    'pi-times': 'mdi:close',
+    'pi-plus': 'mdi:plus',
+    'pi-minus': 'mdi:minus',
+    'pi-arrow-up': 'mdi:arrow-up',
+    'pi-arrow-down': 'mdi:arrow-down',
+    'pi-arrow-left': 'mdi:arrow-left',
+    'pi-arrow-right': 'mdi:arrow-right',
+  }
+  
+  // Убираем префикс 'pi-' если он есть
+  const cleanIcon = primeIcon.startsWith('pi-') ? primeIcon.slice(3) : primeIcon
+  
+  return iconMap[primeIcon] || iconMap[`pi-${cleanIcon}`] || `mdi:${cleanIcon}`
 }
 </script>
 
@@ -183,8 +221,8 @@ const selectCategory = (categoryId: string) => {
 }
 
 /* Icon styling */
-.category-filter__item .pi {
-  font-size: 15px;
+.category-filter__item .mdi-icon {
+  flex-shrink: 0;
 }
 
 /* Badge styling внутри кнопки */

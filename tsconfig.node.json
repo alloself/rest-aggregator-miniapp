@@ -8,5 +8,5 @@
     "strict": true,
     "types": ["node"]
   },
-  "include": ["vite.config.ts", "postcss.config.js"]
+  "include": ["vite.config.ts", "postcss.config.js", "resources/shared/plugins/**/*.ts", "vite-plugins/**/*.ts"]
 }

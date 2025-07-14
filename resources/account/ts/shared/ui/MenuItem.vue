@@ -6,14 +6,26 @@
         :class="computedClass"
         @click="handleClick"
     >
-        <i v-if="icon" :class="icon" class="text-base flex-shrink-0" />
+        <Icon 
+            v-if="icon" 
+            :name="icon" 
+            size="16px" 
+            class="flex-shrink-0" 
+        />
         <span class="flex-1">{{ label }}</span>
-        <i v-if="showArrow" class="pi pi-angle-right text-xs text-gray-400" />
+        <Icon 
+            v-if="showArrow" 
+            name="mdi:chevron-right" 
+            size="12px" 
+            color="#9CA3AF" 
+            class="flex-shrink-0" 
+        />
     </component>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import Icon from '@shared/ui/Icon.vue';
 
 interface Props {
     icon?: string;

@@ -43,8 +43,9 @@
                                     sidebarCollapsed ? item.label : ''
                                 "
                             >
-                                <i
-                                    :class="item.icon"
+                                <Icon
+                                    :name="item.icon"
+                                    size="16px"
                                     class="text-base flex-shrink-0"
                                 />
                                 <span
@@ -66,8 +67,8 @@
                     <Button
                         :icon="
                             sidebarCollapsed
-                                ? 'pi pi-angle-right'
-                                : 'pi pi-angle-left'
+                                ? 'pi pi-chevron-right'
+                                : 'pi pi-chevron-left'
                         "
                         text
                         rounded
@@ -103,6 +104,7 @@ import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import Button from "primevue/button";
 import { UserMenu } from "@account/ts/widgets/UserMenu";
+import Icon from "@shared/ui/Icon.vue";
 
 const route = useRoute();
 
@@ -113,25 +115,25 @@ const navigationItems = [
         name: "dashboard",
         path: "/",
         label: "Главная",
-        icon: "pi pi-home",
+        icon: "mdi:home",
     },
     {
         name: "category",
         path: "/category",
         label: "Категории",
-        icon: "pi pi-tags",
+        icon: "mdi:tag",
     },
     {
         name: "orders",
         path: "/orders",
         label: "Заказы",
-        icon: "pi pi-shopping-cart",
+        icon: "mdi:cart",
     },
     {
         name: "settings",
         path: "/settings",
         label: "Настройки",
-        icon: "pi pi-cog",
+        icon: "mdi:cog",
     },
 ];
 

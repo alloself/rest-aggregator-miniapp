@@ -6,7 +6,7 @@
         <h1 class="home-page__title">Рестораны</h1>
         <Button
           @click="navigation.goToSearch()"
-          icon="pi pi-search"
+          icon="magnify"
           text
           rounded
           class="home-page__search-btn"
@@ -83,7 +83,7 @@
           <Button
             v-if="pagination.current_page > 1"
             @click="loadPage(pagination.current_page - 1)"
-            icon="pi pi-chevron-left"
+            icon="chevron-left"
             text
             label="Назад"
           />
@@ -95,7 +95,7 @@
           <Button
             v-if="pagination.current_page < pagination.last_page"
             @click="loadPage(pagination.current_page + 1)"
-            icon="pi pi-chevron-right"
+            icon="chevron-right"
             text
             label="Далее"
             icon-pos="right"

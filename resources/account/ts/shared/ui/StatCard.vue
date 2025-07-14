@@ -18,17 +18,22 @@
                         class="w-12 h-12 rounded-lg flex items-center justify-center"
                         :class="iconBackgroundClass"
                     >
-                        <i :class="icon" class="text-xl" :style="{ color: iconColor }" />
+                        <Icon 
+                            :name="icon" 
+                            size="24px" 
+                            :color="iconColor" 
+                        />
                     </div>
                 </div>
             </div>
             
             <div v-if="trend" class="mt-3 flex items-center">
                 <div class="flex items-center">
-                    <i 
-                        :class="trendIcon" 
-                        class="text-sm mr-1"
-                        :style="{ color: trendColor }"
+                    <Icon 
+                        :name="trendIconName" 
+                        size="14px" 
+                        :color="trendColor"
+                        class="mr-1"
                     />
                     <span 
                         class="text-sm font-medium"
@@ -48,6 +53,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import Card from 'primevue/card';
+import Icon from '@shared/ui/Icon.vue';
 
 interface TrendData {
     value: number;
@@ -72,9 +78,9 @@ const iconBackgroundClass = computed(() => {
     return 'bg-gray-100';
 });
 
-const trendIcon = computed(() => {
+const trendIconName = computed(() => {
     if (!props.trend) return '';
-    return props.trend.value >= 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down';
+    return props.trend.value >= 0 ? 'mdi:arrow-up' : 'mdi:arrow-down';
 });
 
 const trendColor = computed(() => {

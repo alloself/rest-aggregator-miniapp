@@ -1,9 +1,10 @@
+import { isAxiosError } from "axios";
 import type { FormContext } from "vee-validate";
 import type { Ref } from "vue";
 
 function formatResponseErrors(
     errors: Record<string, string[]>,
-    prefixMap: Record<string, string> = {}
+    prefixMap: Record<string, string> = {},
 ) {
     const formatted: Record<string, string[]> = {};
 
@@ -17,7 +18,7 @@ function formatResponseErrors(
 
 export const useFormSubmit = (
     fn: () => Promise<void>,
-    form: Ref<FormContext | undefined>
+    form: Ref<FormContext | undefined>,
 ) => {
     const handler = async () => {
         if (!form.value) {
@@ -29,18 +30,19 @@ export const useFormSubmit = (
                 return;
             }
             await fn();
-        } catch (error: any) {
-            if (!error) {
+        } catch (error: unknown) {
+            if (isAxiosError(error)) {
+                const formErrors = error?.response?.data.errors;
+                if (formErrors && form) {
+                    const formattedErrors = formatResponseErrors(formErrors, {
+                        title: "link.",
+                        subtitle: "link.",
+                    });
+                    form.value.setErrors(formattedErrors);
+                }
                 return;
             }
-            const formErrors = error?.response?.data.errors;
-            if (formErrors && form) {
-                const formattedErrors = formatResponseErrors(formErrors, {
-                    title: "link.",
-                    subtitle: "link.",
-                });
-                form.value.setErrors(formattedErrors);
-            }
+            throw error;
         }
     };
 

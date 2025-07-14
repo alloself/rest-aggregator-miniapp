@@ -23,7 +23,7 @@
                 title="Всего заказов"
                 :value="stats.totalOrders"
                 description="За все время"
-                icon="pi pi-shopping-cart"
+                icon="mdi:cart"
                 iconColor="#3B82F6"
                 :trend="{ value: 12, unit: '%', period: 'за месяц' }"
             />
@@ -32,7 +32,7 @@
                 title="Активные заказы"
                 :value="stats.activeOrders"
                 description="В обработке"
-                icon="pi pi-clock"
+                icon="mdi:clock"
                 iconColor="#F59E0B"
             />
 
@@ -40,7 +40,7 @@
                 title="Потрачено"
                 :value="formatCurrency(stats.totalSpent)"
                 description="За все время"
-                icon="pi pi-wallet"
+                icon="mdi:wallet"
                 iconColor="#10B981"
                 :trend="{ value: -5, unit: '%', period: 'за месяц' }"
             />
@@ -49,7 +49,7 @@
                 title="Бонусные баллы"
                 :value="stats.bonusPoints"
                 description="Доступно к списанию"
-                icon="pi pi-star"
+                icon="mdi:star"
                 iconColor="#8B5CF6"
             />
         </div>
@@ -97,7 +97,7 @@
                         </div>
                         <div class="flex items-center space-x-2">
                             <Button
-                                icon="pi pi-eye"
+                                icon="eye"
                                 severity="secondary"
                                 text
                                 rounded
@@ -106,7 +106,7 @@
                             />
                             <Button
                                 v-if="order.status === 'completed'"
-                                icon="pi pi-refresh"
+                                icon="refresh"
                                 severity="secondary"
                                 text
                                 rounded
@@ -120,7 +120,7 @@
 
             <div v-if="recentOrders.length === 0" class="px-4 py-6 text-center">
                 <div class="text-gray-500">
-                    <i class="pi pi-shopping-cart text-3xl mb-4 block" />
+                                          <Icon name="mdi:cart" class="text-3xl mb-4 block text-gray-400" />
                     <p class="text-lg font-medium">Пока заказов нет</p>
                     <p class="text-sm mt-1">Оформите свой первый заказ</p>
                 </div>
@@ -135,20 +135,20 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Button
                     label="Новый заказ"
-                    icon="pi pi-plus"
+                    icon="plus"
                     @click="createNewOrder"
                     class="justify-start"
                 />
                 <Button
                     label="Настройки профиля"
-                    icon="pi pi-user"
+                    icon="account"
                     severity="secondary"
                     @click="navigateToSettings"
                     class="justify-start"
                 />
                 <Button
                     label="Связаться с поддержкой"
-                    icon="pi pi-question-circle"
+                    icon="help-circle"
                     severity="secondary"
                     @click="contactSupport"
                     class="justify-start"
@@ -163,6 +163,7 @@ import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { Layout } from "@account/ts/widgets/Layout";
 import StatCard from "@account/ts/shared/ui/StatCard.vue";
+import Icon from "@shared/ui/Icon.vue";
 import Button from "primevue/button";
 import Badge from "primevue/badge";
 

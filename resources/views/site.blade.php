@@ -155,7 +155,7 @@
     
     <!-- Telegram Mini App meta -->
     <meta name="telegram:card" content="app">
-    <meta name="telegram:site" content="@restaurant_aggregator_bot">
+    <meta name="telegram:site" content="restaurant_aggregator_bot">
     
     <!-- Structured data для поисковых систем -->
     <script type="application/ld+json">
@@ -246,4 +246,4 @@
         display: none;
     }
 </style>
-@endpush 
+@endpush

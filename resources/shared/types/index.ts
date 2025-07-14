@@ -20,6 +20,16 @@ export type {
     ApiEndpoints,
 } from "./api";
 
+export interface IBaseEntity {
+    id: string | number;
+    [key: string]: unknown;
+}
+
+export interface IItems<T extends IBaseEntity> {
+    itemTitle?: string | ((item: T) => string);
+    itemValue?: string | ((item: T) => string | number);
+}
+
 export interface ISmartFormField {
     component: Component | string;
     key: string;

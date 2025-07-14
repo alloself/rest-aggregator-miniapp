@@ -130,7 +130,7 @@
           :label="submitLabel"
           :loading="isSubmitting"
           :disabled="isSubmitting"
-          icon="pi pi-check"
+          icon="check"
         />
         
         <Button

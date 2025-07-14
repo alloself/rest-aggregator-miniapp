@@ -10,8 +10,12 @@ declare module 'vue' {
   export interface GlobalComponents {
     AutoComplete: typeof import('primevue/autocomplete')['default']
     Button: typeof import('primevue/button')['default']
+    ButtonGroup: typeof import('primevue/buttongroup')['default']
     Card: typeof import('primevue/card')['default']
     Dropdown: typeof import('primevue/dropdown')['default']
+    IconMdiChevronDown: typeof import('~icons/mdi/chevron-down')['default']
+    IconMdiHelpCircle: typeof import('~icons/mdi/help-circle')['default']
+    IconMdiLogout: typeof import('~icons/mdi/logout')['default']
     Message: typeof import('primevue/message')['default']
     OverlayPanel: typeof import('primevue/overlaypanel')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

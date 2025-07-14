@@ -8,11 +8,10 @@ export interface AuthUser extends Omit<User, 'roles'> {
   restaurant?: Restaurant; // Preloaded restaurant for restaurant owners
 }
 
-// Session-based login (no tokens, uses cookies)
 export interface LoginRequest {
   email: string;
   password: string;
-  remember?: boolean; // "Remember me" checkbox
+  remember?: boolean;
 }
 
 export interface LoginResponse {

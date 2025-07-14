@@ -15,11 +15,10 @@
                 <!-- Restaurant Name and Brief Description -->
                 <div class="restaurant-info">
                     <h1 class="restaurant-info__title">
-                        {{ restaurant?.name || "GRETTO" }}
+                        {{ "GRETTO" }}
                     </h1>
                     <p class="restaurant-info__description">
                         {{
-                            restaurant?.description ||
                             "Средиземноморские завтраки и обеды. Греческая кухня."
                         }}
                     </p>
@@ -30,9 +29,9 @@
                     <!-- Average Check -->
                     <div class="restaurant-details__item">
                         <div class="restaurant-details__icon">
-                            <MdiIcon
-                                name="credit-card-outline"
-                                size="sm"
+                            <Icon
+                                name="mdi:credit-card-outline"
+                                size="16"
                                 color="gray"
                             />
                         </div>
@@ -44,9 +43,9 @@
                         class="restaurant-details__item restaurant-details__item--schedule"
                     >
                         <div class="restaurant-details__icon">
-                            <MdiIcon
-                                name="clock-outline"
-                                size="sm"
+                            <Icon
+                                name="mdi:clock-outline"
+                                size="16"
                                 color="gray"
                             />
                         </div>
@@ -59,14 +58,14 @@
                     <!-- Address -->
                     <div class="restaurant-details__item">
                         <div class="restaurant-details__icon">
-                            <MdiIcon
-                                name="map-marker-outline"
-                                size="sm"
+                            <Icon
+                                name="mdi:map-marker-outline"
+                                size="16"
                                 color="gray"
                             />
                         </div>
                         <span class="restaurant-details__text">{{
-                            restaurant?.address || "Наб. реки Фонтанки, 1"
+                            "Наб. реки Фонтанки, 1"
                         }}</span>
                     </div>
                 </div>
@@ -172,20 +171,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import type { Restaurant } from "@shared/types";
-import {
-    useRestaurantStore,
-    useRestaurantDetailsStore,
-} from "@shared/stores/restaurant";
-
-// PrimeVue components
-import Card from "primevue/card";
-import Image from "primevue/image";
-import Button from "primevue/button";
+import { ref } from "vue";
 
 // Shared UI components
-import { MdiIcon, RestaurantHeroCarousel } from "@shared/ui";
+import { Icon, RestaurantHeroCarousel } from "@shared/ui";
 
 // Local components
 import NewsFeed from "./NewsFeed.vue";
@@ -196,14 +185,8 @@ interface Props {
     slug: string;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
-// Stores
-const restaurantStore = useRestaurantStore();
-const detailsStore = useRestaurantDetailsStore();
-
-// Data
-const restaurant = ref<Restaurant | null>(null);
 const fullDescription = ref(
     "Gretto – место, где еда становится образом жизни. Свежие, натуральные ингредиенты с упором на овощи, сыры и дары моря. Место, где еда становится образом жизни. Свежие, натуральные ингредиенты с упором на овощи, сыры и дары моря. Свежие, натуральные ингредиенты с упором на овощи, сыры и дары моря. Здесь готовят с душой и используют только лучшие продукты. Каждое блюдо – это произведение искусства, которое радует не только глаз, но и вкусовые рецепторы.",
 );
@@ -236,11 +219,6 @@ const showBar = () => {
 const showPhotos = () => {
     // TODO: Реализовать показ фото галереи
 };
-
-// Top-level await - ключевая особенность для Suspense
-restaurant.value = await restaurantStore.fetchRestaurant(props.slug);
-await detailsStore.fetchChefRecommendations(props.slug);
-await detailsStore.fetchNews(props.slug);
 </script>
 
 <style>
