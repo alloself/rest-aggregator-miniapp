@@ -113,8 +113,10 @@ export function parseQueryParams(
 
 // Вспомогательные функции для API
 export function prepareQueryParams<T extends Record<string, unknown>>(
-    params: T
+    params?: T
 ): Record<string, string> {
+    if (!params) return {};
+
     const prepared: Record<string, string> = {};
 
     const processValue = (key: string, value: unknown, parentKey = "") => {

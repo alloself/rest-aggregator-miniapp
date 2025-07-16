@@ -1,14 +1,12 @@
 import type { App } from "vue";
 import PrimeVue from "primevue/config";
-import Lara from "@primeuix/themes/lara";
+import Aura from "@primeuix/themes/aura";
 
 export function setupPrimeVue(app: App): void {
     app.use(PrimeVue, {
         theme: {
-            preset: Lara,
+            preset: Aura,
             options: {
-                prefix: "p",
-                darkModeSelector: ".p-dark",
                 cssLayer: {
                     name: "primevue",
                     order: "theme, base, primevue",
@@ -16,4 +14,4 @@ export function setupPrimeVue(app: App): void {
             },
         },
     });
-}
+} 
