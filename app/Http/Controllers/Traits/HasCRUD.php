@@ -32,9 +32,9 @@ trait HasCRUD
             ? $this->model()::getPaginateList($request->all(), $with)
             : $this->model()::getList($request->all(), $with);
 
-        $resourceClass = $this->resource();
 
-        return $resourceClass::collection($data);
+
+        return $data;
     }
 
     /**
@@ -47,9 +47,9 @@ trait HasCRUD
 
             $with = $request->input('with', []);
 
-            $resourceClass = $this->resource();
 
-            return new $resourceClass($entity->load($with));
+
+            return  $entity;
         });
     }
 
@@ -67,11 +67,11 @@ trait HasCRUD
         $entity = $this->model()::showEntity(
             $id,
             $with
-        ) ?? throw new ModelNotFoundException();
+        );
 
-        $resourceClass = $this->resource();
 
-        return new $resourceClass($entity);
+
+        return $entity;
     }
 
     /**
@@ -85,10 +85,7 @@ trait HasCRUD
             $with = $request->input('with', []);
 
             $entity->updateEntity($request->all(), $with);
-
-            $resourceClass = $this->resource();
-
-            return new $resourceClass($entity);
+            return $entity;
         });
     }
 
@@ -115,11 +112,7 @@ trait HasCRUD
         ]);
 
         return DB::transaction(function () use ($validated) {
-            $entities = $this->model()::whereIn('id', $validated['ids'])->get();
-
-            foreach ($entities as $entity) {
-                $entity->deleteEntity();
-            }
+            $this->model()::deleteMany($validated['ids']);
             return response()->noContent();
         });
     }

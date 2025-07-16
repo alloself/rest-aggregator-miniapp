@@ -4,16 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use App\Models\Traits\HasCRUD;
+use App\Models\Traits\HasList;
 
 abstract class BaseModel extends Model
 {
-    use HasUuids;
+    use HasUuids, HasCRUD, HasList;
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -22,13 +19,4 @@ abstract class BaseModel extends Model
             'deleted_at' => 'datetime',
         ];
     }
-
-    /**
-     * Perform any actions required after the model boots.
-     */
-    protected static function booted(): void
-    {
-        // Можно добавить общие model events здесь
-        parent::booted();
-    }
-} 
+}
