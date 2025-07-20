@@ -17,7 +17,7 @@ trait HasList
             $perPage = Arr::get($params, 'items_per_page', 15);
             $page = Arr::get($params, 'page', 1);
 
-            return self::paginate($perPage, ['*'], 'page', $page);
+            return self::with($with)->paginate($perPage, ['*'], 'page', $page);
         } catch (QueryException $e) {
             throw new \RuntimeException('Data retrieval error' . $e->getMessage());
         }
@@ -26,7 +26,7 @@ trait HasList
     public static function getList(array $params = [], array $with = [])
     {
         try {
-            return self::get();
+            return self::with($with)->get();
         } catch (QueryException $e) {
             throw new \RuntimeException('Data retrieval error' . $e->getMessage());
         }

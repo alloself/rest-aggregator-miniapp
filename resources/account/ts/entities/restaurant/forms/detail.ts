@@ -1,9 +1,10 @@
 import type { ISmartFormField } from "@/shared/types";
 import { computed } from "vue";
 import BaseInput from "@/shared/components/BaseInput.vue";
-import BaseTextarea from "@/shared/components/BaseTextarea.vue";
+import Editor from "primevue/editor";
 import BaseWorkingHoursEditor from "@/shared/components/BaseWorkingHoursEditor.vue";
 import { z } from "zod";
+import BaseFileList from "@/shared/components/BaseFileList.vue";
 
 export const useRestaurantDetailFormFields = () => {
     const fields = computed<ISmartFormField[]>(() => [
@@ -35,7 +36,29 @@ export const useRestaurantDetailFormFields = () => {
             },
         },
         {
-            component: BaseTextarea,
+            component: BaseInput,
+            key: "average_receipt",
+            props: {
+                type: "average_receipt",
+                label: "Средний чек",
+                fluid: true,
+                autocomplete: "restaurant_average_receipt",
+                name: "average_receipt",
+            },
+        },
+        {
+            component: BaseInput,
+            key: "address",
+            props: {
+                type: "address",
+                label: "Адрес",
+                fluid: true,
+                autocomplete: "restaurant_address",
+                name: "address",
+            },
+        },
+        {
+            component: Editor,
             key: "description",
             props: {
                 type: "description",
@@ -48,7 +71,10 @@ export const useRestaurantDetailFormFields = () => {
         {
             component: BaseWorkingHoursEditor,
             key: "working_hours",
-            props: {},
+        },
+        {
+            component: BaseFileList,
+            key: "files",
         },
     ]);
 

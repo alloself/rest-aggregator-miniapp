@@ -45,11 +45,17 @@ export interface Event {
 export interface File {
   // columns
   id: string
-  url: string
+  url: unknown
   name: string
   extension: string
   created_at?: Date | null
   updated_at?: Date | null
+  // relations
+  fileables?: Fileable[]
+  // counts
+  fileables_count: number
+  // exists
+  fileables_exists: boolean
 }
 
 export interface News {
@@ -109,11 +115,18 @@ export interface Restaurant {
   id: string
   slug: string
   name: string
+  average_receipt?: string | null
+  address?: string | null
   description?: string | null
   working_hours?: string[] | null
   user_id: string
   created_at?: Date | null
   updated_at?: Date | null
+  // relations
+  user?: User
+  // counts
+  // exists
+  user_exists: boolean
 }
 
 export interface Role {

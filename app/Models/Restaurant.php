@@ -34,4 +34,9 @@ class Restaurant extends BaseModel
             ->saveSlugsTo('slug')
             ->allowDuplicateSlugs();
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

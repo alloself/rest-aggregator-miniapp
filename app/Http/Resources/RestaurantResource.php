@@ -14,6 +14,13 @@ class RestaurantResource extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'description' => $this->description,
+            'working_hours' => $this->working_hours,
+            'user' => new UserResource($this->user),
+        ];
     }
 }

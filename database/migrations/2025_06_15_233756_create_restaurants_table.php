@@ -15,6 +15,8 @@ return new class extends Migration
             $table->uuid('id')->primary()->unique();
             $table->string('slug');
             $table->string('name');
+            $table->string('average_receipt')->nullable();
+            $table->string('address')->nullable();
             $table->longText('description')->nullable();
             $table->json('working_hours')->nullable();
             $table->uuid('user_id');

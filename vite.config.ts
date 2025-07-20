@@ -7,7 +7,6 @@ import { PrimeVueResolver } from "@primevue/auto-import-resolver";
 import tailwindcss from "@tailwindcss/vite";
 import Icons from "unplugin-icons/vite";
 import { FileSystemIconLoader } from "unplugin-icons/loaders";
-import generateIconMapPlugin from "./vite-plugins/generate-icon-map";
 
 export default defineConfig({
     plugins: [
@@ -41,12 +40,6 @@ export default defineConfig({
             customCollections: {
                 custom: FileSystemIconLoader("./resources/shared/svg"),
             },
-        }),
-        generateIconMapPlugin({
-            svgDir: 'resources/shared/svg',
-            outputPath: 'resources/shared/ui/customIcons.ts',
-            prefix: '',
-            debounceMs: 200
         }),
         tailwindcss(),
     ],

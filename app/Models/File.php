@@ -2,14 +2,53 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\HasList;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Pivot\Fileable;
 
 class File extends BaseModel
 {
+
+    use HasList;
+
     protected $fillable = [
-        'name', 
-        'path',
-        'mime_type',
-        'size',
+        'name',
+        'url',
+        'name',
+        'extension',
     ];
+
+    public function getUrlAttribute($value)
+    {
+        return asset(Storage::url($value));
+    }
+
+    public function fileables()
+    {
+        return $this->hasMany(Fileable::class);
+    }
+
+    function deleteEntity(): bool
+    {
+        $this->fileables()->delete();
+
+        Storage::disk('public')->delete($this->getRawOriginal('url'));
+
+        return $this->delete();
+    }
+
+    public static function createEntity(array $values): File
+    {
+        $originalFile = $values['file'];
+        $name = $originalFile->getClientOriginalName();
+        $url = $originalFile->storeAs('files', uniqid() . "." . $originalFile->getClientOriginalExtension(), 'public');
+
+        $entity = File::create([
+            'url' => $url,
+            'name' => $name,
+            'extension' => $originalFile->getClientOriginalExtension(),
+        ]);
+
+        return $entity;
+    }
 }
