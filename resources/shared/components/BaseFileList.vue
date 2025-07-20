@@ -22,17 +22,23 @@
     </DataTable>
 
     <Dialog v-model:visible="showDialog" modal header="Создать файл">
-        <FileUpload
-            customUpload
-            mode="basic"
-            @select="onSelect"
-            :accept="acceptType"
-            :maxFileSize="1000000"
-        >
-            <template #empty>
-                <span>Drag and drop files to here to upload.</span>
-            </template>
-        </FileUpload>
+        <div class="flex flex-col gap-4">
+            <FileUpload
+                customUpload
+                mode="basic"
+                @select="onSelect"
+                :accept="acceptType"
+                :maxFileSize="1000000"
+            >
+                <template #empty>
+                    <span>Drag and drop files to here to upload.</span>
+                </template>
+            </FileUpload>
+            <BaseInput />
+        </div>
+        <template #footer>
+            <Button label="Сохранить" />
+        </template>
     </Dialog>
 </template>
 
@@ -40,6 +46,7 @@
 import { File as FileModel } from "../types";
 import { ref, computed } from "vue";
 import { AxiosInstance } from "axios";
+import BaseInput from "./BaseInput.vue";
 
 const {
     baseUrl,
