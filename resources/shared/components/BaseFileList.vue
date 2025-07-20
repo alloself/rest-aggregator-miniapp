@@ -27,7 +27,7 @@
             :url="`${baseUrl}`"
             @upload="onUpload"
             :multiple="true"
-            :accept="`${type}/*`"
+            :accept="acceptType"
             :maxFileSize="1000000"
         >
             <template #empty>
@@ -39,7 +39,7 @@
 
 <script setup lang="ts" generic="T extends FileModel">
 import { File as FileModel } from "../types";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { AxiosInstance } from "axios";
 import { FileUploadEvent } from "primevue/fileupload";
 
@@ -55,6 +55,10 @@ const {
 
 const files = defineModel<FileModel[]>("files", {
     default: () => [],
+});
+
+const acceptType = computed(() => {
+    return type === "image" ? "image/*" : undefined;
 });
 
 const showDialog = ref(false);
