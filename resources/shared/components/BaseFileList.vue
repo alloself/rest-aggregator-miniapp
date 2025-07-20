@@ -21,17 +21,36 @@
         </template>
     </DataTable>
 
-    <Dialog v-model:visible="showDialog" modal header="Edit Profile"> </Dialog>
+    <Dialog v-model:visible="showDialog" modal header="Создать файл">
+        <FileUpload
+            name="files[]"
+            :url="`${baseUrl}`"
+            @upload="onUpload"
+            :multiple="true"
+            :accept="`${type}/*`"
+            :maxFileSize="1000000"
+        >
+            <template #empty>
+                <span>Drag and drop files to here to upload.</span>
+            </template>
+        </FileUpload>
+    </Dialog>
 </template>
 
 <script setup lang="ts" generic="T extends FileModel">
 import { File as FileModel } from "../types";
 import { ref } from "vue";
 import { AxiosInstance } from "axios";
+import { FileUploadEvent } from "primevue/fileupload";
 
-const props = defineProps<{
+const {
+    baseUrl,
+    client,
+    type = "file",
+} = defineProps<{
     baseUrl: string;
     client: AxiosInstance;
+    type: "file" | "image";
 }>();
 
 const files = defineModel<FileModel[]>("files", {
@@ -39,4 +58,8 @@ const files = defineModel<FileModel[]>("files", {
 });
 
 const showDialog = ref(false);
+
+const onUpload = (event: FileUploadEvent) => {
+    console.log(event);
+};
 </script>
