@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\BaseCRUDController;
 use App\Models\Category;
+use App\Http\Resources\CategoryResource;
 
 class CategoryController extends BaseCRUDController
 {
@@ -11,4 +12,11 @@ class CategoryController extends BaseCRUDController
     {
         return Category::class;
     }
+
+    public function resource(): string
+    {
+        return CategoryResource::class;
+    }
+
+    
 }

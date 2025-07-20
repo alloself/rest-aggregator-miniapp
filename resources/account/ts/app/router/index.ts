@@ -1,3 +1,4 @@
+import { createCRUDRoutes } from "@/shared/helpers/createCRUDRoutes";
 import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
 
@@ -24,32 +25,12 @@ const routes: RouteRecordRaw[] = [
                 name: "dashboard",
                 component: () => import("@account/ts/pages/Dashboard.vue"),
             },
-            {
-                path: `/category`,
-                name: `category`,
-                meta: {
-                    title: "Категории",
-                },
-                component: () => import("@account/ts/pages/Category/List.vue"),
-            },
-            {
-                path: `/category/create`,
-                name: `categoryCreate`,
-                meta: {
-                    title: "Создание категории",
-                },
-                component: () =>
-                    import("@account/ts/pages/Category/Detail.vue"),
-            },
-            {
-                path: `/category/:id`,
-                name: `categoryDetail`,
-                meta: {
-                    title: "Категория",
-                },
-                component: () =>
-                    import("@account/ts/pages/Category/Detail.vue"),
-            },
+            ...createCRUDRoutes("category", {
+                prefix: "account",
+            }),
+            ...createCRUDRoutes("restaurant", {
+                prefix: "account",
+            }),
         ],
     },
     {

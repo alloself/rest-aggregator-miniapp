@@ -5,11 +5,12 @@ namespace App\Models;
 use App\Models\Traits\HasCRUD;
 use App\Models\Traits\HasList;
 use Kalnoy\Nestedset\NodeTrait;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 
 class Category extends BaseModel
 {
-    use NodeTrait, HasCRUD, HasList;
-
+    use NodeTrait, HasCRUD, HasList, HasSlug;
 
     protected $fillable = [
         'name',
@@ -25,6 +26,14 @@ class Category extends BaseModel
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->saveSlugsTo('slug')
+            ->allowDuplicateSlugs();
+    }
 
 
     public function getParentIdAttribute($value): string | null

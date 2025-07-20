@@ -117,7 +117,6 @@ watch(
 </script>
 
 <style scoped>
-/* Переходы для ошибок */
 .error-fade-enter-active, .error-fade-leave-active {
     transition: opacity 0.2s ease, transform 0.2s ease;
 }

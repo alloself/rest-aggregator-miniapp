@@ -10,16 +10,13 @@ export interface Category {
   parent_id?: string | null
   created_at?: Date | null
   updated_at?: Date | null
-  // mutators
-  full_path: string
   // relations
-  restaurant?: Restaurant
-  dishes?: Dish[]
-  dishes_count: number
-  dishes_exists: boolean
   parent?: Category
   children?: Category[]
+  // counts
   children_count: number
+  // exists
+  parent_exists: boolean
   children_exists: boolean
 }
 
@@ -86,13 +83,15 @@ export interface Permission {
   updated_at?: Date | null
   // relations
   roles?: Role[]
-  roles_count: number
-  roles_exists: boolean
   users?: User[]
-  users_count: number
-  users_exists: boolean
   permissions?: Permission[]
+  // counts
+  roles_count: number
+  users_count: number
   permissions_count: number
+  // exists
+  roles_exists: boolean
+  users_exists: boolean
   permissions_exists: boolean
 }
 
@@ -100,13 +99,19 @@ export interface Fileable {
   // relations
   fileable?: Fileable
   file?: File
+  // counts
+  // exists
+  file_exists: boolean
 }
 
 export interface Restaurant {
   // columns
-  id: number
+  id: string
   slug: string
   name: string
+  description?: string | null
+  working_hours?: Record<string, unknown> | null
+  user_id: string
   created_at?: Date | null
   updated_at?: Date | null
 }
@@ -120,10 +125,12 @@ export interface Role {
   updated_at?: Date | null
   // relations
   permissions?: Permission[]
-  permissions_count: number
-  permissions_exists: boolean
   users?: User[]
+  // counts
+  permissions_count: number
   users_count: number
+  // exists
+  permissions_exists: boolean
   users_exists: boolean
 }
 
@@ -143,9 +150,11 @@ export interface User {
   notifications: never
   // relations
   roles?: Role[]
-  roles_count: number
-  roles_exists: boolean
   permissions?: Permission[]
+  // counts
+  roles_count: number
   permissions_count: number
+  // exists
+  roles_exists: boolean
   permissions_exists: boolean
 }

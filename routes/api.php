@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Account\CategoryController;
+use App\Http\Controllers\Account\RestaurantController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,7 @@ use App\Http\Controllers\Account\CategoryController;
 
 $accountResources = [
     'categories' => CategoryController::class,
+    'restaurants' => RestaurantController::class,
 ];
 
 Route::middleware(['auth:sanctum'])->get('me', [AuthController::class, 'me']);

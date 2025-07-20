@@ -20,6 +20,7 @@ declare module 'vue' {
     IconMdiChevronDown: typeof import('~icons/mdi/chevron-down')['default']
     IconMdiHelpCircle: typeof import('~icons/mdi/help-circle')['default']
     IconMdiLogout: typeof import('~icons/mdi/logout')['default']
+    Image: typeof import('primevue/image')['default']
     Message: typeof import('primevue/message')['default']
     OverlayPanel: typeof import('primevue/overlaypanel')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

@@ -124,16 +124,10 @@ const navigationItems = [
         icon: "mdi:tag",
     },
     {
-        name: "orders",
-        path: "/orders",
-        label: "Заказы",
-        icon: "mdi:cart",
-    },
-    {
-        name: "settings",
-        path: "/settings",
-        label: "Настройки",
-        icon: "mdi:cog",
+        name: "restaurant",
+        path: "/restaurant",
+        label: "Рестораны",
+        icon: "mdi:restaurant",
     },
 ];
 

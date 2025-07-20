@@ -15,6 +15,11 @@ return new class extends Migration
             $table->uuid('id')->primary()->unique();
             $table->string('slug');
             $table->string('name');
+            $table->longText('description')->nullable();
+            $table->json('working_hours')->nullable();
+            $table->uuid('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+
             $table->timestamps();
         });
     }

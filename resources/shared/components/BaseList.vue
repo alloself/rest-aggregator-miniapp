@@ -6,16 +6,18 @@
         paginator
         :rows="5"
         :rowsPerPageOptions="[5, 10, 20, 50]"
+        @row-click="toEdit"
     >
         <slot v-for="col of columns" :name="`column-${col.field}`">
             <Column
                 :key="col.field"
                 :field="col.field"
                 :header="col.header"
+                class="cursor-pointer"
             ></Column>
         </slot>
         <template #paginatorend>
-            <Button type="button" icon="pi pi-download" text />
+            <Button type="button" icon="pi pi-plus" text @click="toCreate" />
         </template>
     </DataTable>
 </template>
@@ -26,15 +28,20 @@ import { IBaseEntity } from "../types";
 import { onBeforeMount, reactive, watch } from "vue";
 import { parseQueryParams, prepareQueryParams } from "../helpers";
 import { useRouter } from "vue-router";
+import { capitalize } from "lodash";
 
 const {
     columns = [],
     baseUrl = "",
     client,
+    entity,
+    relations = [],
 } = defineProps<{
     columns: { field: string; header: string }[];
     baseUrl: string;
     client: AxiosInstance;
+    entity: string;
+    relations?: string[];
 }>();
 
 const listData = reactive<{
@@ -49,7 +56,11 @@ const router = useRouter();
 
 const getItems = async (options?: Record<string, unknown>) => {
     try {
-        const params = prepareQueryParams(options);
+        const queryParams = {
+            ...options,
+            with: relations,
+        };
+        const params = prepareQueryParams(queryParams);
         const { data } = await client.get(baseUrl, {
             params,
         });
@@ -79,4 +90,19 @@ watch(
         deep: true,
     },
 );
+
+const toCreate = () => {
+    router.push({
+        name: `${capitalize(entity)}Create`,
+    });
+};
+
+const toEdit = ({ data }: { data: T }) => {
+    router.push({
+        name: `${capitalize(entity)}Detail`,
+        params: {
+            id: data.id,
+        },
+    });
+};
 </script>
