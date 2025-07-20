@@ -37,6 +37,7 @@ import { AxiosInstance } from "axios";
 import { useFormSubmit } from "../composables";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { capitalize } from "lodash";
 
 const {
     fields = [],
@@ -44,6 +45,7 @@ const {
     client,
     baseUrl,
     initialValues,
+    entity,
     id,
 } = defineProps<{
     fields: ISmartFormField[];
@@ -65,11 +67,24 @@ const isLoading = ref(false);
 
 const onSave = async () => {
     isLoading.value = true;
-    await client.post(baseUrl, form.value?.values);
+    const { data } = await client.post(baseUrl, form.value?.values);
+
+    isLoading.value = false;
+    router.push({
+        name: `${capitalize(entity)}Detail`,
+        params: {
+            id: data.id,
+        },
+    });
+};
+
+const onEdit = async () => {
+    isLoading.value = true;
+    await client.put(`${baseUrl}/${id}`, form.value?.values);
     isLoading.value = false;
 };
 
-const { handler: handleSubmit } = useFormSubmit(onSave, form);
+const { handler: handleSubmit } = useFormSubmit(id ? onEdit : onSave, form);
 
 const getItem = async () => {
     const { data } = await client.get(`${baseUrl}/${id}`);
@@ -81,6 +96,8 @@ const onCancel = () => {
 };
 
 onMounted(() => {
-    getItem();
+    if (id) {
+        getItem();
+    }
 });
 </script>

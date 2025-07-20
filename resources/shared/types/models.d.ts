@@ -110,7 +110,7 @@ export interface Restaurant {
   slug: string
   name: string
   description?: string | null
-  working_hours?: Record<string, unknown> | null
+  working_hours?: string[] | null
   user_id: string
   created_at?: Date | null
   updated_at?: Date | null

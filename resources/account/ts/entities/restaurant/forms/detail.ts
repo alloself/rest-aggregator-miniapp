@@ -2,6 +2,7 @@ import type { ISmartFormField } from "@/shared/types";
 import { computed } from "vue";
 import BaseInput from "@/shared/components/BaseInput.vue";
 import BaseTextarea from "@/shared/components/BaseTextarea.vue";
+import BaseWorkingHoursEditor from "@/shared/components/BaseWorkingHoursEditor.vue";
 import { z } from "zod";
 
 export const useRestaurantDetailFormFields = () => {
@@ -43,6 +44,11 @@ export const useRestaurantDetailFormFields = () => {
                 autocomplete: "restaurant_description",
                 name: "description",
             },
+        },
+        {
+            component: BaseWorkingHoursEditor,
+            key: "working_hours",
+            props: {},
         },
     ]);
 

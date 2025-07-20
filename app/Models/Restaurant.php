@@ -22,6 +22,7 @@ class Restaurant extends BaseModel
 
     protected $casts = [
         'order' => 'integer',
+        'working_hours' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

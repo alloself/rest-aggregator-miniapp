@@ -21,7 +21,7 @@ export const useFormSubmit = (
     form: Ref<FormContext | undefined>,
 ) => {
     const handler = async () => {
-        if (!form.value || !form.value.meta.value.dirty) {
+        if (!form.value) {
             return;
         }
         try {
