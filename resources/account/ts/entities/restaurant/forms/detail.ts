@@ -1,18 +1,19 @@
 import type { ISmartFormField } from "@/shared/types";
 import { computed } from "vue";
-import InputText from "primevue/inputtext";
+import BaseInput from "@/shared/components/BaseInput.vue";
+import BaseTextarea from "@/shared/components/BaseTextarea.vue";
 import { z } from "zod";
 
 export const useRestaurantDetailFormFields = () => {
     const fields = computed<ISmartFormField[]>(() => [
         {
-            component: InputText,
+            component: BaseInput,
             key: "name",
             props: {
                 type: "name",
-                placeholder: "Название",
                 fluid: true,
                 autocomplete: "restaurant_name",
+                label: "Название",
                 name: "name",
             },
             rule: z
@@ -22,14 +23,25 @@ export const useRestaurantDetailFormFields = () => {
                 .min(1, "Название обязательно"),
         },
         {
-            component: InputText,
+            component: BaseInput,
             key: "slug",
             props: {
                 type: "slug",
-                placeholder: "Slug",
+                label: "Slug",
                 fluid: true,
                 autocomplete: "restaurant_slug",
                 name: "slug",
+            },
+        },
+        {
+            component: BaseTextarea,
+            key: "description",
+            props: {
+                type: "description",
+                label: "Описание",
+                fluid: true,
+                autocomplete: "restaurant_description",
+                name: "description",
             },
         },
     ]);
