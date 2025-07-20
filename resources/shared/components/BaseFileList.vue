@@ -23,10 +23,9 @@
 
     <Dialog v-model:visible="showDialog" modal header="Создать файл">
         <FileUpload
-            name="files[]"
-            :url="`${baseUrl}`"
-            @upload="onUpload"
-            :multiple="true"
+            customUpload
+            mode="basic"
+            @select="onSelect"
             :accept="acceptType"
             :maxFileSize="1000000"
         >
@@ -41,7 +40,6 @@
 import { File as FileModel } from "../types";
 import { ref, computed } from "vue";
 import { AxiosInstance } from "axios";
-import { FileUploadEvent } from "primevue/fileupload";
 
 const {
     baseUrl,
@@ -63,7 +61,7 @@ const acceptType = computed(() => {
 
 const showDialog = ref(false);
 
-const onUpload = (event: FileUploadEvent) => {
-    console.log(event);
+const onSelect = ({ files }: { files: File[] }) => {
+    console.log(files);
 };
 </script>
