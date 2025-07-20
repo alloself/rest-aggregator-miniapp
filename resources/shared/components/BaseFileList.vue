@@ -1,5 +1,5 @@
 <template>
-    <DataTable :value="files" tableStyle="min-width: 50rem">
+    <DataTable :value="files" showGridlines stripedRows>
         <Column field="name" header="Name"></Column>
         <Column field="extension" header="Extension"></Column>
         <Column field="preview" header="Preview"></Column>
