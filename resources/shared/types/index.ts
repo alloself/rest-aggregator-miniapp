@@ -21,12 +21,17 @@ export type {
 } from "./api";
 
 export interface IBaseEntity {
-    id: string | number;
+    id: string;
     [key: string]: unknown;
 }
 
-export interface IBaseTreeEntity extends IBaseEntity {
-    children?: IBaseTreeEntity[];
+export interface IBaseColumn {
+    field: string;
+    header: string;
+}
+
+export interface IBaseTreeEntity<T extends IBaseEntity> {
+    children?: T[];
 }
 
 export interface IItems<T extends IBaseEntity> {
