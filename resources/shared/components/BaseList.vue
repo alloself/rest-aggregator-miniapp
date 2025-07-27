@@ -58,7 +58,7 @@ const getItems = async (options?: Record<string, unknown>) => {
     try {
         const queryParams = {
             ...options,
-            with: relations,
+            relations: relations,
         };
         const params = prepareQueryParams(queryParams);
         const { data } = await client.get(baseUrl, {

@@ -4,7 +4,6 @@
         :baseUrl="RESTAURANT_BASE_URL"
         :client="client"
         entity="restaurant"
-        :relations="relations"
     />
 </template>
 
@@ -17,6 +16,4 @@ const columns = [
     { field: "name", header: "Название" },
     { field: "slug", header: "Slug" },
 ];
-
-const relations = ["user"];
 </script>
