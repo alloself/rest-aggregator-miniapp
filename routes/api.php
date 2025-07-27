@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Account\CategoryController;
 use App\Http\Controllers\Account\RestaurantController;
@@ -25,8 +26,8 @@ $accountResources = [
 
 Route::middleware(['auth:sanctum'])->get('me', [AuthController::class, 'me']);
 
-Route::prefix('account')->middleware(['auth:sanctum', 'role:restaurant|root'])->group(function () use ($accountResources) {
-
+// Базовые маршруты аккаунта (без привязки к конкретному ресторану)
+Route::prefix('account')->middleware(['auth:sanctum', 'role:restaurant_owner|root'])->group(function () use ($accountResources) {
     Route::apiResources($accountResources);
 
     Route::prefix('destroy')->group(function () use ($accountResources) {

@@ -40,4 +40,77 @@ class Restaurant extends BaseModel
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Получить всех пользователей этого ресторана (включая владельца и сотрудников)
+     */
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+
+    /**
+     * Получить всех пользователей с их ролями в этом ресторане
+     */
+    public function getUsersWithRoles()
+    {
+        // Временно сохраняем текущий team_id
+        $currentTeamId = getPermissionsTeamId();
+        
+        // Устанавливаем team_id этого ресторана
+        setPermissionsTeamId($this->id);
+        
+        // Получаем всех пользователей с их ролями в этом ресторане
+        $users = $this->users()->with(['roles' => function($query) {
+            $query->where('restaurant_id', $this->id);
+        }])->get();
+        
+        // Восстанавливаем предыдущий team_id
+        setPermissionsTeamId($currentTeamId);
+        
+        return $users;
+    }
+
+    /**
+     * Добавить пользователя с ролью в ресторан
+     */
+    public function addUser(User $user, string $role): void
+    {
+        // Добавляем связь многие-ко-многим если её нет
+        if (!$this->users()->where('user_id', $user->id)->exists()) {
+            $this->users()->attach($user->id);
+        }
+
+        // Назначаем роль в контексте этого ресторана
+        $user->assignRestaurantRole($this->id, $role);
+    }
+
+    /**
+     * Удалить пользователя из ресторана
+     */
+    public function removeUser(User $user): void
+    {
+        // Временно сохраняем текущий team_id
+        $currentTeamId = getPermissionsTeamId();
+        
+        // Устанавливаем team_id этого ресторана
+        setPermissionsTeamId($this->id);
+        
+        // Удаляем все роли пользователя в этом ресторане
+        $user->syncRoles([]);
+        
+        // Восстанавливаем предыдущий team_id
+        setPermissionsTeamId($currentTeamId);
+        
+        // Удаляем связь многие-ко-многим
+        $this->users()->detach($user->id);
+    }
+
+    /**
+     * Изменить роль пользователя в ресторане
+     */
+    public function changeUserRole(User $user, string $newRole): void
+    {
+        $user->assignRestaurantRole($this->id, $newRole);
+    }
 }

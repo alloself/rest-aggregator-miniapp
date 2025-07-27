@@ -124,9 +124,15 @@ export interface Restaurant {
   updated_at?: Date | null
   // relations
   user?: User
+  users?: User[]
+  files?: File[]
   // counts
+  users_count: number
+  files_count: number
   // exists
   user_exists: boolean
+  users_exists: boolean
+  files_exists: boolean
 }
 
 export interface Role {
@@ -162,12 +168,15 @@ export interface User {
   tokens: never
   notifications: never
   // relations
+  restaurants?: Restaurant[]
   roles?: Role[]
   permissions?: Permission[]
   // counts
+  restaurants_count: number
   roles_count: number
   permissions_count: number
   // exists
+  restaurants_exists: boolean
   roles_exists: boolean
   permissions_exists: boolean
 }

@@ -20,7 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-            'check.restaurant.owner' => \App\Http\Middleware\CheckRestaurantOwner::class,
+            'restaurant.team' => \App\Http\Middleware\RestaurantTeamMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
