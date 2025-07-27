@@ -11,12 +11,6 @@
         >
             <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
             <Column field="name" header="Name"></Column>
-            <Column field="extension" header="Extension"></Column>
-            <Column field="preview" header="Preview" v-if="type === 'image'">
-                <template #body="{ data }">
-                    <img :src="data.url" alt="Preview" class="w-16 h-16" />
-                </template>
-            </Column>
             <Column field="pivot.order" header="Order">
                 <template #body="{ data }">
                     <InputNumber v-model="data.pivot.order" />

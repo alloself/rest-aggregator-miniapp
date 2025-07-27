@@ -123,15 +123,16 @@ export interface Restaurant {
   created_at?: Date | null
   updated_at?: Date | null
   // relations
-  user?: User
   users?: User[]
+  images?: File[]
   files?: File[]
   // counts
   users_count: number
+  images_count: number
   files_count: number
   // exists
-  user_exists: boolean
   users_exists: boolean
+  images_exists: boolean
   files_exists: boolean
 }
 
