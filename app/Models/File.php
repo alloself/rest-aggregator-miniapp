@@ -8,7 +8,6 @@ use App\Models\Pivot\Fileable;
 
 class File extends BaseModel
 {
-
     use HasList;
 
     protected $fillable = [

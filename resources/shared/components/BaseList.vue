@@ -7,7 +7,11 @@
         :rows="5"
         :rowsPerPageOptions="[5, 10, 20, 50]"
         @row-click="toEdit"
+        selectionMode="multiple"
+        v-model:selection="selectedItems"
+        size="small"
     >
+        <Column selectionMode="multiple"></Column>
         <slot v-for="col of columns" :name="`column-${col.field}`">
             <Column
                 :key="col.field"
@@ -25,7 +29,7 @@
 <script setup lang="ts" generic="T extends IBaseEntity">
 import { AxiosInstance } from "axios";
 import { IBaseEntity } from "../types";
-import { onBeforeMount, reactive, watch } from "vue";
+import { onBeforeMount, reactive, ref, watch } from "vue";
 import { parseQueryParams, prepareQueryParams } from "../helpers";
 import { useRouter } from "vue-router";
 import { capitalize } from "lodash";
@@ -51,6 +55,8 @@ const listData = reactive<{
     items: [],
     params: {},
 });
+
+const selectedItems = ref<T[]>([]);
 
 const router = useRouter();
 

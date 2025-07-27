@@ -9,7 +9,7 @@
             v-model:selection="selectedFiles"
             size="small"
         >
-            <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+            <Column selectionMode="multiple"></Column>
             <Column field="name" header="Name"></Column>
             <Column field="pivot.order" header="Order">
                 <template #body="{ data }">

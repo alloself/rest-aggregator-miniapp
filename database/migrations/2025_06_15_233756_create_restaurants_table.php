@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->longText('description')->nullable();
             $table->json('working_hours')->nullable();
+            $table->string('yandex_metrica_code')->nullable();
             $table->uuid('user_id');
             $table->foreign('user_id')->references('id')->on('users');
 

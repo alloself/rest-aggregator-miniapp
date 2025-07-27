@@ -39,6 +39,17 @@ export const useRestaurantDetailFormFields = () => {
         },
         {
             component: BaseInput,
+            key: "yandex_metrica_code",
+            props: {
+                type: "yandex_metrica_code",
+                label: "Код метрики",
+                fluid: true,
+                autocomplete: "restaurant_yandex_metrica_code",
+                name: "yandex_metrica_code",
+            },
+        },
+        {
+            component: BaseInput,
             key: "average_receipt",
             props: {
                 type: "average_receipt",

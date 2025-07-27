@@ -25,6 +25,10 @@ export interface IBaseEntity {
     [key: string]: unknown;
 }
 
+export interface IBaseTreeEntity extends IBaseEntity {
+    children?: IBaseTreeEntity[];
+}
+
 export interface IItems<T extends IBaseEntity> {
     itemTitle?: string | ((item: T) => string);
     itemValue?: string | ((item: T) => string | number);

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('order')->default(0);
 
-            $table->uuid('restaurant_id');
+            $table->uuid('restaurant_id')->nullable();
             $table->foreign('restaurant_id')->references('id')->on('restaurants');
 
             $table->unsignedInteger('_lft')->default(0);

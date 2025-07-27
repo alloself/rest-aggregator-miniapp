@@ -205,22 +205,30 @@ const formatTime = (date: Date | null): string => {
 /**
  * Обновляет время начала работы
  */
-const updateStartTime = (dayKey: DayKey, date: Date | null) => {
+const updateStartTime = (dayKey: DayKey, date: Date | Date[] | (Date | null)[] | null | undefined) => {
     const currentValue = modelValue.value || {};
     if (!currentValue[dayKey]) return;
     
-    currentValue[dayKey]!.startTime = formatTime(date);
+    // Извлекаем Date из возможных типов DatePicker
+    const dateValue = Array.isArray(date) ? date[0] : date;
+    // Приводим undefined к null для совместимости с formatTime
+    const normalizedDate = dateValue === undefined ? null : dateValue;
+    currentValue[dayKey]!.startTime = formatTime(normalizedDate);
     modelValue.value = currentValue;
 };
 
 /**
  * Обновляет время окончания работы
  */
-const updateEndTime = (dayKey: DayKey, date: Date | null) => {
+const updateEndTime = (dayKey: DayKey, date: Date | Date[] | (Date | null)[] | null | undefined) => {
     const currentValue = modelValue.value || {};
     if (!currentValue[dayKey]) return;
     
-    currentValue[dayKey]!.endTime = formatTime(date);
+    // Извлекаем Date из возможных типов DatePicker
+    const dateValue = Array.isArray(date) ? date[0] : date;
+    // Приводим undefined к null для совместимости с formatTime
+    const normalizedDate = dateValue === undefined ? null : dateValue;
+    currentValue[dayKey]!.endTime = formatTime(normalizedDate);
     modelValue.value = currentValue;
 };
 

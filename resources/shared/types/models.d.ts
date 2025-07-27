@@ -4,7 +4,7 @@ export interface Category {
   slug: string
   name: string
   order: number
-  restaurant_id: string
+  restaurant_id?: string | null
   _lft: number
   _rgt: number
   parent_id?: string | null
@@ -127,6 +127,7 @@ export interface Restaurant {
   address?: string | null
   description?: string | null
   working_hours?: string[] | null
+  yandex_metrica_code?: string | null
   user_id: string
   created_at?: Date | null
   updated_at?: Date | null
