@@ -12,12 +12,22 @@
             <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
             <Column field="name" header="Name"></Column>
             <Column field="extension" header="Extension"></Column>
-            <Column field="preview" header="Preview"></Column>
-            <Column field="actions" header="Actions">
+            <Column field="preview" header="Preview" v-if="type === 'image'">
                 <template #body="{ data }">
-                    <Button label="View" icon="pi pi-eye" />
+                    <img :src="data.url" alt="Preview" class="w-16 h-16" />
                 </template>
             </Column>
+            <Column field="pivot.order" header="Order">
+                <template #body="{ data }">
+                    <InputNumber v-model="data.pivot.order" />
+                </template>
+            </Column>
+            <Column field="pivot.key" header="Key">
+                <template #body="{ data }">
+                    <InputText v-model="data.pivot.key" />
+                </template>
+            </Column>
+
             <template #footer>
                 <div class="flex">
                     <div class="flex-1"></div>

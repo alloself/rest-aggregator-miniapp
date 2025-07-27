@@ -3,6 +3,7 @@
 namespace App\Models\Traits;
 
 use App\Models\File;
+use App\Models\Pivot\Fileable;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasImages
@@ -12,6 +13,7 @@ trait HasImages
     public function images(): MorphToMany
     {
         return $this->morphToMany(File::class, 'fileable')
+            ->using(Fileable::class)
             ->wherePivot('type', 'image')
             ->withPivot('key', 'order');
     }
