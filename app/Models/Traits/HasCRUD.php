@@ -9,9 +9,13 @@ trait HasCRUD
 
         $entity = static::query()->create($data);
 
+        $entity->syncRelations($relations);
+
         if (!empty($relations)) {
             $entity->load($relations);
         }
+
+
 
         return $entity;
     }
@@ -29,8 +33,17 @@ trait HasCRUD
 
     public function updateEntity(array $data, array $relations = []): self
     {
+        $relationData = [];
+        foreach ($relations as $relation) {
+            if (isset($data[$relation])) {
+                $relationData[$relation] = $data[$relation];
+                unset($data[$relation]);
+            }
+        }
 
         $this->update($data);
+        
+        $this->syncRelations($relationData);
 
         if (!empty($relations)) {
             $this->load($relations);

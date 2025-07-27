@@ -4,13 +4,14 @@ namespace App\Models;
 
 use App\Models\Traits\HasCRUD;
 use App\Models\Traits\HasList;
-use App\Models\Traits\HasFiles;
+use App\Models\Traits\HasImages;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
+
 class Restaurant extends BaseModel
 {
-    use HasCRUD, HasList, HasSlug, HasFiles;
+    use HasCRUD, HasList, HasSlug, HasImages;
 
     protected $fillable = [
         'name',
@@ -36,10 +37,26 @@ class Restaurant extends BaseModel
             ->allowDuplicateSlugs();
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Получить всех пользователей этого ресторана (включая владельца и сотрудников)
@@ -56,18 +73,18 @@ class Restaurant extends BaseModel
     {
         // Временно сохраняем текущий team_id
         $currentTeamId = getPermissionsTeamId();
-        
+
         // Устанавливаем team_id этого ресторана
         setPermissionsTeamId($this->id);
-        
+
         // Получаем всех пользователей с их ролями в этом ресторане
-        $users = $this->users()->with(['roles' => function($query) {
+        $users = $this->users()->with(['roles' => function ($query) {
             $query->where('restaurant_id', $this->id);
         }])->get();
-        
+
         // Восстанавливаем предыдущий team_id
         setPermissionsTeamId($currentTeamId);
-        
+
         return $users;
     }
 
@@ -92,16 +109,16 @@ class Restaurant extends BaseModel
     {
         // Временно сохраняем текущий team_id
         $currentTeamId = getPermissionsTeamId();
-        
+
         // Устанавливаем team_id этого ресторана
         setPermissionsTeamId($this->id);
-        
+
         // Удаляем все роли пользователя в этом ресторане
         $user->syncRoles([]);
-        
+
         // Восстанавливаем предыдущий team_id
         setPermissionsTeamId($currentTeamId);
-        
+
         // Удаляем связь многие-ко-многим
         $this->users()->detach($user->id);
     }

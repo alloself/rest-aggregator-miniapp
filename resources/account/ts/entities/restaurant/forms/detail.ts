@@ -77,11 +77,20 @@ export const useRestaurantDetailFormFields = () => {
         {
             component: BaseFileList,
             props: {
-                type: "image",
+                type: "file",
                 baseUrl: FILE_BASE_URL,
                 client: client,
             },
             key: "files",
+        },
+        {
+            component: BaseFileList,
+            props: {
+                type: "image",
+                baseUrl: FILE_BASE_URL,
+                client: client,
+            },
+            key: "images",
         },
     ]);
 

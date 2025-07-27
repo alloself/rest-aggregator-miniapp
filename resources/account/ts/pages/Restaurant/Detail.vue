@@ -42,5 +42,5 @@ const initialValues = computed<Partial<T>>(() => {
 
 const id = computed(() => route.params.id?.toString() || undefined);
 
-const relations = ["files"];
+const relations = ["files", "images"];
 </script>

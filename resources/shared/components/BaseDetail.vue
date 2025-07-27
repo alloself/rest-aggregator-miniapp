@@ -69,7 +69,11 @@ const isLoading = ref(false);
 
 const onSave = async () => {
     isLoading.value = true;
-    const { data } = await client.post(baseUrl, form.value?.values);
+    const { data } = await client.post(baseUrl, form.value?.values, {
+        params: {
+            relations,
+        },
+    });
 
     isLoading.value = false;
     router.push({
@@ -82,7 +86,11 @@ const onSave = async () => {
 
 const onEdit = async () => {
     isLoading.value = true;
-    await client.put(`${baseUrl}/${id}`, form.value?.values);
+    await client.put(`${baseUrl}/${id}`, form.value?.values, {
+        params: {
+            relations,
+        },
+    });
     isLoading.value = false;
 };
 

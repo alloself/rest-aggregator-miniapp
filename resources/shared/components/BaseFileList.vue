@@ -57,6 +57,14 @@ const {
     initialItems?: FileModel[];
 }>();
 
+const getBasePivot = () => {
+    return {
+        key: "",
+        order: 0,
+        type,
+    };
+};
+
 const files = defineModel<FileModel[]>("modelValue", {
     default: () => [],
 });
@@ -85,7 +93,10 @@ const onSave = async () => {
         });
 
         if (response.data) {
-            files.value = [...files.value, response.data];
+            files.value = [
+                ...files.value,
+                { ...response.data, pivot: getBasePivot() },
+            ];
         }
 
         showDialog.value = false;
