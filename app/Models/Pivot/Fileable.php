@@ -12,6 +12,8 @@ class Fileable extends MorphPivot
 {
     use HasUuids;
 
+    protected $table = 'fileables';
+
     protected $fillable = [
         'file_id',
         'fileable_id',

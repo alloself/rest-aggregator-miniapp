@@ -102,6 +102,14 @@ export interface Permission {
 }
 
 export interface Fileable {
+  // columns
+  id: string
+  fileable_type: string
+  fileable_id: string
+  type: string
+  key?: string | null
+  order: number
+  file_id: string
   // relations
   fileable?: Fileable
   file?: File
