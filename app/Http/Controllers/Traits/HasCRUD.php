@@ -54,16 +54,16 @@ trait HasCRUD
         }
 
         $request->validate([
-            'with' => 'sometimes|array',
+            'relations' => 'sometimes|array',
             'items_per_page' => 'sometimes|integer|min:1|max:100',
             'page' => 'sometimes|integer|min:1'
         ]);
 
-        $with = $request->input('with', []);
+        $relations = $request->input('relations', []);
 
         $data = $request->has(['items_per_page', 'page'])
-            ? $this->model()::getPaginateList($request->all(), $with)
-            : $this->model()::getList($request->all(), $with);
+            ? $this->model()::getPaginateList($request->all(), $relations)
+            : $this->model()::getList($request->all(), $relations);
 
         return $data;
     }
@@ -78,11 +78,10 @@ trait HasCRUD
         }
 
         return DB::transaction(function () use ($request) {
-            $entity = $this->model()::createEntity($request->all());
-
-            $with = $request->input('with', []);
-
-            return  $entity;
+            $relations = $request->input('relations', []);
+            $entity = $this->model()::createEntity($request->all(), $relations);
+            
+            return $entity;
         });
     }
 
@@ -96,14 +95,14 @@ trait HasCRUD
         }
 
         $request->validate([
-            'with' => 'sometimes|array'
+            'relations' => 'sometimes|array'
         ]);
 
-        $with = $request->input('with', []);
+        $relations = $request->input('relations', []);
 
         $entity = $this->model()::showEntity(
             $id,
-            $with
+            $relations
         );
 
         return $entity;
@@ -121,9 +120,9 @@ trait HasCRUD
         return DB::transaction(function () use ($id, $request) {
             $entity = $this->model()::findOrFail($id);
 
-            $with = $request->input('with', []);
+            $relations = $request->input('relations', []);
 
-            $entity->updateEntity($request->all(), $with);
+            $entity->updateEntity($request->all(), $relations);
             return $entity;
         });
     }

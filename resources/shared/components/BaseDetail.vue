@@ -47,6 +47,7 @@ const {
     initialValues,
     entity,
     id,
+    relations = [],
 } = defineProps<{
     fields: ISmartFormField[];
     title?: string;
@@ -55,6 +56,7 @@ const {
     baseUrl: string;
     initialValues?: Partial<T>;
     id?: string;
+    relations?: string[];
 }>();
 
 const emit = defineEmits<{ save: [value: FormContext<T>] }>();
@@ -87,7 +89,11 @@ const onEdit = async () => {
 const { handler: handleSubmit } = useFormSubmit(id ? onEdit : onSave, form);
 
 const getItem = async () => {
-    const { data } = await client.get(`${baseUrl}/${id}`);
+    const { data } = await client.get(`${baseUrl}/${id}`, {
+        params: {
+            relations,
+        },
+    });
     form.value?.setValues(data);
 };
 

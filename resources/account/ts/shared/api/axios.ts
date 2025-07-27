@@ -1,11 +1,11 @@
 import { ApiError } from "@/shared";
+
 import axios, { AxiosResponse, AxiosError } from "axios";
 import router from "../../app/router";
 
 export const client = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     headers: {
-        "Content-Type": "application/json",
         Accept: "application/json",
     },
     withCredentials: true,
@@ -39,6 +39,18 @@ const handleAuthenticationError = () => {
 };
 
 export const setupInterceptors = () => {
+    // Request interceptor to handle Content-Type for different data types
+    client.interceptors.request.use(
+        (config) => {
+            // Let axios automatically set Content-Type for FormData
+            if (!(config.data instanceof FormData)) {
+                config.headers['Content-Type'] = 'application/json';
+            }
+            return config;
+        },
+        (error) => Promise.reject(error)
+    );
+
     client.interceptors.response.use(
         (response: AxiosResponse) => response,
         async (error: AxiosError<ApiError>) => {

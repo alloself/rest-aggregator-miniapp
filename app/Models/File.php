@@ -37,9 +37,9 @@ class File extends BaseModel
         return $this->delete();
     }
 
-    public static function createEntity(array $values): File
+    public static function createEntity(array $data, array $relations = []): self
     {
-        $originalFile = $values['file'];
+        $originalFile = $data['file'];
         $name = $originalFile->getClientOriginalName();
         $url = $originalFile->storeAs('files', uniqid() . "." . $originalFile->getClientOriginalExtension(), 'public');
 
@@ -48,6 +48,10 @@ class File extends BaseModel
             'name' => $name,
             'extension' => $originalFile->getClientOriginalExtension(),
         ]);
+
+        if (!empty($relations)) {
+            $entity->load($relations);
+        }
 
         return $entity;
     }

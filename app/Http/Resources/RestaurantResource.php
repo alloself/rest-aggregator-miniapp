@@ -21,6 +21,7 @@ class RestaurantResource extends ResourceCollection
             'description' => $this->description,
             'working_hours' => $this->working_hours,
             'user' => new UserResource($this->user),
+            'files' => FileResource::collection($this->files),
         ];
     }
 }

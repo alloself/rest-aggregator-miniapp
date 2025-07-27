@@ -6,6 +6,7 @@
         :fields="fields"
         v-model:form="form"
         :initialValues="initialValues"
+        :relations="relations"
         :id="id"
     />
 </template>
@@ -40,4 +41,6 @@ const initialValues = computed<Partial<T>>(() => {
 });
 
 const id = computed(() => route.params.id?.toString() || undefined);
+
+const relations = ["files"];
 </script>

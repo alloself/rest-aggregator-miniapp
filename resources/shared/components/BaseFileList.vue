@@ -30,14 +30,10 @@
                 :accept="acceptType"
                 :maxFileSize="1000000"
             >
-                <template #empty>
-                    <span>Drag and drop files to here to upload.</span>
-                </template>
             </FileUpload>
-            <BaseInput />
         </div>
         <template #footer>
-            <Button label="Сохранить" />
+            <Button label="Сохранить" @click="onSave" />
         </template>
     </Dialog>
 </template>
@@ -46,19 +42,22 @@
 import { File as FileModel } from "../types";
 import { ref, computed } from "vue";
 import { AxiosInstance } from "axios";
-import BaseInput from "./BaseInput.vue";
 
 const {
     baseUrl,
     client,
     type = "file",
+    invalid = false,
+    initialItems = [],
 } = defineProps<{
     baseUrl: string;
     client: AxiosInstance;
     type: "file" | "image";
+    invalid?: boolean;
+    initialItems?: FileModel[];
 }>();
 
-const files = defineModel<FileModel[]>("files", {
+const files = defineModel<FileModel[]>("modelValue", {
     default: () => [],
 });
 
@@ -68,7 +67,30 @@ const acceptType = computed(() => {
 
 const showDialog = ref(false);
 
+const bufferItems = ref<File[]>([]);
+
 const onSelect = ({ files }: { files: File[] }) => {
-    console.log(files);
+    bufferItems.value = files;
+};
+
+const onSave = async () => {
+    const formData = new FormData();
+    formData.append("file", bufferItems.value[0]);
+
+    try {
+        const response = await client.post(baseUrl, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+
+        if (response.data) {
+            files.value = [...files.value, response.data];
+        }
+
+        showDialog.value = false;
+    } catch (error) {
+        console.error("File upload failed:", error);
+    }
 };
 </script>

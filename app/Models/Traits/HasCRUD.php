@@ -4,23 +4,38 @@ namespace App\Models\Traits;
 
 trait HasCRUD
 {
-    public static function createEntity(array $data): self
+    public static function createEntity(array $data, array $relations = []): self
     {
+
         $entity = static::query()->create($data);
+
+        if (!empty($relations)) {
+            $entity->load($relations);
+        }
 
         return $entity;
     }
 
-    public static function showEntity($id, array $with = []): self
+    public static function showEntity($id, array $relations = []): self
     {
         $entity = static::findOrFail($id);
 
+        if (!empty($relations)) {
+            $entity->load($relations);
+        }
+
         return $entity;
     }
 
-    public function updateEntity(array $data, array $with = []): self
+    public function updateEntity(array $data, array $relations = []): self
     {
+
         $this->update($data);
+
+        if (!empty($relations)) {
+            $this->load($relations);
+        }
+
         return $this;
     }
 

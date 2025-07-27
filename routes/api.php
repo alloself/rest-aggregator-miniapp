@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Account\CategoryController;
 use App\Http\Controllers\Account\RestaurantController;
+use App\Http\Controllers\Account\FileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,7 @@ use App\Http\Controllers\Account\RestaurantController;
 $accountResources = [
     'categories' => CategoryController::class,
     'restaurants' => RestaurantController::class,
+    'files' => FileController::class,
 ];
 
 Route::middleware(['auth:sanctum'])->get('me', [AuthController::class, 'me']);

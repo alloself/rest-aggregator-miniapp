@@ -4,12 +4,13 @@ namespace App\Models;
 
 use App\Models\Traits\HasCRUD;
 use App\Models\Traits\HasList;
+use App\Models\Traits\HasFiles;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
 class Restaurant extends BaseModel
 {
-    use HasCRUD, HasList, HasSlug;
+    use HasCRUD, HasList, HasSlug, HasFiles;
 
     protected $fillable = [
         'name',

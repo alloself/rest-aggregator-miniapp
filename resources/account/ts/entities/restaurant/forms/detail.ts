@@ -5,6 +5,8 @@ import Editor from "primevue/editor";
 import BaseWorkingHoursEditor from "@/shared/components/BaseWorkingHoursEditor.vue";
 import { z } from "zod";
 import BaseFileList from "@/shared/components/BaseFileList.vue";
+import { client } from "@/account/ts/shared/api/axios";
+import { FILE_BASE_URL } from "../../category/const";
 
 export const useRestaurantDetailFormFields = () => {
     const fields = computed<ISmartFormField[]>(() => [
@@ -74,6 +76,11 @@ export const useRestaurantDetailFormFields = () => {
         },
         {
             component: BaseFileList,
+            props: {
+                type: "image",
+                baseUrl: FILE_BASE_URL,
+                client: client,
+            },
             key: "files",
         },
     ]);
