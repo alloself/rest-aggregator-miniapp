@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Account\CategoryController;
 use App\Http\Controllers\Account\RestaurantController;
 use App\Http\Controllers\Account\FileController;
+use App\Http\Controllers\Site\RestaurantController as SiteRestaurantController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +26,6 @@ $accountResources = [
 
 Route::middleware(['auth:sanctum'])->get('me', [AuthController::class, 'me']);
 
-// Базовые маршруты аккаунта (без привязки к конкретному ресторану)
 Route::prefix('account')->middleware(['auth:sanctum', 'role:restaurant_owner|root'])->group(function () use ($accountResources) {
     Route::apiResources($accountResources);
 
@@ -35,4 +34,8 @@ Route::prefix('account')->middleware(['auth:sanctum', 'role:restaurant_owner|roo
             Route::post($route, [$controller, 'deleteMany']);
         }
     });
+});
+
+Route::prefix('site')->middleware(['web'])->group(function () {
+    Route::get('restaurants/{slug}', [SiteRestaurantController::class, 'show']);
 });
