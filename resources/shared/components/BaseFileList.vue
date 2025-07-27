@@ -1,25 +1,43 @@
 <template>
-    <DataTable :value="files" showGridlines stripedRows>
-        <Column field="name" header="Name"></Column>
-        <Column field="extension" header="Extension"></Column>
-        <Column field="preview" header="Preview"></Column>
-        <Column field="actions" header="Actions">
-            <template #body="{ data }">
-                <Button label="View" icon="pi pi-eye" />
+    <div>
+        <h3>{{ title }}</h3>
+        <DataTable
+            :value="files"
+            showGridlines
+            stripedRows
+            selectionMode="multiple"
+            v-model:selection="selectedFiles"
+            size="small"
+        >
+            <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+            <Column field="name" header="Name"></Column>
+            <Column field="extension" header="Extension"></Column>
+            <Column field="preview" header="Preview"></Column>
+            <Column field="actions" header="Actions">
+                <template #body="{ data }">
+                    <Button label="View" icon="pi pi-eye" />
+                </template>
+            </Column>
+            <template #footer>
+                <div class="flex">
+                    <div class="flex-1"></div>
+                    <Button
+                        type="button"
+                        icon="pi pi-trash"
+                        text
+                        :disabled="selectedFiles.length === 0"
+                        @click="deleteSelectedFiles"
+                    />
+                    <Button
+                        type="button"
+                        icon="pi pi-plus"
+                        text
+                        @click="showDialog = true"
+                    />
+                </div>
             </template>
-        </Column>
-        <template #footer>
-            <div class="flex">
-                <div class="flex-1"></div>
-                <Button
-                    type="button"
-                    icon="pi pi-plus"
-                    text
-                    @click="showDialog = true"
-                />
-            </div>
-        </template>
-    </DataTable>
+        </DataTable>
+    </div>
 
     <Dialog v-model:visible="showDialog" modal header="Создать файл">
         <div class="flex flex-col gap-4">
@@ -49,12 +67,14 @@ const {
     type = "file",
     invalid = false,
     initialItems = [],
+    title,
 } = defineProps<{
     baseUrl: string;
     client: AxiosInstance;
     type: "file" | "image";
     invalid?: boolean;
     initialItems?: FileModel[];
+    title: string;
 }>();
 
 const getBasePivot = () => {
@@ -64,6 +84,8 @@ const getBasePivot = () => {
         type,
     };
 };
+
+const selectedFiles = ref<FileModel[]>([]);
 
 const files = defineModel<FileModel[]>("modelValue", {
     default: () => [],
@@ -103,5 +125,12 @@ const onSave = async () => {
     } catch (error) {
         console.error("File upload failed:", error);
     }
+};
+
+const deleteSelectedFiles = async () => {
+    files.value = files.value.filter(
+        (file) => !selectedFiles.value.includes(file),
+    );
+    selectedFiles.value = [];
 };
 </script>
