@@ -39,16 +39,16 @@ const handleAuthenticationError = () => {
 };
 
 export const setupInterceptors = () => {
-    // Request interceptor to handle Content-Type for different data types
     client.interceptors.request.use(
         (config) => {
-            // Let axios automatically set Content-Type for FormData
             if (!(config.data instanceof FormData)) {
-                config.headers['Content-Type'] = 'application/json';
+                config.headers["Content-Type"] = "application/json";
+            } else {
+                config.headers["Content-Type"] = "multipart/form-data";
             }
             return config;
         },
-        (error) => Promise.reject(error)
+        (error) => Promise.reject(error),
     );
 
     client.interceptors.response.use(

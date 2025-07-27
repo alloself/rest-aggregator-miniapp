@@ -112,11 +112,7 @@ const onSave = async () => {
     formData.append("file", bufferItems.value[0]);
 
     try {
-        const response = await client.post(baseUrl, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        });
+        const response = await client.post(baseUrl, formData);
 
         if (response.data) {
             files.value = [
