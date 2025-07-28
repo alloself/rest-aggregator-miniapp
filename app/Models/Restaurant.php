@@ -68,6 +68,14 @@ class Restaurant extends BaseModel
     }
 
     /**
+     * Получить владельца ресторана
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
      * Получить всех пользователей с их ролями в этом ресторане
      */
     public function getUsersWithRoles()

@@ -3,12 +3,12 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class RestaurantResource extends ResourceCollection
+class RestaurantResource extends JsonResource
 {
     /**
-     * Transform the resource collection into an array.
+     * Transform the resource into an array.
      *
      * @return array<int|string, mixed>
      */
@@ -20,8 +20,8 @@ class RestaurantResource extends ResourceCollection
             'slug' => $this->slug,
             'description' => $this->description,
             'working_hours' => $this->working_hours,
-            'user' => new UserResource($this->user),
-            'files' => FileResource::collection($this->files),
+            'user' => new UserResource($this->whenLoaded('user')),
+            'files' => FileResource::collection($this->whenLoaded('files')),
         ];
     }
 }

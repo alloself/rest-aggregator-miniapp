@@ -1,20 +1,14 @@
 <template>
   <div class="restaurant-page">
-    <!-- Enhanced Suspense - лучшее из обоих миров -->
-    <EnhancedSuspenseWrapper 
-      :slug="route.params.slug as string" 
-      :min-duration="2500" 
-    />
+    <RestaurantPageContent :slug="route.params.slug as string" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useRoute } from 'vue-router';
+import RestaurantPageContent from '../widgets/restaurant-page/RestaurantPageContent.vue';
 
-// Local components  
-import EnhancedSuspenseWrapper from '../components/EnhancedSuspenseWrapper.vue'
-
-const route = useRoute()
+const route = useRoute();
 </script>
 
 <style>
@@ -29,4 +23,4 @@ const route = useRoute()
   min-height: 100vh;
   overflow-x: hidden; /* Предотвращаем выход изображений за край экрана */
 }
-</style> 
+</style>

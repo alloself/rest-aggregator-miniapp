@@ -10,7 +10,24 @@ class RestaurantController extends Controller
 {
     public function show(string $slug)
     {
-        $restaurant = Restaurant::where('slug', $slug)->first();
-        return new RestaurantResource($restaurant);
+        try {
+            $restaurant = Restaurant::with(['user', 'files', 'images'])
+                ->where('slug', $slug)
+                ->first();
+            
+            if (!$restaurant) {
+                return response()->json([
+                    'message' => 'Ресторан не найден',
+                    'error' => 'Restaurant not found'
+                ], 404);
+            }
+            
+            return new RestaurantResource($restaurant);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Произошла ошибка при загрузке ресторана',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
