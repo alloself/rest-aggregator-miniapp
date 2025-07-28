@@ -13,7 +13,6 @@ class File extends BaseModel
     protected $fillable = [
         'name',
         'url',
-        'name',
         'extension',
     ];
 
