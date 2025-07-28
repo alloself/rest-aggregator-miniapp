@@ -1,0 +1,124 @@
+@reference "tailwindcss";
+@tailwind base;
+
+@layer base {
+    .restaurant-card {
+        @apply bg-[rgba(255,254,251,0.97)];
+    }
+
+    .restaurant-card__hero-carousel {
+        @apply relative;
+    }
+
+    .restaurant-card__card {
+        @apply bg-white rounded-t-[20px] shadow-[0px_2px_4px_0px_rgba(0,0,0,0.15)] relative z-10 -mt-9 mx-4;
+    }
+
+    .restaurant-card__content {
+        @apply p-6;
+    }
+
+    .restaurant-card__header {
+        @apply mb-4;
+    }
+
+    .restaurant-card__title {
+        @apply text-xl font-semibold text-gray-900 leading-tight mb-3 font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+        letter-spacing: -0.03em;
+    }
+
+    .restaurant-card__description {
+        @apply text-[17px] text-black leading-tight font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+        letter-spacing: -0.03em;
+    }
+
+    .restaurant-card__details {
+        @apply mb-4;
+    }
+
+    .restaurant-card__detail-item {
+        @apply flex items-center gap-3 mb-3;
+    }
+
+    .restaurant-card__detail-item--schedule {
+        @apply items-start;
+    }
+
+    .restaurant-card__detail-icon {
+        @apply w-6 h-6 flex-shrink-0 flex items-center justify-center;
+    }
+
+    .restaurant-card__detail-icon--schedule {
+        @apply mt-0.5;
+    }
+
+    .restaurant-card__detail-text {
+        @apply text-[15px] text-black font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+        letter-spacing: -0.05em;
+    }
+
+    .restaurant-card__detail-schedule {
+        @apply text-[15px] text-black leading-tight font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+        letter-spacing: -0.05em;
+    }
+
+    .restaurant-card__actions {
+        @apply flex gap-1;
+    }
+
+    .restaurant-card__button {
+        @apply flex-1 h-[39px] px-2.5 rounded-[20px] border-0 cursor-pointer flex items-center justify-center transition-all duration-300 ease-in-out bg-gray-100 text-black hover:bg-gray-200 font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif] font-medium text-[15px];
+        letter-spacing: -0.05em;
+    }
+
+    .restaurant-card__full-description {
+        @apply bg-gray-100/70 rounded-b-[20px] px-[18px] pt-8 pb-6 relative -mt-2 mx-4 mb-6;
+    }
+
+    .restaurant-card__full-description-text {
+        @apply text-[15px] text-black text-center leading-tight font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+        letter-spacing: -0.03em;
+    }
+
+    .restaurant-card__chef-section {
+        @apply mb-6 p-0;
+    }
+
+    .restaurant-card__chef-title {
+        @apply text-lg font-semibold text-black mb-4 px-4 font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+        letter-spacing: -0.04em;
+    }
+
+    .restaurant-card__chef-items {
+        @apply flex gap-1 overflow-x-auto px-4 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
+    }
+
+    .restaurant-card__chef-featured {
+        @apply flex-shrink-0 w-[90px] h-[100px] rounded-r-[30px] p-5 flex items-center justify-center bg-[rgba(255,251,233,0.68)];
+    }
+
+    .restaurant-card__chef-featured-image {
+        @apply w-[52px] h-[52px] overflow-hidden;
+    }
+
+    .restaurant-card__chef-item {
+        @apply flex-shrink-0 w-[100px] h-[100px] rounded-[20px] overflow-hidden cursor-pointer;
+    }
+
+    .restaurant-card__chef-image {
+        @apply max-w-full h-full object-cover block;
+    }
+
+    .restaurant-card__chef-image--regular {
+        @apply w-full h-full object-cover block rounded-[20px];
+    }
+
+    .restaurant-card__footer {
+        @apply text-center py-6;
+    }
+
+    .restaurant-card__footer-text {
+        @apply text-base font-medium leading-tight font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+        color: rgba(0, 0, 0, 0.35);
+    }
+}

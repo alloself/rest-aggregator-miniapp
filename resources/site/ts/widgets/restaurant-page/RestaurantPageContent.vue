@@ -1,30 +1,94 @@
 <template>
-  <div class="restaurant-page">
-    <div v-if="loading" class="restaurant-page__loading">Загрузка...</div>
+  <div class="restaurant-page-content">
+    <div v-if="loading" class="restaurant-page-content__loading">
+      <div class="loading-spinner">Загрузка...</div>
+    </div>
 
-    <div v-else-if="error" class="restaurant-page__error">
+    <div v-else-if="error" class="restaurant-page-content__error">
       {{ error }}
     </div>
 
-    <div v-else-if="restaurant" class="restaurant-page__content">
-      <h1 class="restaurant-page__title">{{ restaurant.name }}</h1>
-      <p v-if="restaurant.description" class="restaurant-page__description" v-html="restaurant.description"></p>
-      <!-- Добавьте здесь дополнительную информацию о ресторане -->
+    <div v-else-if="restaurant" class="restaurant-page-content__wrapper">
+      <RestaurantCard
+        :restaurant="restaurant"
+        :hero-images="heroImages"
+        :chef-recommendations="chefRecommendations"
+        :contact-info="contactInfo"
+        @show-menu="handleShowMenu"
+        @show-bar="handleShowBar"
+        @show-photos="handleShowPhotos"
+      />
     </div>
 
-    <div v-else class="restaurant-page__not-found">Ресторан не найден</div>
+    <div v-else class="restaurant-page-content__not-found">Ресторан не найден</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount } from 'vue';
+import { onBeforeMount, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRestaurantStore } from '@site/ts/stores/restaurant';
+import RestaurantCard from './RestaurantCard.vue';
 
-const { slug } = defineProps<{ slug: string }>();
+interface Props {
+  slug: string;
+}
+
+const { slug } = defineProps<Props>();
 
 const store = useRestaurantStore();
 const { restaurant, loading, error } = storeToRefs(store);
+
+// Мок данные для примера (можно будет заменить реальными данными)
+const heroImages = computed(() => [
+  {
+    url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=400&fit=crop',
+    alt: 'Интерьер ресторана',
+  },
+  { url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=400&fit=crop', alt: 'Блюда ресторана' },
+  {
+    url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=400&fit=crop',
+    alt: 'Атмосфера ресторана',
+  },
+]);
+
+const chefRecommendations = computed(() => [
+  {
+    id: '1',
+    name: 'Стейк рибай с овощами гриль',
+    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=300&h=200&fit=crop',
+  },
+  {
+    id: '2',
+    name: 'Паста карбонара с трюфелями',
+    image: 'https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=300&h=200&fit=crop',
+  },
+  {
+    id: '3',
+    name: 'Тирамису от шефа',
+    image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=300&h=200&fit=crop',
+  },
+]);
+
+const contactInfo = computed(() => ({
+  phone: '+7 (495) 123-45-67',
+  telegram: 'restaurant_bot',
+}));
+
+const handleShowMenu = () => {
+  console.log('Показать меню');
+  // Здесь можно добавить логику открытия меню
+};
+
+const handleShowBar = () => {
+  console.log('Показать бар');
+  // Здесь можно добавить логику открытия барной карты
+};
+
+const handleShowPhotos = () => {
+  console.log('Показать фото');
+  // Здесь можно добавить логику открытия галереи фото
+};
 
 onBeforeMount(async () => {
   await store.getRestaurantData(slug);
@@ -32,29 +96,38 @@ onBeforeMount(async () => {
 </script>
 
 <style scoped>
-.restaurant-page {
-  padding: 20px;
+.restaurant-page-content {
+  min-height: 100vh;
+  background-color: #fff;
 }
 
-.restaurant-page__loading,
-.restaurant-page__error,
-.restaurant-page__not-found {
+.restaurant-page-content__loading,
+.restaurant-page-content__error,
+.restaurant-page-content__not-found {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
   text-align: center;
   padding: 40px 20px;
 }
 
-.restaurant-page__error {
+.restaurant-page-content__error {
   color: #dc3545;
+  font-size: 16px;
 }
 
-.restaurant-page__title {
-  font-size: 2rem;
-  margin-bottom: 1rem;
+.restaurant-page-content__not-found {
+  color: #6c757d;
+  font-size: 16px;
 }
 
-.restaurant-page__description {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  color: #666;
+.loading-spinner {
+  font-size: 16px;
+  color: #6c757d;
+}
+
+.restaurant-page-content__wrapper {
+  width: 100%;
 }
 </style>
