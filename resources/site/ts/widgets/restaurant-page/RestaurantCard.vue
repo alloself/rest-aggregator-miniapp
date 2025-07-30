@@ -11,7 +11,7 @@
         <!-- Restaurant Name and Brief Description -->
         <div class="restaurant-card__header">
           <h1 class="restaurant-card__title">
-            {{ restaurant?.name || 'Загрузка...' }}
+            {{ restaurant?.name }}
           </h1>
           <p v-if="restaurant?.description" class="restaurant-card__description">
             {{ getShortDescription(restaurant.description) }}
@@ -20,33 +20,31 @@
 
         <!-- Restaurant Details Section -->
         <div class="restaurant-card__details">
-          <!-- Average Check -->
-          <div v-if="restaurant?.average_receipt" class="restaurant-card__detail-item">
-            <div class="restaurant-card__detail-icon">
-              <Icon name="mdi:credit-card-outline" size="16" color="gray" />
-            </div>
-            <span class="restaurant-card__detail-text">{{ restaurant.average_receipt }}</span>
-          </div>
-
           <!-- Work Schedule -->
           <div
             v-if="restaurant?.working_hours"
             class="restaurant-card__detail-item restaurant-card__detail-item--schedule"
           >
             <div class="restaurant-card__detail-icon restaurant-card__detail-icon--schedule">
-              <Icon name="mdi:clock-outline" size="16" color="gray" />
+              <Icon name="clock" size="16" color="gray" />
             </div>
             <div class="restaurant-card__detail-schedule">
-              <div v-for="schedule in restaurant.working_hours" :key="schedule">
-                {{ schedule }}
-              </div>
+              <WorkingHours :working-hours="restaurant.working_hours" />
             </div>
+          </div>
+
+          <!-- Average Check -->
+          <div v-if="restaurant?.average_receipt" class="restaurant-card__detail-item">
+            <div class="restaurant-card__detail-icon">
+              <Icon name="card" size="16" color="gray" />
+            </div>
+            <span class="restaurant-card__detail-text">{{ `${restaurant.average_receipt} ₽` }}</span>
           </div>
 
           <!-- Address -->
           <div v-if="restaurant?.address" class="restaurant-card__detail-item">
             <div class="restaurant-card__detail-icon">
-              <Icon name="mdi:map-marker-outline" size="16" color="gray" />
+              <Icon name="location" size="16" color="gray" />
             </div>
             <span class="restaurant-card__detail-text">{{ restaurant.address }}</span>
           </div>
@@ -115,7 +113,7 @@ import { Restaurant } from '@/shared';
 
 // Shared UI components
 import { RestaurantHeroCarousel } from '@shared/ui';
-import { AppButton, AppImage } from '@site/ts/shared/ui';
+import { AppButton, AppImage, WorkingHours } from '@site/ts/shared/ui';
 import { Icon } from '@shared/ui';
 
 // Local components

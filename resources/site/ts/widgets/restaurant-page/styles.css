@@ -11,7 +11,7 @@
     }
 
     .restaurant-card__card {
-        @apply bg-white rounded-t-[20px] shadow-[0px_2px_4px_0px_rgba(0,0,0,0.15)] relative z-10 -mt-9 mx-4;
+        @apply bg-white rounded-[20px] shadow-[0px_2px_4px_0px_rgba(0,0,0,0.15)] relative z-10 -mt-9 mx-4;
     }
 
     .restaurant-card__content {
