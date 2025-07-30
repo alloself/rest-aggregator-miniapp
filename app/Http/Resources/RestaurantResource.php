@@ -25,6 +25,7 @@ class RestaurantResource extends JsonResource
             'yandex_metrica_code' => $this->yandex_metrica_code,
             'user' => new UserResource($this->whenLoaded('user')),
             'files' => FileResource::collection($this->whenLoaded('files')),
+            'subtitle' => $this->subtitle,
         ];
     }
 }

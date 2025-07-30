@@ -19,6 +19,7 @@ declare module 'vue' {
     DataTable: typeof import('primevue/datatable')['default']
     Dialog: typeof import('primevue/dialog')['default']
     Divider: typeof import('primevue/divider')['default']
+    Drawer: typeof import('primevue/drawer')['default']
     Dropdown: typeof import('primevue/dropdown')['default']
     FileUpload: typeof import('primevue/fileupload')['default']
     IconMdiChevronDown: typeof import('~icons/mdi/chevron-down')['default']
