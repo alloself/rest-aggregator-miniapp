@@ -13,8 +13,8 @@
           <h1 class="restaurant-card__title">
             {{ restaurant?.name }}
           </h1>
-          <p v-if="restaurant?.description" class="restaurant-card__description">
-            {{ getShortDescription(restaurant.description) }}
+          <p v-if="restaurant?.subtitle" class="restaurant-card__description">
+            {{ restaurant.subtitle }}
           </p>
         </div>
 
@@ -38,7 +38,7 @@
             <div class="restaurant-card__detail-icon">
               <Icon name="card" size="16" color="gray" />
             </div>
-            <span class="restaurant-card__detail-text">{{ `${restaurant.average_receipt} ₽` }}</span>
+            <span class="restaurant-card__detail-text">{{ formattedAverageReceipt }}</span>
           </div>
 
           <!-- Address -->
@@ -159,6 +159,23 @@ const getShortDescription = (description: string): string => {
 const featuredDish = computed(() => props.chefRecommendations[0] || null);
 
 const regularDishes = computed(() => props.chefRecommendations.slice(1));
+
+// Форматирование среднего чека
+const formattedAverageReceipt = computed(() => {
+  if (!props.restaurant?.average_receipt) return '';
+
+  const receipt = props.restaurant.average_receipt.toString().trim();
+
+  // Проверяем, является ли значение только числом
+  const isOnlyNumber = /^\d+$/.test(receipt);
+
+  if (isOnlyNumber) {
+    return `${receipt} ₽`;
+  }
+
+  // Если это не только число, возвращаем как есть
+  return receipt;
+});
 
 // Methods
 const showMenu = () => {

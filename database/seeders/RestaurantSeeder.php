@@ -25,9 +25,9 @@ class RestaurantSeeder extends Seeder
         $grettoRestaurant = Restaurant::create([
             'name' => 'Gretto',
             'slug' => 'gretto',
-            'subtitle' => 'Уютный ресторан с домашней атмосферой',
+            'subtitle' => 'Средиземноморские завтраки и обеды. Греческая кухня.',
             'description' => 'Ресторан Gretto предлагает изысканную кухню в уютной домашней атмосфере. Мы готовим из свежих продуктов и создаем незабываемые вкусовые впечатления.',
-            'address' => 'ул. Примерная, 123, г. Город',
+            'address' => 'Наб. реки Фонтанки, 1',
             'average_receipt' => '1500-2500 руб.',
             'working_hours' => [
                 'friday' => [
