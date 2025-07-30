@@ -24,15 +24,33 @@ import TreeTable from "primevue/treetable";
 import Column from "primevue/column";
 import type { TreeNode } from "primevue/treenode";
 import type { IBaseEntity, IBaseTreeEntity, IBaseColumn } from "../types";
+import type { Component } from "vue";
+import { useRightDrawer } from "../composables/useRightDrawer";
+import type { RightDrawerData, RightDrawerProps } from "../types/rightDrawer";
 
-const { columns = [], title = "" } = defineProps<{
+const {
+    columns = [],
+    title = "",
+    createComponent,
+    createTitle = "Создание элемента",
+    createProps,
+} = defineProps<{
     columns?: IBaseColumn[];
     title?: string;
+    createComponent?: Component;
+    createTitle?: string;
+    createProps?: RightDrawerProps;
+}>();
+
+const emit = defineEmits<{
+    create: [data: RightDrawerData];
 }>();
 
 const items = defineModel<T[]>("items", {
     default: () => [],
 });
+
+const { push } = useRightDrawer();
 
 const treeNodes = computed<TreeNode[]>(() => {
     return items.value.map((item) => transformToTreeNode(item));
@@ -49,7 +67,20 @@ function transformToTreeNode(item: T): TreeNode {
     };
 }
 
-const onCreate = () => {
-    console.log("onCreate");
+const onCreate = (): void => {
+    if (createComponent) {
+        push(createComponent, {
+            title: createTitle,
+            props: createProps,
+            onSave: (data: RightDrawerData) => {
+                emit("create", data);
+            },
+            onClose: () => {
+                console.log("Создание отменено");
+            },
+        });
+    } else {
+        console.log("onCreate: компонент создания не задан");
+    }
 };
 </script>
