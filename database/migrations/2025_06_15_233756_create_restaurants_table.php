@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary()->unique();
             $table->string('slug');
             $table->string('name');
+            $table->longText('subtitle')->nullable();
             $table->string('average_receipt')->nullable();
             $table->string('address')->nullable();
             $table->longText('description')->nullable();

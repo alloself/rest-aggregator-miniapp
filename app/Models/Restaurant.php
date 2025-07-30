@@ -22,6 +22,7 @@ class Restaurant extends BaseModel
         'address',
         'average_receipt',
         'user_id',
+        'subtitle'
     ];
 
 

@@ -8,6 +8,12 @@
                 :field="col.field"
                 :header="col.header"
             />
+            <template #footer>
+                <div class="flex ">
+                    <div class="flex-1"/>
+                    <Button type="button" icon="pi pi-plus" text @click="onCreate" />
+                </div>
+            </template>
         </TreeTable>
     </div>
 </template>
@@ -42,4 +48,8 @@ function transformToTreeNode(item: T): TreeNode {
             : undefined,
     };
 }
+
+const onCreate = () => {
+    console.log("onCreate");
+};
 </script>
