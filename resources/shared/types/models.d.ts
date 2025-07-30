@@ -123,6 +123,7 @@ export interface Restaurant {
   id: string
   slug: string
   name: string
+  subtitle?: string | null
   average_receipt?: string | null
   address?: string | null
   description?: string | null
@@ -133,6 +134,7 @@ export interface Restaurant {
   updated_at?: Date | null
   // relations
   users?: User[]
+  user?: User
   images?: File[]
   files?: File[]
   // counts
@@ -141,6 +143,7 @@ export interface Restaurant {
   files_count: number
   // exists
   users_exists: boolean
+  user_exists: boolean
   images_exists: boolean
   files_exists: boolean
 }
