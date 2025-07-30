@@ -30,13 +30,34 @@ class RestaurantSeeder extends Seeder
             'address' => 'ул. Примерная, 123, г. Город',
             'average_receipt' => '1500-2500 руб.',
             'working_hours' => [
-                'monday' => ['open' => '10:00', 'close' => '22:00'],
-                'tuesday' => ['open' => '10:00', 'close' => '22:00'],
-                'wednesday' => ['open' => '10:00', 'close' => '22:00'],
-                'thursday' => ['open' => '10:00', 'close' => '22:00'],
-                'friday' => ['open' => '10:00', 'close' => '23:00'],
-                'saturday' => ['open' => '11:00', 'close' => '23:00'],
-                'sunday' => ['open' => '11:00', 'close' => '21:00'],
+                'friday' => [
+                    'endTime' => '22:00',
+                    'startTime' => '09:00'
+                ],
+                'monday' => [
+                    'endTime' => '22:00',
+                    'startTime' => '09:00'
+                ],
+                'sunday' => [
+                    'endTime' => '22:00',
+                    'startTime' => '09:00'
+                ],
+                'tuesday' => [
+                    'endTime' => '22:00',
+                    'startTime' => '09:00'
+                ],
+                'saturday' => [
+                    'endTime' => '22:00',
+                    'startTime' => '09:00'
+                ],
+                'thursday' => [
+                    'endTime' => '22:00',
+                    'startTime' => '09:00'
+                ],
+                'wednesday' => [
+                    'endTime' => '22:00',
+                    'startTime' => '09:00'
+                ]
             ],
             'user_id' => $rootUser->id,
         ]);
