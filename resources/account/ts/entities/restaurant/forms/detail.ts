@@ -1,13 +1,13 @@
 import type { ISmartFormField } from "@/shared/types";
 import { computed } from "vue";
 import BaseInput from "@/shared/components/BaseInput.vue";
-import Editor from "primevue/editor";
 import BaseWorkingHoursEditor from "@/shared/components/BaseWorkingHoursEditor.vue";
 import { z } from "zod";
 import BaseFileList from "@/shared/components/BaseFileList.vue";
 import { client } from "@/account/ts/shared/api/axios";
 import { FILE_BASE_URL } from "../../category/const";
 import BaseTree from "@/shared/components/BaseTree.vue";
+import BaseEditor from "@/shared/components/BaseEditor.vue";
 
 export const useRestaurantDetailFormFields = () => {
   const fields = computed<ISmartFormField[]>(() => [
@@ -84,11 +84,11 @@ export const useRestaurantDetailFormFields = () => {
       },
     },
     {
-      component: Editor,
+      component: BaseEditor,
       key: "description",
       props: {
         type: "description",
-        label: "Описание",
+        title: "Описание",
         fluid: true,
         autocomplete: "restaurant_description",
         name: "description",
