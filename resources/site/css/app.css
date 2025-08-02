@@ -1,30 +1,218 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+/* CSS Variables для Design Tokens */
+@theme {
+    /* Основные цвета */
+    --color-bg-primary: #fffefb;
+    --color-bg-secondary: #f4f3f3;
+    --color-bg-secondary-hover: #ebeaea;
+    --color-bg-secondary-active: #e1e0e0;
+    --color-bg-card: #fffefd;
+    --color-bg-overlay: rgba(235, 235, 235, 0.38);
+    --color-bg-disabled: rgba(0, 0, 0, 0.2);
+    --color-bg-section: #bdbdbd;
+
+    /* Текстовые цвета */
+    --color-text-primary: #000000;
+    --color-text-secondary: rgba(0, 0, 0, 0.35);
+    --color-text-accent: #1c1c1e;
+    --color-text-muted: rgba(0, 0, 0, 0.4);
+    --color-text-dark: #050505;
+
+    /* Белый цвет и его вариации */
+    --color-white-pure: #ffffff;
+    --color-white-soft: #f5f5f5;
+
+    /* Цвета интерфейса */
+    --color-surface-default: #eeeeee;
+    --color-surface-light: #f2f2f1;
+    --color-surface-warm: #f8f7f5;
+    --color-surface-cool: rgba(238, 238, 238, 0.5);
+    --color-surface-muted: rgba(238, 238, 238, 0.73);
+
+    /* Акцентные цвета */
+    --color-accent-primary: rgba(200, 228, 155, 0.35);
+    --color-accent-primary-hover: rgba(200, 228, 155, 0.45);
+    --color-accent-primary-active: rgba(200, 228, 155, 0.55);
+    --color-accent-secondary: #fffbce;
+    --color-accent-tertiary: rgba(122, 158, 159, 0.41);
+    --color-accent-success: rgba(236, 246, 220, 0.96);
+    --color-accent-success-alt: #edf6dd;
+    --color-accent-warning: rgba(253, 224, 131, 0.85);
+    --color-accent-error: rgba(116, 116, 116, 0.44);
+
+    /* Специальные цвета для telegram */
+    --color-telegram-blue: #2aabee;
+    --color-telegram-blue-dark: #229ed9;
+    --color-telegram-accent: #7a9e9f;
+    --color-telegram-accent-fill: #7a9e9f;
+
+    /* Границы и разделители */
+    --color-border-default: rgba(0, 0, 0, 0.3);
+    --color-border-light: rgba(0, 0, 0, 0.2);
+    --color-border-lighter: rgba(0, 0, 0, 0.19);
+
+    /* Радиусы скругления */
+    --radius-none: 0px;
+    --radius-small: 15px;
+    --radius-medium: 18px;
+    --radius-default: 20px;
+    --radius-large: 30px;
+    --radius-xlarge: 40px;
+    --radius-full: 50px;
+    --radius-button: 20px;
+    --radius-card: 20px;
+    --radius-overlay: 60px;
+
+    /* Тени */
+    --shadow-card: 0px 2px 4px 0px rgba(0, 0, 0, 0.15);
+    --shadow-elevated: 0px 4px 4px 0px rgba(0, 0, 0, 0.12);
+    --shadow-overlay: 0px 4px 4px 0px rgba(0, 0, 0, 0.15);
+    --shadow-button: 0px 0px 4px 0px rgba(0, 0, 0, 0.2);
+    --shadow-image: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    --shadow-bottom: 4px 0px 20px 2px rgba(0, 0, 0, 0.1);
+    --shadow-none: none;
+    --shadow-backdrop: blur(4px);
+
+    /* Размеры и отступы */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 10px;
+    --spacing-lg: 12px;
+    --spacing-xl: 15px;
+    --spacing-2xl: 16px;
+    --spacing-3xl: 18px;
+    --spacing-4xl: 20px;
+    --spacing-5xl: 25px;
+    --spacing-6xl: 30px;
+
+    /* Специфичные отступы */
+    --gap-tiny: 4px;
+    --gap-small: 6px;
+    --gap-medium: 8px;
+    --gap-large: 10px;
+    --gap-xlarge: 12px;
+    --gap-2xlarge: 14px;
+    --gap-3xlarge: 16px;
+
+    /* Внутренние отступы */
+    --padding-button: 10px;
+    --padding-card: 20px;
+    --padding-section: 15px;
+    --padding-small: 5px;
+
+    /* Размеры элементов */
+    --size-icon-small: 13px;
+    --size-icon-medium: 16px;
+    --size-icon-large: 20px;
+    --size-icon-xlarge: 24px;
+    --size-icon-2xlarge: 28px;
+
+    /* Кнопки */
+    --size-button-height-small: 30px;
+    --size-button-height-medium: 39px;
+    --size-button-height-large: 61px;
+    --size-button-width-small: 104px;
+    --size-button-width-medium: 134px;
+    --size-button-width-large: 323px;
+
+    /* Элементы интерфейса */
+    --size-dot-small: 8px;
+    --size-dot-medium: 12px;
+
+    /* Изображения */
+    --size-image-small: 26px;
+    --size-image-medium: 46px;
+    --size-image-large: 100px;
+    --size-image-hero: 298px;
+
+    /* Контейнеры */
+    --size-container-mobile: 440px;
+    --size-container-card: 410px;
+
+    /* Состояния */
+    --opacity-disabled: 0.3;
+    --opacity-muted: 0.35;
+    --opacity-overlay: 0.44;
+
+    /* Анимации */
+    --transition-default: 0.2s ease-in-out;
+    --transition-fast: 0.1s ease-in-out;
+    --transition-slow: 0.3s ease-in-out;
+
+    /* Типографика */
+    --font-size-heading-lg: 20px;
+    --font-size-heading-md: 18px;
+    --font-size-heading-sm: 16px;
+    --font-size-body-lg: 17px;
+    --font-size-body-md: 16px;
+    --font-size-body-default: 15px;
+    --font-size-body-sm: 14px;
+    --font-size-body-tiny: 12px;
+    --font-size-caption-default: 16px;
+    --font-size-caption-bold: 15px;
+
+    --font-weight-heading-lg: 600;
+    --font-weight-heading-md: 600;
+    --font-weight-heading-sm: 500;
+    --font-weight-body-lg: 400;
+    --font-weight-body-md: 500;
+    --font-weight-body-default: 400;
+    --font-weight-body-sm: 400;
+    --font-weight-body-tiny: 500;
+    --font-weight-caption-default: 500;
+    --font-weight-caption-bold: 600;
+
+    --line-height-heading-lg: 1.3em;
+    --line-height-heading-md: 1em;
+    --line-height-heading-sm: 1.1em;
+    --line-height-body-lg: 1.3em;
+    --line-height-body-md: 1.3em;
+    --line-height-body-default: 1.44em;
+    --line-height-body-sm: 1.1em;
+    --line-height-body-tiny: 0.95em;
+    --line-height-caption-default: 1em;
+    --line-height-caption-bold: 1.3em;
+
+    --letter-spacing-heading-lg: 0px;
+    --letter-spacing-heading-md: -4%;
+    --letter-spacing-heading-sm: -1%;
+    --letter-spacing-body-lg: -3%;
+    --letter-spacing-body-md: 0px;
+    --letter-spacing-body-default: -6%;
+    --letter-spacing-body-sm: -2%;
+    --letter-spacing-body-tiny: -1%;
+    --letter-spacing-caption-default: -2%;
+    --letter-spacing-caption-bold: -3%;
+}
 
 /* Global styles для предотвращения выхода изображений за край экрана */
-html, body {
-  overflow-x: hidden;
-  max-width: 100vw;
+html,
+body {
+    overflow-x: hidden;
+    max-width: 100vw;
 }
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 img {
-  max-width: 100%;
-  height: auto;
+    max-width: 100%;
+    height: auto;
 }
 
 /* Специальные правила для Telegram Mini App */
 @media (max-width: 440px) {
-  html, body {
-    width: 100%;
-    overflow-x: hidden;
-  }
-  
-  .restaurant-page-content img {
-    max-width: 100%;
-    width: 100%;
-    object-fit: cover;
-  }
+    html,
+    body {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    .restaurant-page-content img {
+        max-width: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
 }

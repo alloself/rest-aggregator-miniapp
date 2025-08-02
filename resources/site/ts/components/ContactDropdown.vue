@@ -1,131 +1,114 @@
 <template>
   <div class="contact-dropdown" ref="dropdownRef">
     <!-- Trigger Button -->
-    <button 
-      @click="toggleDropdown"
-      class="contact-dropdown__trigger"
-    >
-      <Icon 
-        name="mdi:phone" 
-        size="19"
-        color="black"
-        class="contact-dropdown__icon"
-      />
-    </button>
+    <AppButton @click="toggleDropdown" variant="help" size="small" class="contact-dropdown__trigger">
+      <template #icon>
+        <Icon name="phone" size="12" class="contact-dropdown__icon" />
+      </template>
+    </AppButton>
 
     <!-- Dropdown Menu -->
-    <div 
-      v-if="isOpen"
-      class="contact-dropdown__menu"
-    >
+    <div v-if="isOpen" class="contact-dropdown__menu">
       <!-- Phone Option -->
       <div class="contact-dropdown__item" @click="handlePhoneCall">
         <div class="contact-dropdown__item-icon contact-dropdown__item-icon--phone">
-          <SvgIcon 
-            name="phone-icon" 
-            size="custom"
-            :custom-size="22"
-            color="black"
-          />
+          <Icon name="call" :size="22" />
         </div>
-        <span class="contact-dropdown__item-text contact-dropdown__item-text--phone">Позвонить</span>
+        <span class="contact-dropdown__item-text">Позвонить</span>
       </div>
+
+      <!-- Divider -->
+      <div class="contact-dropdown__divider"></div>
 
       <!-- Telegram Option -->
       <div class="contact-dropdown__item" @click="handleTelegramMessage">
         <div class="contact-dropdown__item-icon contact-dropdown__item-icon--telegram">
-          <SvgIcon 
-            name="telegram-icon" 
-            size="custom"
-            :custom-size="18"
-            color="telegram"
-          />
+          <Icon name="telegram" :size="18" />
         </div>
-        <span class="contact-dropdown__item-text contact-dropdown__item-text--telegram">Написать</span>
+        <span class="contact-dropdown__item-text">Написать</span>
       </div>
+
+      <!-- Divider -->
+      <div class="contact-dropdown__divider"></div>
 
       <!-- Booking Option -->
       <div class="contact-dropdown__item" @click="handleBooking">
         <div class="contact-dropdown__item-icon contact-dropdown__item-icon--booking">
-          <SvgIcon 
-            name="booking-icon" 
-            size="custom"
-            :custom-size="18"
-            color="black"
-          />
+          <Icon name="booking" :size="18" />
         </div>
-        <span class="contact-dropdown__item-text contact-dropdown__item-text--booking">Забронировать</span>
+        <span class="contact-dropdown__item-text">Забронировать</span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { Icon } from '@shared/ui'
-import SvgIcon from './SvgIcon.vue'
+import { ref, onMounted, onUnmounted } from 'vue';
+
+import { AppButton } from '../shared/ui';
+import { Icon } from '@/shared';
 
 // Props
 interface Props {
-  phone?: string
-  telegramUsername?: string
+  phone?: string;
+  telegramUsername?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   phone: '+7 (495) 123-45-67',
-  telegramUsername: 'restaurant_bot'
-})
+  telegramUsername: 'restaurant_bot',
+});
 
 // Reactive data
-const isOpen = ref(false)
-const dropdownRef = ref<HTMLElement>()
+const isOpen = ref(false);
+const dropdownRef = ref<HTMLElement>();
 
 // Methods
 const toggleDropdown = () => {
-  isOpen.value = !isOpen.value
-}
+  isOpen.value = !isOpen.value;
+};
 
 const closeDropdown = () => {
-  isOpen.value = false
-}
+  isOpen.value = false;
+};
 
 const handlePhoneCall = () => {
   if (props.phone) {
     // Remove all non-numeric characters for tel: link
-    const cleanPhone = props.phone.replace(/[^\d+]/g, '')
-    window.location.href = `tel:${cleanPhone}`
+    const cleanPhone = props.phone.replace(/[^\d+]/g, '');
+    window.location.href = `tel:${cleanPhone}`;
   }
-  closeDropdown()
-}
+  closeDropdown();
+};
 
 const handleTelegramMessage = () => {
   if (props.telegramUsername) {
-    const telegramUrl = `https://t.me/${props.telegramUsername}`
-    window.open(telegramUrl, '_blank')
+    const telegramUrl = `https://t.me/${props.telegramUsername}`;
+    window.open(telegramUrl, '_blank');
   }
-  closeDropdown()
-}
+  closeDropdown();
+};
 
 const handleBooking = () => {
   // TODO: Integrate with booking system
-  closeDropdown()
-}
+  closeDropdown();
+};
 
 // Click outside handler
 const handleClickOutside = (event: Event) => {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
-    closeDropdown()
+    closeDropdown();
   }
-}
+};
 
 // Lifecycle
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
+  document.addEventListener('click', handleClickOutside);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
 <style>
@@ -133,7 +116,7 @@ onUnmounted(() => {
 .contact-dropdown {
   position: relative;
   display: inline-block;
-  
+
   /* Reset any PrimeVue styles */
   * {
     box-sizing: border-box;
@@ -142,116 +125,78 @@ onUnmounted(() => {
   &__trigger {
     width: 59px;
     height: 39px;
-    background-color: rgba(200, 228, 155, 0.35);
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &:hover {
-      background-color: rgba(200, 228, 155, 0.5);
-    }
-
-    &:focus {
-      outline: none;
-    }
   }
 
   &__icon {
     width: 19px;
     height: 18px;
-    color: #000000;
+    color: var(--color-text-primary);
   }
 
   &__menu {
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    background-color: #FFFFFF;
-    border-radius: 15px;
-    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.2);
+    background-color: var(--color-white-pure);
+    border-radius: var(--radius-small);
+    box-shadow: var(--shadow-button);
     width: 177px;
-    height: 134px;
+    min-height: 134px;
     z-index: 100;
     animation: dropdown-appear 0.2s ease-out;
+    padding: var(--spacing-xs) 0;
   }
 
   &__item {
-    position: absolute;
+    display: flex;
+    align-items: center;
     width: 100%;
+    padding: var(--spacing-xs) var(--spacing-lg);
+    gap: var(--gap-xlarge);
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color var(--transition-default);
+    min-height: 44px;
 
     &:hover {
-      background-color: rgba(244, 243, 243, 0.5);
-      border-radius: 8px;
-      margin: 0 4px;
-      width: calc(100% - 8px);
+      background-color: var(--color-bg-secondary);
     }
   }
 
   &__item-icon {
-    position: absolute;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #000000;
+    color: var(--color-text-primary);
+    flex-shrink: 0;
 
     &--phone {
-      left: 18px;
-      top: 15px;
       width: 22px;
       height: 22px;
     }
 
     &--telegram {
-      left: 21px;
-      top: 57px;
       width: 18px;
       height: 18px;
-      color: #2AABEE;
     }
 
     &--booking {
-      left: 23px;
-      top: 97px;
       width: 18px;
       height: 18px;
     }
   }
 
   &__item-text {
-    position: absolute;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 15px;
-    font-weight: 400;
-    color: #000000;
-    line-height: 1em;
-    letter-spacing: -0.03em;
+    font-size: var(--font-size-body-default);
+    font-weight: var(--font-weight-body-default);
+    line-height: var(--line-height-body-default);
+    letter-spacing: var(--letter-spacing-body-default);
+    color: var(--color-text-primary);
+  }
 
-    &--phone {
-      left: 51px;
-      top: 17px;
-      width: 77px;
-      height: 18px;
-    }
-
-    &--telegram {
-      left: 51px;
-      top: 57px;
-      width: 70px;
-      height: 18px;
-    }
-
-    &--booking {
-      left: 51px;
-      top: 99px;
-      width: 111px;
-      height: 18px;
-    }
+  &__divider {
+    height: 1px;
+    background-color: var(--color-border-light);
+    margin: 0 var(--spacing-lg);
   }
 }
 
@@ -266,4 +211,4 @@ onUnmounted(() => {
     transform: translateY(0);
   }
 }
-</style> 
+</style>

@@ -52,9 +52,9 @@
 
         <!-- Action Buttons -->
         <div class="restaurant-card__actions">
-          <AppButton label="Меню" @click="showMenu" class="restaurant-card__button" />
-          <AppButton label="Бар" @click="showBar" class="restaurant-card__button" />
-          <AppButton label="Фото" @click="showPhotos" class="restaurant-card__button" />
+          <AppButton label="Меню" variant="secondary" size="small" @click="showMenu" fullWidth />
+          <AppButton label="Бар" variant="secondary" size="small" @click="showBar" fullWidth />
+          <AppButton label="Фото" variant="secondary" size="small" @click="showPhotos" fullWidth />
           <!-- Contact Dropdown -->
           <ContactDropdown
             v-if="contactInfo.phone || contactInfo.telegram"
@@ -85,7 +85,7 @@
         <!-- Featured Large Item -->
         <div v-if="featuredDish" class="restaurant-card__chef-featured">
           <div class="restaurant-card__chef-featured-image">
-            <AppImage :src="featuredDish.image" :alt="featuredDish.name" class="restaurant-card__chef-image" />
+            <Icon name="chief" class="restaurant-card__chef-image" />
           </div>
         </div>
 
@@ -150,30 +150,21 @@ const emit = defineEmits<{
   showPhotos: [];
 }>();
 
-// Computed properties
-const getShortDescription = (description: string): string => {
-  const strippedText = description.replace(/<[^>]*>/g, '');
-  return strippedText.length > 80 ? strippedText.substring(0, 80) + '...' : strippedText;
-};
-
 const featuredDish = computed(() => props.chefRecommendations[0] || null);
 
-const regularDishes = computed(() => props.chefRecommendations.slice(1));
+const regularDishes = computed(() => props.chefRecommendations);
 
-// Форматирование среднего чека
 const formattedAverageReceipt = computed(() => {
   if (!props.restaurant?.average_receipt) return '';
 
   const receipt = props.restaurant.average_receipt.toString().trim();
 
-  // Проверяем, является ли значение только числом
   const isOnlyNumber = /^\d+$/.test(receipt);
 
   if (isOnlyNumber) {
     return `${receipt} ₽`;
   }
 
-  // Если это не только число, возвращаем как есть
   return receipt;
 });
 
