@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('subtitle');
             $table->datetime('start_at');
-            $table->string('price');
+            $table->decimal('price', 10, 2)->nullable();
+
             $table->longText('description');
 
             $table->uuid('restaurant_id');

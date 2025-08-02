@@ -41,5 +41,5 @@ const initialValues = computed<Partial<T>>(() => {
   } as Partial<T>;
 });
 
-const relations = ["files", "images", "news"];
+const relations = ["files", "images", "news", "events"];
 </script>

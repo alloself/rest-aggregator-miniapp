@@ -26,6 +26,8 @@ class Event extends BaseModel
 
     protected $casts = [
         'start_at' => 'datetime',
+        'price' => 'decimal:2',
+        'is_free' => 'boolean',
     ];
 
     public function getSlugOptions(): SlugOptions

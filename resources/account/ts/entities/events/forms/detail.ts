@@ -7,7 +7,8 @@ import BaseFileList from '@/shared/components/BaseFileList.vue';
 import { FILE_BASE_URL } from '../../category/const';
 import { client } from '@/account/ts/shared/api/axios';
 import BaseNumberInput from '@/shared/components/BaseNumberInput.vue';
-export const useNewsDetailFormFields = () => {
+
+export const useEventsDetailFormFields = () => {
   const fields = computed<ISmartFormField[]>(() => [
     {
       component: BaseInput,
@@ -15,7 +16,7 @@ export const useNewsDetailFormFields = () => {
       props: {
         type: 'title',
         fluid: true,
-        autocomplete: 'news_title',
+        autocomplete: 'event_title',
         label: 'Заголовок',
         name: 'title',
       },
@@ -29,21 +30,27 @@ export const useNewsDetailFormFields = () => {
       component: BaseInput,
       key: 'slug',
       props: {
-        type: 'slug',
         label: 'Slug',
-        fluid: true,
-        autocomplete: 'news_slug',
+
+        autocomplete: 'event_slug',
         name: 'slug',
+      },
+    },
+    {
+      component: BaseInput,
+      key: 'subtitle',
+      props: {
+        label: 'Подзаголовок',
+        autocomplete: 'event_subtitle',
+        name: 'subtitle',
       },
     },
     {
       component: BaseNumberInput,
       key: 'order',
       props: {
-        type: 'order',
         label: 'Порядок',
-        fluid: true,
-        autocomplete: 'news_order',
+        autocomplete: 'event_order',
         name: 'order',
       },
     },
@@ -51,11 +58,19 @@ export const useNewsDetailFormFields = () => {
       component: BaseEditor,
       key: 'description',
       props: {
-        type: 'description',
         title: 'Описание',
-        fluid: true,
-        autocomplete: 'news_description',
+        autocomplete: 'event_description',
         name: 'description',
+      },
+    },
+    {
+      component: BaseNumberInput,
+      key: 'price ',
+      props: {
+        type: 'number',
+        label: 'Цена',
+        autocomplete: 'event_price',
+        name: 'price',
       },
     },
     {

@@ -33,13 +33,29 @@ export interface Dish {
 
 export interface Event {
   // columns
-  id: number
+  id: string
   slug: string
-  name: string
+  title: string
+  subtitle: string
+  start_at: Date
+  price?: number | null
+  description: string
   restaurant_id: string
   order: number
+  deleted_at?: Date | null
   created_at?: Date | null
   updated_at?: Date | null
+  // relations
+  restaurant?: Restaurant
+  images?: File[]
+  files?: File[]
+  // counts
+  images_count: number
+  files_count: number
+  // exists
+  restaurant_exists: boolean
+  images_exists: boolean
+  files_exists: boolean
 }
 
 export interface File {
@@ -148,17 +164,20 @@ export interface Restaurant {
   updated_at?: Date | null
   // relations
   news?: News[]
+  events?: Event[]
   users?: User[]
   user?: User
   images?: File[]
   files?: File[]
   // counts
   news_count: number
+  events_count: number
   users_count: number
   images_count: number
   files_count: number
   // exists
   news_exists: boolean
+  events_exists: boolean
   users_exists: boolean
   user_exists: boolean
   images_exists: boolean
