@@ -8,7 +8,6 @@
       showGridlines
       stripedRows
       @row-click="toEdit"
-      selectionMode="multiple"
       v-model:selection="selectedItems"
       size="small"
     >

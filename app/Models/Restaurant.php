@@ -47,6 +47,11 @@ class Restaurant extends BaseModel
         return $this->hasMany(News::class);
     }
 
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
+    }
+
 
 
 

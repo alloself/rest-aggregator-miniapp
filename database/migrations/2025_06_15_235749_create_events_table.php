@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
             $table->string('slug');
-            $table->string('name');
+            $table->string('title');
+            $table->string('subtitle');
+            $table->datetime('start_at');
+            $table->string('price');
+            $table->longText('description');
 
             $table->uuid('restaurant_id');
             $table->foreign('restaurant_id')->references('id')->on('restaurants');
@@ -23,7 +27,7 @@ return new class extends Migration
 
 
             $table->index(['slug', 'restaurant_id']);
-
+            $table->softDeletes();
             $table->timestamps();
         });
     }
