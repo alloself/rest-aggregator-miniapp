@@ -7,11 +7,12 @@ use App\Models\Traits\HasList;
 use App\Models\Traits\HasImages;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Restaurant extends BaseModel
 {
-    use HasCRUD, HasList, HasSlug, HasImages;
+    use HasCRUD, HasList, HasSlug, HasImages, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -39,6 +40,11 @@ class Restaurant extends BaseModel
             ->generateSlugsFrom('name')
             ->saveSlugsTo('slug')
             ->allowDuplicateSlugs();
+    }
+
+    public function news(): HasMany
+    {
+        return $this->hasMany(News::class);
     }
 
 

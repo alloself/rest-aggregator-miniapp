@@ -13,13 +13,12 @@
   </div>
 </template>
 
-<script setup lang="ts" generic="T extends IBaseTreeEntity<T> & IBaseEntity">
+<script setup lang="ts" generic="T extends IBaseEntity & IBaseTreeEntity<T>">
 import { computed } from "vue";
 import TreeTable from "primevue/treetable";
 import Column from "primevue/column";
 import type { TreeNode } from "primevue/treenode";
 import type { IBaseEntity, IBaseTreeEntity, IBaseColumn } from "../types";
-import type { Component } from "vue";
 
 const { columns = [], title = "" } = defineProps<{
   columns?: IBaseColumn[];

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('yandex_metrica_code')->nullable();
             $table->uuid('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-
+            $table->softDeletes();
             $table->timestamps();
         });
     }
