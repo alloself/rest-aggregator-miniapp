@@ -22,6 +22,7 @@ class Restaurant extends BaseModel
         'yandex_metrica_code',
         'address',
         'average_receipt',
+        'phone',
         'user_id',
         'subtitle'
     ];

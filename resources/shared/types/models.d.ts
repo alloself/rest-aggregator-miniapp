@@ -154,6 +154,7 @@ export interface Restaurant {
   name: string
   subtitle?: string | null
   average_receipt?: string | null
+  phone?: string | null
   address?: string | null
   description?: string | null
   working_hours?: string[] | null

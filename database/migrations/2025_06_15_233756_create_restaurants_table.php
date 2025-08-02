@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->longText('subtitle')->nullable();
             $table->string('average_receipt')->nullable();
+            $table->string('phone')->nullable();
             $table->string('address')->nullable();
             $table->longText('description')->nullable();
             $table->json('working_hours')->nullable();
