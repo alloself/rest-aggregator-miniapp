@@ -6,6 +6,7 @@ use App\Http\Controllers\Account\CategoryController;
 use App\Http\Controllers\Account\RestaurantController;
 use App\Http\Controllers\Account\FileController;
 use App\Http\Controllers\Site\RestaurantController as SiteRestaurantController;
+use App\Http\Controllers\Account\NewsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,7 @@ $accountResources = [
     'categories' => CategoryController::class,
     'restaurants' => RestaurantController::class,
     'files' => FileController::class,
+    'news' => NewsController::class,
 ];
 
 Route::middleware(['auth:sanctum'])->get('me', [AuthController::class, 'me']);
@@ -38,4 +40,5 @@ Route::prefix('account')->middleware(['auth:sanctum', 'role:restaurant_owner|roo
 
 Route::prefix('site')->middleware(['web'])->group(function () {
     Route::get('restaurants/{slug}', [SiteRestaurantController::class, 'show']);
+    Route::get('restaurants/{slug}/news', [SiteRestaurantController::class, 'news']);
 });

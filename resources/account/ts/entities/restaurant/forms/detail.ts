@@ -8,8 +8,10 @@ import { client } from "@/account/ts/shared/api/axios";
 import { FILE_BASE_URL } from "../../category/const";
 import BaseTree from "@/shared/components/BaseTree.vue";
 import BaseEditor from "@/shared/components/BaseEditor.vue";
+import BaseRelationTable from "@/shared/components/BaseRelationTable.vue";
+import { NewsDetail } from "../../news";
 
-export const useRestaurantDetailFormFields = () => {
+export const useRestaurantDetailFormFields = (props: { id?: string }) => {
   const fields = computed<ISmartFormField[]>(() => [
     {
       component: BaseInput,
@@ -38,7 +40,6 @@ export const useRestaurantDetailFormFields = () => {
         name: "subtitle",
       },
     },
-
     {
       component: BaseInput,
       key: "slug",
@@ -117,6 +118,28 @@ export const useRestaurantDetailFormFields = () => {
         title: "Изображения",
       },
       key: "images",
+    },
+    {
+      component: BaseRelationTable,
+      props: {
+        title: "Новости",
+        entity: "news",
+        columns: [
+          {
+            field: "title",
+            header: "Название",
+          },
+          {
+            field: "order",
+            header: "Порядок",
+          },
+        ],
+        detailComponent: NewsDetail,
+        initialValues: {
+          restaurant_id: props.id,
+        },
+      },
+      key: "news",
     },
     {
       component: BaseTree,

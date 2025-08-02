@@ -5,29 +5,26 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class RestaurantResource extends JsonResource
+class NewsResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @return array<int|string, mixed>
+     * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'subtitle' => $this->subtitle,
             'slug' => $this->slug,
+            'title' => $this->title,
             'description' => $this->description,
-            'working_hours' => $this->working_hours,
-            'address' => $this->address,
-            'average_receipt' => $this->average_receipt,
-            'yandex_metrica_code' => $this->yandex_metrica_code,
-            'user' => new UserResource($this->whenLoaded('user')),
+            'order' => $this->order,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'restaurant' => $this->whenLoaded('restaurant'),
             'files' => FileResource::collection($this->whenLoaded('files')),
             'images' => FileResource::collection($this->whenLoaded('images')),
-            'news' => NewsResource::collection($this->whenLoaded('news')),
         ];
     }
 }
