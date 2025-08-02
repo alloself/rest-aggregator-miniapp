@@ -181,7 +181,3 @@ const showPhotos = () => {
   emit('showPhotos');
 };
 </script>
-
-<style scoped>
-@import './styles.css';
-</style>

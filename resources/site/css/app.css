@@ -5,6 +5,7 @@
     /* Основные цвета */
     --color-bg-primary: #fffefb;
     --color-bg-secondary: #f4f3f3;
+    --color-secondary: #f4f3f3;
     --color-bg-secondary-hover: #ebeaea;
     --color-bg-secondary-active: #e1e0e0;
     --color-bg-card: #fffefd;
@@ -216,3 +217,5 @@ img {
         object-fit: cover;
     }
 }
+
+@import './widgets/restaurant-page/styles.css';

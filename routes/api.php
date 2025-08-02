@@ -38,7 +38,7 @@ Route::prefix('account')->middleware(['auth:sanctum', 'role:restaurant_owner|roo
     });
 });
 
-Route::prefix('site')->middleware(['web'])->group(function () {
+Route::prefix('site')->group(function () {
     Route::get('restaurants/{slug}', [SiteRestaurantController::class, 'show']);
     Route::get('restaurants/{slug}/news', [SiteRestaurantController::class, 'news']);
 });

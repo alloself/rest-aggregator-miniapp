@@ -1,5 +1,3 @@
-@reference "tailwindcss";
-
 .restaurant-card {
     @apply bg-[rgba(255,254,251,0.97)];
 }
@@ -65,7 +63,7 @@
 }
 
 .restaurant-card__full-description {
-    @apply bg-[var(--color-bg-secondary)] rounded-b-[20px] px-[18px] pt-8 pb-6 relative -mt-2 mx-4 mb-6;
+    @apply bg-secondary rounded-b-[20px] px-[18px] pt-8 pb-6 relative -mt-2 mx-4 mb-6;
 }
 
 .restaurant-card__full-description-text {

@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { client } from '@account/ts/shared/api/axios';
+
 import { Restaurant } from '@/shared';
+import { client } from '../shared/api/axios';
 
 interface RestaurantApiResponse {
   data: Restaurant;
