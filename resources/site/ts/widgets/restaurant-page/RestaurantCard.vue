@@ -78,27 +78,27 @@
     </div>
 
     <!-- Chef Recommendations -->
-    <section v-if="chefRecommendations.length > 0" class="restaurant-card__chef-section">
-      <h2 class="restaurant-card__chef-title">Шеф рекомендует</h2>
+    <!--    <section v-if="chefRecommendations.length > 0" class="restaurant-card__chef-section">-->
+    <!--      <h2 class="restaurant-card__chef-title">Шеф рекомендует</h2>-->
 
-      <div class="restaurant-card__chef-items">
-        <!-- Featured Large Item -->
-        <div v-if="featuredDish" class="restaurant-card__chef-featured">
-          <div class="restaurant-card__chef-featured-image">
-            <Icon name="chief" class="restaurant-card__chef-image" />
-          </div>
-        </div>
+    <!--      <div class="restaurant-card__chef-items">-->
+    <!--        &lt;!&ndash; Featured Large Item &ndash;&gt;-->
+    <!--        <div v-if="featuredDish" class="restaurant-card__chef-featured">-->
+    <!--          <div class="restaurant-card__chef-featured-image">-->
+    <!--            <Icon name="chief" class="restaurant-card__chef-image" />-->
+    <!--          </div>-->
+    <!--        </div>-->
 
-        <!-- Regular Items -->
-        <div v-for="dish in regularDishes" :key="dish.id" class="restaurant-card__chef-item">
-          <AppImage
-            :src="dish.image"
-            :alt="dish.name"
-            class="restaurant-card__chef-image restaurant-card__chef-image--regular"
-          />
-        </div>
-      </div>
-    </section>
+    <!--        &lt;!&ndash; Regular Items &ndash;&gt;-->
+    <!--        <div v-for="dish in regularDishes" :key="dish.id" class="restaurant-card__chef-item">-->
+    <!--          <AppImage-->
+    <!--            :src="dish.image"-->
+    <!--            :alt="dish.name"-->
+    <!--            class="restaurant-card__chef-image restaurant-card__chef-image&#45;&#45;regular"-->
+    <!--          />-->
+    <!--        </div>-->
+    <!--      </div>-->
+    <!--    </section>-->
 
     <!-- Footer -->
     <div class="restaurant-card__footer">
