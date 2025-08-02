@@ -60,13 +60,26 @@ export interface File {
 
 export interface News {
   // columns
-  id: number
+  id: string
   slug: string
-  name: string
+  title: string
+  description: string
   restaurant_id: string
   order: number
+  deleted_at?: Date | null
   created_at?: Date | null
   updated_at?: Date | null
+  // relations
+  restaurant?: Restaurant
+  images?: File[]
+  files?: File[]
+  // counts
+  images_count: number
+  files_count: number
+  // exists
+  restaurant_exists: boolean
+  images_exists: boolean
+  files_exists: boolean
 }
 
 export interface Offer {
@@ -130,18 +143,22 @@ export interface Restaurant {
   working_hours?: string[] | null
   yandex_metrica_code?: string | null
   user_id: string
+  deleted_at?: Date | null
   created_at?: Date | null
   updated_at?: Date | null
   // relations
+  news?: News[]
   users?: User[]
   user?: User
   images?: File[]
   files?: File[]
   // counts
+  news_count: number
   users_count: number
   images_count: number
   files_count: number
   // exists
+  news_exists: boolean
   users_exists: boolean
   user_exists: boolean
   images_exists: boolean

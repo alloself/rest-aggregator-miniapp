@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('news', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
             $table->string('slug');
-            $table->string('name');
-
+            $table->string('title');
+            $table->longText('description');
 
             $table->uuid('restaurant_id');
             $table->foreign('restaurant_id')->references('id')->on('restaurants');
@@ -24,7 +24,7 @@ return new class extends Migration
 
 
             $table->index(['slug', 'restaurant_id']);
-            
+            $table->softDeletes();
             $table->timestamps();
         });
     }
