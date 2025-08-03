@@ -38,6 +38,11 @@ Route::prefix('account')->middleware(['auth:sanctum', 'role:restaurant_owner|roo
             Route::post($route, [$controller, 'deleteMany']);
         }
     });
+
+    // Дополнительные роуты для ресторанов
+    Route::post('restaurants/{restaurant}/setup-telegram-bot', [RestaurantController::class, 'setupTelegramBot']);
+    Route::get('restaurants/{restaurant}/bot-info', [RestaurantController::class, 'getBotInfo']);
+    Route::post('restaurants/{restaurant}/set-chat-description', [RestaurantController::class, 'setChatDescription']);
 });
 
 Route::prefix('site')->group(function () {
