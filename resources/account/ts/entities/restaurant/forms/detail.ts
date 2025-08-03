@@ -97,6 +97,18 @@ export const useRestaurantDetailFormFields = (props: { id?: string }) => {
       },
     },
     {
+      component: BaseInput,
+      key: 'telegram_bot_token',
+      props: {
+        type: 'text',
+        label: 'Токен Telegram бота',
+        fluid: true,
+        autocomplete: 'telegram_bot_token',
+        name: 'telegram_bot_token',
+        placeholder: 'Введите токен вашего Telegram бота',
+      },
+    },
+    {
       component: BaseEditor,
       key: 'description',
       props: {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5772335eaccd313cf34d215853d808e9",
+    "content-hash": "d646123730db4c02497bc56c36684700",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -241,16 +241,16 @@
         },
         {
             "name": "defstudio/telegraph",
-            "version": "v1.59.0",
+            "version": "v1.60.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/defstudio/telegraph.git",
-                "reference": "ca20a0f76c7c972db0ea8dec66f9187854c787a3"
+                "reference": "fe9a83fec967d38f5b94e282867ed5a46fb21cd4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/defstudio/telegraph/zipball/ca20a0f76c7c972db0ea8dec66f9187854c787a3",
-                "reference": "ca20a0f76c7c972db0ea8dec66f9187854c787a3",
+                "url": "https://api.github.com/repos/defstudio/telegraph/zipball/fe9a83fec967d38f5b94e282867ed5a46fb21cd4",
+                "reference": "fe9a83fec967d38f5b94e282867ed5a46fb21cd4",
                 "shasum": ""
             },
             "require": {
@@ -315,7 +315,7 @@
             ],
             "support": {
                 "issues": "https://github.com/defstudio/telegraph/issues",
-                "source": "https://github.com/defstudio/telegraph/tree/v1.59.0"
+                "source": "https://github.com/defstudio/telegraph/tree/v1.60.0"
             },
             "funding": [
                 {
@@ -331,7 +331,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-04-22T14:43:57+00:00"
+            "time": "2025-07-14T12:17:24+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
