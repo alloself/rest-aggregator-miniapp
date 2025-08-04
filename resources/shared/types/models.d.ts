@@ -74,6 +74,15 @@ export interface File {
   fileables_exists: boolean
 }
 
+export interface Message {
+  // columns
+  id: number
+  description?: string | null
+  deleted_at?: Date | null
+  created_at?: Date | null
+  updated_at?: Date | null
+}
+
 export interface News {
   // columns
   id: string
@@ -158,6 +167,7 @@ export interface Restaurant {
   telegram_bot_token?: string | null
   address?: string | null
   description?: string | null
+  welcome_message?: string | null
   working_hours?: string[] | null
   yandex_metrica_code?: string | null
   user_id: string
@@ -167,8 +177,8 @@ export interface Restaurant {
   // relations
   news?: News[]
   events?: Event[]
-  users?: User[]
   user?: User
+  users?: User[]
   images?: File[]
   files?: File[]
   // counts
@@ -180,8 +190,8 @@ export interface Restaurant {
   // exists
   news_exists: boolean
   events_exists: boolean
-  users_exists: boolean
   user_exists: boolean
+  users_exists: boolean
   images_exists: boolean
   files_exists: boolean
 }

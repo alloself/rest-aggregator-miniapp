@@ -10,48 +10,11 @@ use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Restaurant extends BaseModel
 {
     use HasCRUD, HasList, HasSlug, HasImages, SoftDeletes;
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        // Вызываем методы настройки Telegram бота после создания ресторана
-        static::created(function ($restaurant) {
-            if (!empty($restaurant->telegram_bot_token)) {
-                try {
-                    $restaurant->setupTelegramBot();
-                    $restaurant->setupTelegramBotLogo();
-                } catch (\Exception $e) {
-                    Log::error('Ошибка настройки Telegram бота при создании ресторана', [
-                        'restaurant_id' => $restaurant->id,
-                        'error' => $e->getMessage()
-                    ]);
-                }
-            }
-        });
-
-        // Вызываем методы настройки Telegram бота после обновления ресторана
-        static::updated(function ($restaurant) {
-            if (!empty($restaurant->telegram_bot_token)) {
-                try {
-                    $restaurant->setupTelegramBot();
-                    $restaurant->setupTelegramBotLogo();
-                } catch (\Exception $e) {
-                    Log::error('Ошибка настройки Telegram бота при обновлении ресторана', [
-                        'restaurant_id' => $restaurant->id,
-                        'error' => $e->getMessage()
-                    ]);
-                }
-            }
-        });
-    }
 
     protected $fillable = [
         'name',
@@ -64,7 +27,8 @@ class Restaurant extends BaseModel
         'phone',
         'telegram_bot_token',
         'user_id',
-        'subtitle'
+        'subtitle',
+        'welcome_message'
     ];
 
 
@@ -96,5 +60,29 @@ class Restaurant extends BaseModel
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Получить пользователей, связанных с рестораном (many-to-many)
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class);
+    }
+
+    /**
+     * Добавить пользователя к ресторану с возможностью указания роли
+     */
+    public function addUser(User $user, ?string $role = null): void
+    {
+        // Добавляем пользователя к ресторану через many-to-many отношение
+        if (!$this->users()->where('user_id', $user->id)->exists()) {
+            $this->users()->attach($user->id);
+        }
+
+        // Если указана роль, назначаем её пользователю в контексте этого ресторана
+        if ($role) {
+            $user->assignRestaurantRole($this->id, $role);
+        }
     }
 }

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('telegram_bot_token')->nullable();
             $table->string('address')->nullable();
             $table->longText('description')->nullable();
+            $table->longText('welcome_message')->nullable();
             $table->json('working_hours')->nullable();
             $table->string('yandex_metrica_code')->nullable();
             $table->uuid('user_id');

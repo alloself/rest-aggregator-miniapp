@@ -77,7 +77,7 @@ const onSave = async () => {
 
 const onEdit = async () => {
   isLoading.value = true;
-  await client.put(`${baseUrl}/${id}`, form.value?.values, {
+  const { data } = await client.put(`${baseUrl}/${id}`, form.value?.values, {
     params: {
       relations,
     },

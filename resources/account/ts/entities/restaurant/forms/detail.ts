@@ -112,11 +112,18 @@ export const useRestaurantDetailFormFields = (props: { id?: string }) => {
       component: BaseEditor,
       key: 'description',
       props: {
-        type: 'description',
         title: 'Описание',
-        fluid: true,
         autocomplete: 'restaurant_description',
         name: 'description',
+      },
+    },
+    {
+      component: BaseEditor,
+      key: 'welcome_message',
+      props: {
+        title: 'Приветственное сообщение бота телеграм',
+        autocomplete: 'restaurant_welcome_message',
+        name: 'welcome_message',
       },
     },
     {

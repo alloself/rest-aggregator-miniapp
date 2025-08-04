@@ -55,7 +55,7 @@ class FileSeeder extends Seeder
             return [];
         }
 
-        $files = glob($directoryPath . '/*.{jpg,jpeg,png,gif,webp}', GLOB_BRACE);
+        $files = glob($directoryPath . '/*.{jpg,jpeg,png,gif,webp}', defined('GLOB_BRACE') ? GLOB_BRACE : 0);
         
         if (empty($files)) {
             $this->command->warn("Файлы изображений не найдены в директории {$key}.");
