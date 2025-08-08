@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
+use App\Models\Restaurant;
+use App\Observers\RestaurantObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureModels();
+        Restaurant::observe(RestaurantObserver::class);
     }
 
     /**

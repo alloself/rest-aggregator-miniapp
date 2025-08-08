@@ -85,4 +85,12 @@ class Restaurant extends BaseModel
             $user->assignRestaurantRole($this->id, $role);
         }
     }
+
+    /**
+     * Удобный доступ к Telegram сервису в контексте этого ресторана.
+     */
+    public function bot(): \App\Services\TelegramBot
+    {
+        return \App\Services\TelegramBot::forRestaurant($this);
+    }
 }
