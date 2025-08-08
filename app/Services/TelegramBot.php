@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Arr;
 use RuntimeException;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Telegram Bot/WebApp helper for restaurant-scoped interactions.
@@ -116,6 +117,172 @@ class TelegramBot
     {
         $params = array_merge(['name' => $firstName], $options);
         return (bool) $this->api('setMyName', $params);
+    }
+
+    /**
+     * Set the bot's description shown in the bot profile.
+     * Telegram allows up to 512 characters; we conservatively truncate.
+     *
+     * @param array{language_code?:string} $options
+     */
+    public function setMyDescription(string $description, array $options = []): bool
+    {
+        $normalized = $this->normalizeTextForTelegram($description, 512);
+        $params = array_merge(['description' => $normalized], $options);
+        return (bool) $this->api('setMyDescription', $params);
+    }
+
+    /**
+     * Set the bot's short description (shown on the bot profile in the chat list).
+     * Telegram allows up to 120 characters; truncate accordingly.
+     *
+     * @param array{language_code?:string} $options
+     */
+    public function setMyShortDescription(string $shortDescription, array $options = []): bool
+    {
+        $normalized = $this->normalizeTextForTelegram($shortDescription, 120);
+        $params = array_merge(['short_description' => $normalized], $options);
+        return (bool) $this->api('setMyShortDescription', $params);
+    }
+
+    /**
+     * Normalize arbitrary HTML/plain text to plain UTF-8 text suitable for Telegram fields.
+     */
+    private function normalizeTextForTelegram(string $text, int $maxLength): string
+    {
+        // Decode HTML entities (including &nbsp;) then strip tags
+        $decoded = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $plain = strip_tags($decoded);
+        // Replace NBSP (U+00A0) with regular space
+        $plain = str_replace("\xC2\xA0", ' ', $plain);
+        // Collapse whitespace
+        $plain = (string) preg_replace('/\s+/u', ' ', $plain);
+        $plain = trim($plain);
+        // Enforce max length
+        if (mb_strlen($plain) > $maxLength) {
+            $plain = mb_substr($plain, 0, $maxLength);
+        }
+        return $plain;
+    }
+
+    // ============ Mini App setup helpers ============
+
+    /**
+     * Build absolute WebApp URL for a given restaurant (app.url/restaurant/{slug}).
+     */
+    public function buildRestaurantWebAppUrl(Restaurant $restaurant): string
+    {
+        $base = rtrim((string) config('app.url'), '/');
+        return $base.'/restaurant/'.ltrim((string) $restaurant->slug, '/');
+    }
+
+    /**
+     * Perform basic setup: set the bot's menu button to open the restaurant's Mini App.
+     * Uses the URL app.url/restaurant/{slug}. Menu text defaults to "Приложение".
+     */
+    public function setupRestaurantMiniApp(Restaurant $restaurant, string $menuText = 'Приложение'): bool
+    {
+        $url = $this->buildRestaurantWebAppUrl($restaurant);
+        $this->assertWebAppUrlAllowed($url);
+        // Some Telegram clients cache menu button aggressively. To force-refresh text,
+        // first reset to default, then set the WebApp with the desired text and URL.
+        $resetOk = (bool) $this->api('setChatMenuButton', [
+            'menu_button' => [
+                'type' => 'default',
+            ],
+        ]);
+
+        $setOk = $this->setMenuButtonWebApp($menuText, $url);
+        return $resetOk && $setOk;
+    }
+
+    /**
+     * Validate WebApp URL scheme: HTTPS required in production; HTTP allowed only in test env.
+     */
+    private function assertWebAppUrlAllowed(string $url): void
+    {
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+        if ($scheme === 'https') {
+            return;
+        }
+        if ($this->useTestEnvironment && $scheme === 'http') {
+            return;
+        }
+        throw new RuntimeException('WebApp URL must be HTTPS (HTTP allowed only in Telegram test environment).');
+    }
+
+    // ============ Chat photo helpers ============
+
+    /**
+     * Update a chat's photo using restaurant image with pivot key 'telegram_avatar'.
+     * Works for supergroups/channels where the bot is admin with appropriate rights.
+     *
+     * @param int|string $chatId
+     */
+    public function setChatPhotoFromRestaurantAvatar(int|string $chatId, Restaurant $restaurant): bool
+    {
+        $file = $restaurant->images()->wherePivot('key', 'telegram_avatar')->first();
+        if (!$file) {
+            return false;
+        }
+
+        $storedRelativePath = $file->getRawOriginal('url');
+        if (!$storedRelativePath) {
+            return false;
+        }
+
+        $absolutePath = Storage::disk('public')->path($storedRelativePath);
+        if (!is_readable($absolutePath)) {
+            return false;
+        }
+
+        $multipart = [
+            [
+                'name' => 'chat_id',
+                'contents' => (string) $chatId,
+            ],
+            [
+                'name' => 'photo',
+                'contents' => fopen($absolutePath, 'r'),
+                'filename' => basename($absolutePath),
+            ],
+        ];
+
+        return (bool) $this->apiMultipart('setChatPhoto', $multipart);
+    }
+
+    /**
+     * Low-level multipart call for uploading files to Telegram (e.g., setChatPhoto).
+     * @param array<int,array{name:string,contents:mixed,filename?:string}> $multipart
+     * @return mixed
+     */
+    private function apiMultipart(string $method, array $multipart): mixed
+    {
+        $segments = ['/bot'.$this->token.'/'];
+        if ($this->useTestEnvironment) {
+            $segments[] = 'test/';
+        }
+        $segments[] = ltrim($method, '/');
+        $path = implode('', $segments);
+
+        try {
+            $response = $this->httpClient->post($path, [
+                'http_errors' => false,
+                'multipart' => $multipart,
+            ]);
+        } catch (GuzzleException $e) {
+            throw new RuntimeException('Telegram API request failed: '.$e->getMessage(), previous: $e);
+        }
+
+        $payload = json_decode((string) $response->getBody(), true) ?: [];
+
+        if (!is_array($payload) || ($payload['ok'] ?? false) !== true) {
+            $description = (string) Arr::get($payload, 'description', 'unknown error');
+            $errorCode = (int) Arr::get($payload, 'error_code', 0);
+            throw new RuntimeException("Telegram API error ({$errorCode}): {$description}");
+        }
+
+        return $payload['result'] ?? null;
     }
 
     /**
