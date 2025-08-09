@@ -177,11 +177,19 @@ class TelegramBot
     }
 
     /**
-     * Perform basic setup: set the bot's menu button to open the restaurant's Mini App.
-     * Uses the URL app.url/restaurant/{slug}. Menu text defaults to "Приложение".
+     * Perform basic setup for a restaurant:
+     * - Set webhook to APP_URL/api/telegram/webhook/{restaurant_id}
+     * - Reset menu button → default (to refresh cached text)
+     * - Set menu button to WebApp (app.url/restaurant/{slug}) with text (default: "Приложение")
      */
     public function setupRestaurantMiniApp(Restaurant $restaurant, string $menuText = 'Приложение'): bool
     {
+        // 1) Set webhook
+        $webhookUrl = $this->buildRestaurantWebhookUrl($restaurant);
+        $this->assertWebhookUrlAllowed($webhookUrl);
+        $hookOk = $this->setWebhook($webhookUrl);
+
+        // 2) Configure Mini App menu button
         $url = $this->buildRestaurantWebAppUrl($restaurant);
         $this->assertWebAppUrlAllowed($url);
         // Some Telegram clients cache menu button aggressively. To force-refresh text,
@@ -193,7 +201,7 @@ class TelegramBot
         ]);
 
         $setOk = $this->setMenuButtonWebApp($menuText, $url);
-        return $resetOk && $setOk;
+        return $hookOk && $resetOk && $setOk;
     }
 
     /**
@@ -209,6 +217,27 @@ class TelegramBot
             return;
         }
         throw new RuntimeException('WebApp URL must be HTTPS (HTTP allowed only in Telegram test environment).');
+    }
+
+    /**
+     * Build webhook URL: APP_URL/api/telegram/webhook/{restaurant_id}
+     */
+    private function buildRestaurantWebhookUrl(Restaurant $restaurant): string
+    {
+        $base = rtrim((string) config('app.url'), '/');
+        return $base.'/api/telegram/webhook/'.$restaurant->getKey();
+    }
+
+    /**
+     * Telegram requires a valid HTTPS webhook URL with a trusted certificate.
+     * Enforce HTTPS regardless of test environment.
+     */
+    private function assertWebhookUrlAllowed(string $url): void
+    {
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+        if ($scheme !== 'https') {
+            throw new RuntimeException('Webhook URL must be HTTPS with a valid certificate. See SSL_GUIDE.md');
+        }
     }
 
     // ============ Chat photo helpers ============

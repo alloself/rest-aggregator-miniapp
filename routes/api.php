@@ -8,6 +8,7 @@ use App\Http\Controllers\Account\FileController;
 use App\Http\Controllers\Site\RestaurantController as SiteRestaurantController;
 use App\Http\Controllers\Account\NewsController;
 use App\Http\Controllers\Account\EventController;
+use App\Http\Controllers\Telegram\WebhookController as TelegramWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,3 +46,6 @@ Route::prefix('site')->group(function () {
     Route::get('restaurants/{slug}/news', [SiteRestaurantController::class, 'news']);
     Route::get('restaurants/{slug}/events', [SiteRestaurantController::class, 'events']);
 });
+
+// Telegram Bot Webhook endpoint per restaurant (UUID or slug)
+Route::post('telegram/webhook/{restaurant}', [TelegramWebhookController::class, 'handle']);

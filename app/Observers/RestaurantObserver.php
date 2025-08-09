@@ -30,6 +30,7 @@ class RestaurantObserver
 
             if ($nameChanged) {
                 $bot->setMyName($restaurant->name);
+                $bot->setupRestaurantMiniApp($restaurant);
             }
 
             if ($descChanged) {
@@ -49,14 +50,8 @@ class RestaurantObserver
                     $bot->setMyShortDescription($shortSource);
                 }
             }
-
-            $bot->setupRestaurantMiniApp($restaurant);
-
-
         } catch (Throwable $e) {
             report($e);
         }
     }
 }
-
-
