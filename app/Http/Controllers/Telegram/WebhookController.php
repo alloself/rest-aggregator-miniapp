@@ -118,6 +118,18 @@ class WebhookController extends Controller
             return;
         }
 
+        // Обработка переданных пользователей (адресная книга)
+        if (isset($message['users_shared'])) {
+            $this->handleUsersSharedMessage($message['users_shared'], $chatId, $service, $restaurant, $from);
+            return;
+        }
+
+        // Обработка команды /contacts
+        if ($text === '/contacts') {
+            $this->sendContactRequestMessage($chatId, $service, $restaurant);
+            return;
+        }
+
         // Обработка текстовых сообщений
         if ($text === '⏭️ Пропустить') {
             $this->handleSkipMessage($chatId, $service, $restaurant);
@@ -173,7 +185,7 @@ class WebhookController extends Controller
      */
     private function sendContactRequestMessage(int $chatId, TelegramBotService $service, Restaurant $restaurant): void
     {
-        $contactMessage = "Поделитесь своими контактами, чтобы мы могли связаться с вами для подтверждения брони и уведомлений о специальных предложениях! 📱";
+        $contactMessage = "Поделитесь своими контактами и друзьями, чтобы:\n📱 Мы могли связаться с вами для подтверждения брони\n🔔 Отправлять уведомления о специальных предложениях\n👥 Помочь вам найти друзей в приложении!";
 
         // Отправляем сообщение БЕЗ кнопок
         $service->sendMessage([
@@ -188,6 +200,19 @@ class WebhookController extends Controller
                 [
                     'text' => '📞 Поделиться контактом',
                     'request_contact' => true,
+                ],
+            ],
+            [
+                [
+                    'text' => '👥 Поделиться друзьями',
+                    'request_users' => [
+                        'request_id' => 1,
+                        'user_is_bot' => false,
+                        'max_quantity' => 10,
+                        'request_name' => true,
+                        'request_username' => true,
+                        'request_photo' => true,
+                    ],
                 ],
             ],
             [
@@ -603,6 +628,131 @@ class WebhookController extends Controller
 
 
     /**
+     * Обработка переданных пользователей (адресная книга)
+     */
+    private function handleUsersSharedMessage(array $usersShared, int $chatId, TelegramBotService $service, Restaurant $restaurant, array $from): void
+    {
+        try {
+            Log::info('👥 ОТЛАДКА: Начало обработки переданных пользователей', [
+                'users_shared' => $usersShared,
+                'chat_id' => $chatId,
+                'from' => $from,
+                'restaurant_id' => $restaurant->id,
+                'step' => 'start_handle_users_shared'
+            ]);
+
+            $requestId = $usersShared['request_id'] ?? null;
+            $users = $usersShared['users'] ?? [];
+
+            Log::info('👥 ОТЛАДКА: Извлеченные данные переданных пользователей', [
+                'request_id' => $requestId,
+                'users_count' => count($users),
+                'users' => $users,
+                'step' => 'users_shared_data_extracted'
+            ]);
+
+            // Находим пользователя по chat_id
+            $user = User::where('chat_id', (string)$chatId)->first();
+
+            if (!$user) {
+                Log::error('❌ ОТЛАДКА: Пользователь не найден!', [
+                    'chat_id' => $chatId,
+                    'step' => 'user_not_found_for_users_shared'
+                ]);
+
+                $service->sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => '❌ Ошибка: пользователь не найден. Попробуйте команду /start.',
+                ]);
+
+                return;
+            }
+
+            // Логируем детальную информацию о каждом переданном пользователе
+            foreach ($users as $index => $sharedUser) {
+                Log::info('👤 ОТЛАДКА: Информация о переданном пользователе', [
+                    'index' => $index,
+                    'user_id' => $sharedUser['user_id'] ?? null,
+                    'first_name' => $sharedUser['first_name'] ?? null,
+                    'last_name' => $sharedUser['last_name'] ?? null,
+                    'username' => $sharedUser['username'] ?? null,
+                    'photo' => $sharedUser['photo'] ?? null,
+                    'step' => 'shared_user_details'
+                ]);
+
+                // Получаем дополнительную информацию о пользователе
+                if (isset($sharedUser['user_id'])) {
+                    $userId = (int) $sharedUser['user_id'];
+                    
+                    // Получаем информацию о пользователе через getChat
+                    $userInfo = $this->getUserInfo($userId, $service);
+                    if ($userInfo) {
+                        Log::info('👤 ОТЛАДКА: Дополнительная информация о переданном пользователе', [
+                            'user_id' => $userId,
+                            'user_info' => $userInfo,
+                            'step' => 'shared_user_additional_info'
+                        ]);
+                    }
+
+                    // Получаем аватар пользователя
+                    $avatarUrl = $this->getUserAvatarUrl($userId, $service);
+                    if ($avatarUrl) {
+                        Log::info('👤 ОТЛАДКА: Аватар переданного пользователя', [
+                            'user_id' => $userId,
+                            'avatar_url' => $avatarUrl,
+                            'step' => 'shared_user_avatar'
+                        ]);
+                    }
+                }
+            }
+
+            // Отправляем подтверждение
+            $usersCount = count($users);
+            $confirmationText = "✅ Спасибо! Получена информация о {$usersCount} друзьях из вашей адресной книги.";
+            
+            if ($usersCount > 0) {
+                $confirmationText .= "\n\n📋 Список переданных друзей:\n";
+                foreach ($users as $index => $sharedUser) {
+                    $name = ($sharedUser['first_name'] ?? '') . 
+                           (isset($sharedUser['last_name']) ? ' ' . $sharedUser['last_name'] : '');
+                    $username = isset($sharedUser['username']) ? ' (@' . $sharedUser['username'] . ')' : '';
+                    $confirmationText .= ($index + 1) . ". {$name}{$username}\n";
+                }
+            }
+
+            $service->sendMessage([
+                'chat_id' => $chatId,
+                'text' => $confirmationText,
+            ]);
+
+            Log::info('✅ ОТЛАДКА: Информация о переданных пользователях обработана', [
+                'user_id' => $user->id,
+                'chat_id' => $chatId,
+                'users_count' => $usersCount,
+                'restaurant_id' => $restaurant->id,
+                'step' => 'users_shared_processed'
+            ]);
+
+            // Показываем обновленную клавиатуру (с контактами и приложением)
+            $this->setAppKeyboard($chatId, $service, $restaurant);
+
+        } catch (Throwable $e) {
+            Log::error('❌ ОТЛАДКА: Ошибка обработки переданных пользователей', [
+                'error' => $e->getMessage(),
+                'error_line' => $e->getLine(),
+                'error_file' => $e->getFile(),
+                'chat_id' => $chatId,
+                'users_shared' => $usersShared,
+                'restaurant_id' => $restaurant->id,
+                'step' => 'error_in_handle_users_shared'
+            ]);
+
+            // Заменяем клавиатуру даже при ошибке
+            $this->setAppKeyboard($chatId, $service, $restaurant);
+        }
+    }
+
+    /**
      * Обработка сообщения "Пропустить"
      */
     private function handleSkipMessage(int $chatId, TelegramBotService $service, Restaurant $restaurant): void
@@ -613,7 +763,7 @@ class WebhookController extends Controller
             'text' => '⏭️ Вы пропустили отправку контакта.',
         ]);
 
-        // Заменяем клавиатуру на кнопку приложения
+        // Показываем обновленную клавиатуру (с контактами и приложением)  
         $this->setAppKeyboard($chatId, $service, $restaurant);
 
         Log::info('Пользователь пропустил шаг регистрации', [
@@ -765,17 +915,17 @@ class WebhookController extends Controller
                 'step' => 'confirmation_sent'
             ]);
 
-            // Заменяем клавиатуру на кнопку приложения
-            Log::info('⌨️ ОТЛАДКА: Замена клавиатуры', [
+            // Устанавливаем постоянную клавиатуру с приложением и контактами
+            Log::info('⌨️ ОТЛАДКА: Установка постоянной клавиатуры', [
                 'chat_id' => $chatId,
-                'step' => 'replacing_keyboard'
+                'step' => 'setting_persistent_keyboard'
             ]);
 
             $this->setAppKeyboard($chatId, $service, $restaurant);
 
-            Log::info('✅ ОТЛАДКА: Клавиатура заменена', [
+            Log::info('✅ ОТЛАДКА: Постоянная клавиатура установлена', [
                 'chat_id' => $chatId,
-                'step' => 'keyboard_replaced'
+                'step' => 'persistent_keyboard_set'
             ]);
         } catch (Throwable $e) {
             Log::error('❌ ОТЛАДКА: Ошибка обработки контактных данных', [
@@ -798,7 +948,7 @@ class WebhookController extends Controller
 
 
     /**
-     * Установить клавиатуру с кнопкой приложения
+     * Установить постоянную клавиатуру с приложением и контактами
      */
     private function setAppKeyboard(int $chatId, TelegramBotService $service, Restaurant $restaurant): void
     {
@@ -817,12 +967,29 @@ class WebhookController extends Controller
                 'step' => 'web_app_url_built'
             ]);
 
-            // Создаем клавиатуру с кнопкой для открытия Mini App
+            // Создаем клавиатуру с кнопкой для открытия Mini App и контактами
             $replyMarkup = $service->createReplyKeyboard([
                 [
                     [
-                        'text' => 'Открыть приложение',
+                        'text' => '🚀 Открыть приложение',
                         'web_app' => ['url' => $webAppUrl],
+                    ],
+                ],
+                [
+                    [
+                        'text' => '📞 Поделиться контактом',
+                        'request_contact' => true,
+                    ],
+                    [
+                        'text' => '👥 Поделиться друзьями',
+                        'request_users' => [
+                            'request_id' => 1,
+                            'user_is_bot' => false,
+                            'max_quantity' => 10,
+                            'request_name' => true,
+                            'request_username' => true,
+                            'request_photo' => true,
+                        ],
                     ],
                 ]
             ], true, false);
@@ -839,7 +1006,7 @@ class WebhookController extends Controller
 
             $result = $service->sendMessage([
                 'chat_id' => $chatId,
-                'text' => '🎉 Готово! Теперь вы можете пользоваться приложением.',
+                'text' => '🎉 Отлично! Регистрация завершена!\n🚀 Откройте приложение для заказов\n📱 Поделитесь контактами для уведомлений\n👥 Найдите друзей через адресную книгу',
                 'reply_markup' => $replyMarkup,
             ]);
 
