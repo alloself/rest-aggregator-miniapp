@@ -30,11 +30,22 @@ class RestaurantObserver
             $bot = TelegramBot::forRestaurant($restaurant);
 
             if ($tokenChanged) {
+                try {
+                    $bot->deleteWebhook(true);
+                } catch (Throwable $e) {
+                    report($e);
+                }
                 $bot->setupRestaurantMiniApp($restaurant);
             }
 
             if ($nameChanged) {
                 $bot->setMyName($restaurant->name);
+                // Refresh menu button URL to reflect a new slug after name change
+                try {
+                    $bot->setupRestaurantMiniApp($restaurant);
+                } catch (Throwable $e) {
+                    report($e);
+                }
             }
 
             if ($descChanged) {
