@@ -20,17 +20,21 @@ class RestaurantObserver
 
         $nameChanged = $restaurant->wasChanged('name');
         $descChanged = $restaurant->wasChanged('welcome_message') || $restaurant->wasChanged('subtitle');
+        $tokenChanged = $restaurant->wasChanged('telegram_bot_token');
 
-        if (!$nameChanged && !$descChanged) {
+        if (!$nameChanged && !$descChanged && !$tokenChanged) {
             return;
         }
 
         try {
             $bot = TelegramBot::forRestaurant($restaurant);
 
+            if ($tokenChanged) {
+                $bot->setupRestaurantMiniApp($restaurant);
+            }
+
             if ($nameChanged) {
                 $bot->setMyName($restaurant->name);
-                $bot->setupRestaurantMiniApp($restaurant);
             }
 
             if ($descChanged) {
@@ -50,6 +54,23 @@ class RestaurantObserver
                     $bot->setMyShortDescription($shortSource);
                 }
             }
+        } catch (Throwable $e) {
+            report($e);
+        }
+    }
+
+    /**
+     * Initial setup after restaurant created (if token already set).
+     */
+    public function created(Restaurant $restaurant): void
+    {
+        $token = (string) $restaurant->telegram_bot_token;
+        if ($token === '') {
+            return;
+        }
+
+        try {
+            TelegramBot::forRestaurant($restaurant)->setupRestaurantMiniApp($restaurant);
         } catch (Throwable $e) {
             report($e);
         }
