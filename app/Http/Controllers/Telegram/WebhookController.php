@@ -137,7 +137,7 @@ class WebhookController extends Controller
         }
 
         // Создаем или обновляем пользователя
-        $user = $this->createOrUpdateFromTelegram($from);
+        $user = $this->createOrUpdateFromTelegram($from, $service);
 
         if ($user) {
             Log::info('Пользователь сохранен при открытии Mini App', [
@@ -342,9 +342,145 @@ class WebhookController extends Controller
     }
 
     /**
+     * Получить дополнительную информацию о пользователе через getChat
+     */
+    private function getUserInfo(int $userId, TelegramBotService $service): ?array
+    {
+        try {
+            Log::info('👤 ОТЛАДКА: Начало получения информации о пользователе', [
+                'user_id' => $userId,
+                'step' => 'start_get_user_info'
+            ]);
+
+            $response = $service->getChat([
+                'chat_id' => $userId,
+            ]);
+
+            Log::info('👤 ОТЛАДКА: Ответ getChat', [
+                'response' => $response,
+                'step' => 'got_chat_response'
+            ]);
+
+            if (isset($response['result'])) {
+                return $response['result'];
+            }
+
+            return null;
+        } catch (Throwable $e) {
+            Log::error('❌ ОТЛАДКА: Ошибка получения информации о пользователе', [
+                'error' => $e->getMessage(),
+                'user_id' => $userId,
+                'step' => 'error_getting_user_info'
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Получить URL аватара пользователя из Telegram
+     */
+    private function getUserAvatarUrl(int $userId, TelegramBotService $service): ?string
+    {
+        try {
+            Log::info('🖼️ ОТЛАДКА: Начало получения аватара пользователя', [
+                'user_id' => $userId,
+                'step' => 'start_get_avatar'
+            ]);
+
+            // Получаем фотографии профиля пользователя
+            $response = $service->getUserProfilePhotos([
+                'user_id' => $userId,
+                'limit' => 1,
+            ]);
+
+            Log::info('🖼️ ОТЛАДКА: Ответ getUserProfilePhotos', [
+                'response' => $response,
+                'step' => 'got_profile_photos_response'
+            ]);
+
+            if (!isset($response['result']['photos']) || empty($response['result']['photos'])) {
+                Log::info('🖼️ ОТЛАДКА: У пользователя нет фотографий профиля', [
+                    'user_id' => $userId,
+                    'step' => 'no_profile_photos'
+                ]);
+                return null;
+            }
+
+            // Берем первую (последнюю загруженную) фотографию
+            $firstPhoto = $response['result']['photos'][0];
+            
+            if (empty($firstPhoto)) {
+                Log::info('🖼️ ОТЛАДКА: Первая фотография пустая', [
+                    'user_id' => $userId,
+                    'step' => 'first_photo_empty'
+                ]);
+                return null;
+            }
+
+            // Берем наибольшее разрешение (последний элемент в массиве)
+            $largestPhoto = end($firstPhoto);
+            
+            if (!isset($largestPhoto['file_id'])) {
+                Log::warning('🖼️ ОТЛАДКА: Отсутствует file_id в фотографии', [
+                    'largest_photo' => $largestPhoto,
+                    'step' => 'missing_file_id'
+                ]);
+                return null;
+            }
+
+            $fileId = $largestPhoto['file_id'];
+
+            Log::info('🖼️ ОТЛАДКА: Получен file_id', [
+                'file_id' => $fileId,
+                'step' => 'got_file_id'
+            ]);
+
+            // Получаем информацию о файле
+            $fileResponse = $service->getFile([
+                'file_id' => $fileId,
+            ]);
+
+            Log::info('🖼️ ОТЛАДКА: Ответ getFile', [
+                'file_response' => $fileResponse,
+                'step' => 'got_file_response'
+            ]);
+
+            if (!isset($fileResponse['result']['file_path'])) {
+                Log::warning('🖼️ ОТЛАДКА: Отсутствует file_path в ответе', [
+                    'file_response' => $fileResponse,
+                    'step' => 'missing_file_path'
+                ]);
+                return null;
+            }
+
+            $filePath = $fileResponse['result']['file_path'];
+
+            // Строим полный URL к файлу
+            $avatarUrl = $service->getFileUrl($filePath);
+
+            Log::info('✅ ОТЛАДКА: Получен URL аватара', [
+                'avatar_url' => $avatarUrl,
+                'user_id' => $userId,
+                'step' => 'got_avatar_url'
+            ]);
+
+            return $avatarUrl;
+        } catch (Throwable $e) {
+            Log::error('❌ ОТЛАДКА: Ошибка получения аватара пользователя', [
+                'error' => $e->getMessage(),
+                'error_line' => $e->getLine(),
+                'error_file' => $e->getFile(),
+                'user_id' => $userId,
+                'step' => 'error_getting_avatar'
+            ]);
+            return null;
+        }
+    }
+
+    /**
      * Создать или обновить пользователя по данным из Telegram
      */
-    private function createOrUpdateFromTelegram(array $telegramUser): ?User
+    private function createOrUpdateFromTelegram(array $telegramUser, TelegramBotService $service): ?User
     {
         try {
             Log::info('🔍 ОТЛАДКА: Начало создания/обновления пользователя', [
@@ -353,9 +489,26 @@ class WebhookController extends Controller
             ]);
 
             $chatId = (string) $telegramUser['id'];
+            $userId = (int) $telegramUser['id'];
             $firstName = (string) ($telegramUser['first_name'] ?? '');
             $lastName = (string) ($telegramUser['last_name'] ?? '');
             $username = (string) ($telegramUser['username'] ?? '');
+            
+            // Получаем дополнительную информацию о пользователе
+            $userInfo = $this->getUserInfo($userId, $service);
+            $avatarUrl = $this->getUserAvatarUrl($userId, $service);
+            
+            // Обновляем данные из дополнительной информации если доступно
+            if ($userInfo) {
+                // Используем bio из getChat как дополнительную информацию
+                if (isset($userInfo['bio'])) {
+                    Log::info('👤 ОТЛАДКА: Получена дополнительная информация', [
+                        'bio' => $userInfo['bio'],
+                        'user_id' => $userId,
+                        'step' => 'got_additional_user_info'
+                    ]);
+                }
+            }
 
             Log::info('🔍 ОТЛАДКА: Извлеченные данные', [
                 'chat_id' => $chatId,
@@ -393,6 +546,7 @@ class WebhookController extends Controller
                     'first_name' => $firstName,
                     'last_name' => $lastName ?: null,
                     'username' => $username ?: null,
+                    'avatar_url' => $avatarUrl,
                 ]);
 
                 Log::info('✅ ОТЛАДКА: Пользователь обновлен', [
@@ -415,6 +569,7 @@ class WebhookController extends Controller
                 'last_name' => $lastName ?: null,
                 'username' => $username ?: null,
                 'chat_id' => $chatId,
+                'avatar_url' => $avatarUrl,
             ];
 
             Log::info('🔍 ОТЛАДКА: Данные для создания пользователя', [
@@ -544,10 +699,47 @@ class WebhookController extends Controller
                 'step' => 'saving_phone_number'
             ]);
 
-            // Обновляем номер телефона пользователя
-            $user->update([
+            // Получаем дополнительную информацию о пользователе (аватар)
+            $avatarUrl = null;
+            if ($userId) {
+                $avatarUrl = $this->getUserAvatarUrl((int)$userId, $service);
+            }
+
+            // Обновляем данные пользователя
+            $updateData = [
                 'phone' => $phoneNumber,
-            ]);
+            ];
+
+            // Обновляем имя из контакта, если оно отличается
+            if (!empty($firstName) && $firstName !== $user->first_name) {
+                $updateData['first_name'] = $firstName;
+                Log::info('📞 ОТЛАДКА: Обновляем имя из контакта', [
+                    'old_first_name' => $user->first_name,
+                    'new_first_name' => $firstName,
+                    'step' => 'updating_first_name_from_contact'
+                ]);
+            }
+
+            if (!empty($lastName) && $lastName !== $user->last_name) {
+                $updateData['last_name'] = $lastName;
+                Log::info('📞 ОТЛАДКА: Обновляем фамилию из контакта', [
+                    'old_last_name' => $user->last_name,
+                    'new_last_name' => $lastName,
+                    'step' => 'updating_last_name_from_contact'
+                ]);
+            }
+
+            // Обновляем аватар, если получили новый
+            if ($avatarUrl && $avatarUrl !== $user->avatar_url) {
+                $updateData['avatar_url'] = $avatarUrl;
+                Log::info('📞 ОТЛАДКА: Обновляем аватар пользователя', [
+                    'old_avatar_url' => $user->avatar_url,
+                    'new_avatar_url' => $avatarUrl,
+                    'step' => 'updating_avatar_from_contact'
+                ]);
+            }
+
+            $user->update($updateData);
 
             Log::info('✅ ОТЛАДКА: Номер телефона сохранен', [
                 'user_id' => $user->id,

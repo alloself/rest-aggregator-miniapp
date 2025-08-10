@@ -44,6 +44,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'chat_id',
         'phone',
         'username',
+        'avatar_url',
     ];
 
     /**

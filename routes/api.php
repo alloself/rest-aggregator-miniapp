@@ -47,5 +47,4 @@ Route::prefix('site')->group(function () {
     Route::get('restaurants/{slug}/events', [SiteRestaurantController::class, 'events']);
 });
 
-// Telegram Bot Webhook endpoint per restaurant (UUID or slug)
 Route::post('telegram/webhook/{restaurant}', [TelegramWebhookController::class, 'handle']);
