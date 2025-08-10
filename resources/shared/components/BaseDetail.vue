@@ -21,19 +21,19 @@
   </Card>
 </template>
 <script setup lang="ts" generic="T extends IBaseEntity">
-import { FormContext } from "vee-validate";
-import { IBaseEntity, ISmartFormField } from "../types";
-import SmartForm from "./SmartForm.vue";
-import { AxiosInstance } from "axios";
-import { useFormSubmit } from "../composables";
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
-import { capitalize } from "lodash";
+import { FormContext } from 'vee-validate';
+import { IBaseEntity, ISmartFormField } from '../types';
+import SmartForm from './SmartForm.vue';
+import { AxiosInstance } from 'axios';
+import { useFormSubmit } from '../composables';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { capitalize } from 'lodash';
 
 const {
   fields = [],
   id,
-  title = "Создание",
+  title = 'Создание',
   client,
   baseUrl,
   initialValues,
@@ -54,7 +54,7 @@ const emit = defineEmits<{ save: [value: FormContext<T>] }>();
 
 const router = useRouter();
 
-const form = defineModel<FormContext<T>>("form");
+const form = defineModel<FormContext<T>>('form');
 
 const isLoading = ref(false);
 
@@ -82,6 +82,7 @@ const onEdit = async () => {
       relations,
     },
   });
+  form.value?.setValues(data);
   isLoading.value = false;
 };
 
