@@ -10,10 +10,11 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Traits\HasImages;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, HasUuids, HasRoles, SoftDeletes, HasApiTokens;
+    use HasFactory, Notifiable, HasUuids, HasRoles, SoftDeletes, HasApiTokens, HasImages;
 
     /**
      * Custom interfaces for ModelTyper - исключаем нежелательные поля
@@ -40,6 +41,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'middle_name',
         'email',
         'password',
+        'chat_id',
+        'phone',
+        'username',
     ];
 
     /**
@@ -66,6 +70,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'phone' => 'hashed',
         ];
     }
 
@@ -135,5 +140,30 @@ class User extends Authenticatable implements MustVerifyEmail
         setPermissionsTeamId($currentTeamId);
         
         return $this;
+    }
+
+    /**
+     * Получить фото профиля пользователя
+     */
+    public function getProfilePhoto(): ?File
+    {
+        return $this->images()->wherePivot('key', 'profile_photo')->first();
+    }
+
+    /**
+     * Получить URL фото профиля пользователя
+     */
+    public function getProfilePhotoUrl(): ?string
+    {
+        $photo = $this->getProfilePhoto();
+        return $photo ? $photo->url : null;
+    }
+
+    /**
+     * Проверить есть ли у пользователя фото профиля
+     */
+    public function hasProfilePhoto(): bool
+    {
+        return $this->images()->wherePivot('key', 'profile_photo')->exists();
     }
 }

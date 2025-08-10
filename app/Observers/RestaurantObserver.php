@@ -25,7 +25,7 @@ class RestaurantObserver
         if ($token === '') {
             return;
         }
-
+        
         $tokenChanged = $restaurant->wasChanged('telegram_bot_token');
         $wasRecentlyCreated = $restaurant->wasRecentlyCreated;
 
