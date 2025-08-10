@@ -668,7 +668,8 @@ class WebhookController extends Controller
                 return;
             }
 
-            // Логируем детальную информацию о каждом переданном пользователе
+            // Обрабатываем и сохраняем каждого переданного пользователя
+            $savedFriendsCount = 0;
             foreach ($users as $index => $sharedUser) {
                 Log::info('👤 ОТЛАДКА: Информация о переданном пользователе', [
                     'index' => $index,
@@ -681,6 +682,10 @@ class WebhookController extends Controller
                 ]);
 
                 // Получаем дополнительную информацию о пользователе
+                $userId = null;
+                $userInfo = null;
+                $avatarUrl = null;
+                
                 if (isset($sharedUser['user_id'])) {
                     $userId = (int) $sharedUser['user_id'];
                     
@@ -694,8 +699,8 @@ class WebhookController extends Controller
                         ]);
                     }
 
-                    // Получаем аватар пользователя
-                    $avatarUrl = $this->getUserAvatarUrl($userId, $service);
+                    // Получаем аватар пользователя из photo данных или через API
+                    $avatarUrl = $this->extractAvatarFromSharedUser($sharedUser, $userId, $service);
                     if ($avatarUrl) {
                         Log::info('👤 ОТЛАДКА: Аватар переданного пользователя', [
                             'user_id' => $userId,
@@ -703,12 +708,51 @@ class WebhookController extends Controller
                             'step' => 'shared_user_avatar'
                         ]);
                     }
+
+                    // Пытаемся найти или создать друга в базе данных
+                    $friendUser = $this->findOrCreateFriendUser($userId, $sharedUser, $userInfo, $avatarUrl);
+                    
+                    if ($friendUser) {
+                        // Добавляем друга к текущему пользователю
+                        try {
+                            // Дополнительные данные для сохранения в pivot таблице
+                            $telegramData = [
+                                'shared_from_telegram' => true,
+                                'shared_at' => now()->toISOString(),
+                                'telegram_photo_data' => $sharedUser['photo'] ?? null,
+                                'additional_telegram_info' => $userInfo,
+                            ];
+
+                            $user->addFriend($friendUser, $telegramData);
+                            $savedFriendsCount++;
+
+                            Log::info('✅ ОТЛАДКА: Друг успешно добавлен', [
+                                'user_id' => $user->id,
+                                'friend_user_id' => $friendUser->id,
+                                'friend_telegram_id' => $userId,
+                                'friend_name' => ($sharedUser['first_name'] ?? '') . ' ' . ($sharedUser['last_name'] ?? ''),
+                                'step' => 'friend_successfully_added'
+                            ]);
+
+                        } catch (Throwable $e) {
+                            Log::error('❌ ОТЛАДКА: Ошибка добавления друга', [
+                                'error' => $e->getMessage(),
+                                'user_id' => $user->id,
+                                'friend_telegram_id' => $userId,
+                                'step' => 'error_adding_friend'
+                            ]);
+                        }
+                    }
                 }
             }
 
             // Отправляем подтверждение
             $usersCount = count($users);
             $confirmationText = "✅ Спасибо! Получена информация о {$usersCount} друзьях из вашей адресной книги.";
+            
+            if ($savedFriendsCount > 0) {
+                $confirmationText .= "\n💾 Сохранено в базу данных: {$savedFriendsCount} друзей";
+            }
             
             if ($usersCount > 0) {
                 $confirmationText .= "\n\n📋 Список переданных друзей:\n";
@@ -749,6 +793,171 @@ class WebhookController extends Controller
 
             // Заменяем клавиатуру даже при ошибке
             $this->setAppKeyboard($chatId, $service, $restaurant);
+        }
+    }
+
+    /**
+     * Извлечь URL аватара из данных пошаренного пользователя
+     */
+    private function extractAvatarFromSharedUser(array $sharedUser, int $userId, TelegramBotService $service): ?string
+    {
+        try {
+            Log::info('🖼️ ОТЛАДКА: Начало извлечения аватара из пошаренных данных', [
+                'user_id' => $userId,
+                'has_photo' => isset($sharedUser['photo']),
+                'step' => 'start_extract_avatar_from_shared'
+            ]);
+
+            // Проверяем, есть ли фото в данных пошаренного пользователя
+            if (isset($sharedUser['photo']) && is_array($sharedUser['photo'])) {
+                $photos = $sharedUser['photo'];
+                
+                Log::info('🖼️ ОТЛАДКА: Найдены фотографии в пошаренных данных', [
+                    'user_id' => $userId,
+                    'photos_count' => count($photos),
+                    'photos' => $photos,
+                    'step' => 'found_photos_in_shared_data'
+                ]);
+
+                // Берем фото с самым высоким разрешением (последнее в массиве)
+                $highestResPhoto = end($photos);
+                
+                if (isset($highestResPhoto['file_id'])) {
+                    Log::info('🖼️ ОТЛАДКА: Выбрано фото высокого разрешения', [
+                        'user_id' => $userId,
+                        'file_id' => $highestResPhoto['file_id'],
+                        'width' => $highestResPhoto['width'] ?? 'unknown',
+                        'height' => $highestResPhoto['height'] ?? 'unknown',
+                        'step' => 'selected_high_res_photo'
+                    ]);
+
+                    // Получаем информацию о файле через Telegram API
+                    $fileResponse = $service->getFile([
+                        'file_id' => $highestResPhoto['file_id']
+                    ]);
+
+                    if (isset($fileResponse['result']['file_path'])) {
+                        $avatarUrl = $service->getFileUrl($fileResponse['result']['file_path']);
+                        
+                        Log::info('✅ ОТЛАДКА: Получен URL аватара из пошаренных данных', [
+                            'user_id' => $userId,
+                            'avatar_url' => $avatarUrl,
+                            'file_path' => $fileResponse['result']['file_path'],
+                            'step' => 'got_avatar_url_from_shared_data'
+                        ]);
+
+                        return $avatarUrl;
+                    }
+                }
+            }
+
+            // Если нет фото в пошаренных данных, пытаемся получить через getUserProfilePhotos
+            Log::info('🖼️ ОТЛАДКА: Фото в пошаренных данных не найдено, пытаемся через API', [
+                'user_id' => $userId,
+                'step' => 'fallback_to_api'
+            ]);
+
+            return $this->getUserAvatarUrl($userId, $service);
+
+        } catch (Throwable $e) {
+            Log::error('❌ ОТЛАДКА: Ошибка извлечения аватара из пошаренных данных', [
+                'error' => $e->getMessage(),
+                'user_id' => $userId,
+                'step' => 'error_extract_avatar_from_shared'
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Найти или создать пользователя-друга по данным из Telegram
+     */
+    private function findOrCreateFriendUser(int $telegramId, array $sharedUser, ?array $userInfo, ?string $avatarUrl): ?User
+    {
+        try {
+            Log::info('🔍 ОТЛАДКА: Поиск пользователя-друга', [
+                'telegram_id' => $telegramId,
+                'shared_user' => $sharedUser,
+                'step' => 'start_find_friend_user'
+            ]);
+
+            // Сначала пытаемся найти существующего пользователя по chat_id
+            $friendUser = User::where('chat_id', (string)$telegramId)->first();
+
+            if ($friendUser) {
+                Log::info('✅ ОТЛАДКА: Пользователь-друг найден в базе', [
+                    'friend_user_id' => $friendUser->id,
+                    'telegram_id' => $telegramId,
+                    'step' => 'existing_friend_user_found'
+                ]);
+
+                // Обновляем информацию, если есть новые данные
+                $updateData = [];
+                
+                if (!empty($sharedUser['first_name']) && $sharedUser['first_name'] !== $friendUser->first_name) {
+                    $updateData['first_name'] = $sharedUser['first_name'];
+                }
+                
+                if (!empty($sharedUser['last_name']) && $sharedUser['last_name'] !== $friendUser->last_name) {
+                    $updateData['last_name'] = $sharedUser['last_name'];
+                }
+                
+                if (!empty($sharedUser['username']) && $sharedUser['username'] !== $friendUser->username) {
+                    $updateData['username'] = $sharedUser['username'];
+                }
+                
+                if (!empty($avatarUrl) && $avatarUrl !== $friendUser->avatar_url) {
+                    $updateData['avatar_url'] = $avatarUrl;
+                }
+
+                if (!empty($updateData)) {
+                    $friendUser->update($updateData);
+                    Log::info('🔄 ОТЛАДКА: Обновлена информация о пользователе-друге', [
+                        'friend_user_id' => $friendUser->id,
+                        'updated_data' => $updateData,
+                        'step' => 'friend_user_updated'
+                    ]);
+                }
+
+                return $friendUser;
+            }
+
+            // Создаем нового пользователя, если не найден
+            Log::info('➕ ОТЛАДКА: Создание нового пользователя-друга', [
+                'telegram_id' => $telegramId,
+                'shared_user' => $sharedUser,
+                'step' => 'creating_new_friend_user'
+            ]);
+
+            $userData = [
+                'first_name' => $sharedUser['first_name'] ?? 'Неизвестно',
+                'last_name' => $sharedUser['last_name'] ?? null,
+                'username' => $sharedUser['username'] ?? null,
+                'chat_id' => (string)$telegramId,
+                'avatar_url' => $avatarUrl,
+            ];
+
+            $friendUser = User::create($userData);
+
+            Log::info('✅ ОТЛАДКА: Новый пользователь-друг создан', [
+                'friend_user_id' => $friendUser->id,
+                'telegram_id' => $telegramId,
+                'user_data' => $userData,
+                'step' => 'new_friend_user_created'
+            ]);
+
+            return $friendUser;
+
+        } catch (Throwable $e) {
+            Log::error('❌ ОТЛАДКА: Ошибка поиска/создания пользователя-друга', [
+                'error' => $e->getMessage(),
+                'telegram_id' => $telegramId,
+                'shared_user' => $sharedUser,
+                'step' => 'error_find_create_friend_user'
+            ]);
+
+            return null;
         }
     }
 
