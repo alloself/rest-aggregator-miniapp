@@ -748,10 +748,12 @@ class WebhookController extends Controller
 
             // Отправляем подтверждение
             $usersCount = count($users);
-            $confirmationText = "✅ Спасибо! Получена информация о {$usersCount} друзьях из вашей адресной книги.";
+            $friendsWord = $this->pluralizeRussian($usersCount, 'друге', 'друзьях', 'друзьях');
+            $confirmationText = "✅ Спасибо! Получена информация о {$usersCount} {$friendsWord} из вашей адресной книги.";
             
             if ($savedFriendsCount > 0) {
-                $confirmationText .= "\n💾 Сохранено в базу данных: {$savedFriendsCount} друзей";
+                $savedFriendsWord = $this->pluralizeRussian($savedFriendsCount, 'друг', 'друга', 'друзей');
+                $confirmationText .= "\n💾 Сохранено в базу данных: {$savedFriendsCount} {$savedFriendsWord}";
             }
             
             if ($usersCount > 0) {
@@ -793,6 +795,29 @@ class WebhookController extends Controller
 
             // Заменяем клавиатуру даже при ошибке
             $this->setAppKeyboard($chatId, $service, $restaurant);
+        }
+    }
+
+    /**
+     * Склонение существительных по числам (русский язык)
+     */
+    private function pluralizeRussian(int $number, string $one, string $few, string $many): string
+    {
+        $number = abs($number);
+        
+        if ($number % 100 >= 11 && $number % 100 <= 19) {
+            return $many;
+        }
+        
+        switch ($number % 10) {
+            case 1:
+                return $one;
+            case 2:
+            case 3:
+            case 4:
+                return $few;
+            default:
+                return $many;
         }
     }
 
@@ -1215,7 +1240,7 @@ class WebhookController extends Controller
 
             $result = $service->sendMessage([
                 'chat_id' => $chatId,
-                'text' => '🎉 Отлично! Регистрация завершена!\n🚀 Откройте приложение для заказов\n📱 Поделитесь контактами для уведомлений\n👥 Найдите друзей через адресную книгу',
+                'text' => "🎉 Отлично! Регистрация завершена!\n\n🚀 Откройте приложение для заказов\n📱 Поделитесь контактами для уведомлений\n👥 Найдите друзей через адресную книгу",
                 'reply_markup' => $replyMarkup,
             ]);
 
