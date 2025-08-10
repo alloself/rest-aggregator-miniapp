@@ -184,12 +184,7 @@ class TelegramBot
      */
     public function setupRestaurantMiniApp(Restaurant $restaurant, string $menuText = 'Приложение'): bool
     {
-        // 1) Set webhook
-        $webhookUrl = $this->buildRestaurantWebhookUrl($restaurant);
-        $this->assertWebhookUrlAllowed($webhookUrl);
-        $hookOk = $this->setWebhook($webhookUrl);
-
-        // 2) Configure Mini App menu button
+        // 1) Configure Mini App menu button (do this first so UI updates even if webhook fails)
         $url = $this->buildRestaurantWebAppUrl($restaurant);
         $this->assertWebAppUrlAllowed($url);
         // Some Telegram clients cache menu button aggressively. To force-refresh text,
@@ -201,7 +196,18 @@ class TelegramBot
         ]);
 
         $setOk = $this->setMenuButtonWebApp($menuText, $url);
-        return $hookOk && $resetOk && $setOk;
+
+        // 2) Set webhook (do not fail the setup if webhook cannot be set right now)
+        try {
+            $webhookUrl = $this->buildRestaurantWebhookUrl($restaurant);
+            $this->assertWebhookUrlAllowed($webhookUrl);
+            $this->setWebhook($webhookUrl);
+        } catch (\Throwable $e) {
+            // log and continue; UI part is already configured
+            report($e);
+        }
+
+        return $resetOk && $setOk;
     }
 
     /**
