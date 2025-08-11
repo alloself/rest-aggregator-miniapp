@@ -69,7 +69,7 @@ class RestaurantController extends Controller
             $perPage = min($request->integer('per_page', 15), 50);
             $sortBy = $request->enum('sort_by', $config['sort_fields'], $config['default_sort']);
             $sortDirection = $request->enum('sort_direction', ['asc', 'desc'], 'asc');
-            $withImages = $request->boolean('with_images', false);
+            $withImages = $request->boolean('with_images', true);
 
             $query = $restaurant->{$config['relation']}()
                 ->when($withImages, fn($query) => $query->with('images', 'files'))

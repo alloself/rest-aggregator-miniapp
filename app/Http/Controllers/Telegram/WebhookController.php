@@ -5,22 +5,12 @@ namespace App\Http\Controllers\Telegram;
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use App\Models\User;
-use App\Models\File;
 use App\Services\TelegramBotService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Throwable;
 
-/**
- * Контроллер для обработки webhook запросов от Telegram
- * Обновлен для работы с TelegramBotService v2.0 (API 9.1)
- * 
- * @version 2.0
- */
 class WebhookController extends Controller
 {
     /**
