@@ -92,6 +92,6 @@ class Restaurant extends BaseModel
      */
     public function bot(): TelegramBotService
     {
-        return TelegramBotService::forRestaurant($this);
+        return new TelegramBotService($this->telegram_bot_token);
     }
 }
