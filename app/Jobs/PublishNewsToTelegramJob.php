@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\News;
 use App\Models\Restaurant;
 use App\Models\User;
+use App\Models\RestaurantChat;
 use App\Services\TelegramBotService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -44,12 +45,18 @@ class PublishNewsToTelegramJob implements ShouldQueue
      */
     public function handle(): void
     {
+        Log::info('PublishNewsToTelegramJob: старт', [
+            'news_id' => $this->news_id,
+        ]);
         /** @var News|null $news */
         $news = News::query()
             ->with(['restaurant', 'images'])
             ->find($this->news_id);
 
         if (!$news) {
+            Log::warning('PublishNewsToTelegramJob: новость не найдена', [
+                'news_id' => $this->news_id,
+            ]);
             return;
         }
 
@@ -57,6 +64,10 @@ class PublishNewsToTelegramJob implements ShouldQueue
         $restaurant = $news->restaurant;
         if (!$restaurant || empty($restaurant->telegram_bot_token)) {
             // Нет контекста ресторана или токена — публиковать некуда
+            Log::warning('PublishNewsToTelegramJob: отсутствует ресторан или его токен', [
+                'news_id' => $news->getKey(),
+                'has_restaurant' => (bool) $restaurant,
+            ]);
             return;
         }
 
@@ -64,6 +75,9 @@ class PublishNewsToTelegramJob implements ShouldQueue
 
         $recipients = $this->collectRecipients($restaurant);
         if ($recipients->isEmpty()) {
+            Log::info('PublishNewsToTelegramJob: список получателей пуст', [
+                'news_id' => $news->getKey(),
+            ]);
             return;
         }
 
@@ -85,6 +99,11 @@ class PublishNewsToTelegramJob implements ShouldQueue
                         'parse_mode' => 'HTML',
                     ]);
                 }
+                Log::info('PublishNewsToTelegramJob: отправлено сообщение', [
+                    'chat_id' => $chatId,
+                    'news_id' => $news->getKey(),
+                    'with_images' => $imageUrls->isNotEmpty(),
+                ]);
             } catch (\Throwable $e) {
                 Log::warning('Не удалось отправить новость в Telegram', [
                     'news_id' => $news->getKey(),
@@ -120,6 +139,19 @@ class PublishNewsToTelegramJob implements ShouldQueue
         // Пользователи M2M
         $users = $restaurant->relationLoaded('users') ? $restaurant->users : $restaurant->users()->get();
         foreach ($users as $user) {
+            if (!empty($user->chat_id)) {
+                $chatIds->push($user->chat_id);
+            }
+        }
+
+        // Все пользователи с ролью telegram_user в контексте ресторана (teams)
+        $currentTeam = getPermissionsTeamId();
+        setPermissionsTeamId($restaurant->getKey());
+        /** @var \Illuminate\Database\Eloquent\Collection<int,User> $usersWithRole */
+        $usersWithRole = User::role('telegram_user')->get();
+        setPermissionsTeamId($currentTeam);
+
+        foreach ($usersWithRole as $user) {
             if (!empty($user->chat_id)) {
                 $chatIds->push($user->chat_id);
             }
