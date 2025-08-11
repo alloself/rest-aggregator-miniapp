@@ -1,7 +1,14 @@
 <template>
   <article class="news-card">
     <div class="news-card__media" v-if="imageItems.length > 0">
-      <RestaurantHeroCarousel :images="imageItems" :autoplay="4000" :show-pagination="true" height="220px" />
+      <RestaurantHeroCarousel
+        :images="imageItems"
+        :autoplay="4000"
+        :show-pagination="true"
+        height="220px"
+        border-radius="20px"
+        pagination-bottom="24px"
+      />
     </div>
 
     <div class="news-card__body">
@@ -63,7 +70,8 @@ const formattedDate = computed(() => {
   background: #ffffff;
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  margin-inline: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .news-card__media {
