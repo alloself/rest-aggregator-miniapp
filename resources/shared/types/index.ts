@@ -63,14 +63,15 @@ export function isApiError(obj: any): obj is ApiError {
     return obj && typeof obj === "object" && "message" in obj;
 }
 
-export function isPaginatedResponse<T>(obj: any): obj is PaginatedResponse<T> {
-    return (
-        obj &&
-        typeof obj === "object" &&
-        "data" in obj &&
-        Array.isArray(obj.data) &&
-        "current_page" in obj
-    );
+export function isPaginatedResponse<T>(obj: unknown): obj is PaginatedResponse<T> {
+    if (!obj || typeof obj !== "object") return false;
+    const anyObj = obj as Record<string, unknown>;
+    const dataOk = Array.isArray(anyObj.data);
+    const links = anyObj.links as Record<string, unknown> | undefined;
+    const meta = anyObj.meta as Record<string, unknown> | undefined;
+    const linksOk = !!links && "first" in links && "last" in links && "prev" in links && "next" in links;
+    const metaOk = !!meta && "current_page" in meta && "last_page" in meta && "per_page" in meta && "total" in meta;
+    return dataOk && linksOk && metaOk;
 }
 
 export function isUser(obj: any): obj is User {
