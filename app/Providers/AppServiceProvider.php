@@ -2,16 +2,15 @@
 
 namespace App\Providers;
 
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
+
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-use Laravel\Fortify\Fortify;
+
 use App\Models\Restaurant;
 use App\Observers\RestaurantObserver;
+use App\Models\News;
+use App\Observers\NewsObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureModels();
         Restaurant::observe(RestaurantObserver::class);
+        News::observe(NewsObserver::class);
     }
 
     /**

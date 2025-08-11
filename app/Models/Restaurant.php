@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Services\TelegramBotService;
 
 class Restaurant extends BaseModel
 {
@@ -89,8 +90,8 @@ class Restaurant extends BaseModel
     /**
      * Удобный доступ к Telegram сервису в контексте этого ресторана.
      */
-    public function bot(): \App\Services\TelegramBot
+    public function bot(): TelegramBotService
     {
-        return \App\Services\TelegramBot::forRestaurant($this);
+        return TelegramBotService::forRestaurant($this);
     }
 }
