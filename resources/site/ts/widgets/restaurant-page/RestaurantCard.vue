@@ -2,7 +2,7 @@
   <div class="restaurant-card">
     <!-- Hero Carousel -->
     <div class="restaurant-card__hero-carousel">
-      <RestaurantHeroCarousel :images="heroImages" :autoplay="4000" height="298px" />
+      <RestaurantHeroCarousel :images="images" :autoplay="4000" height="298px" />
     </div>
 
     <!-- Restaurant Card -->
