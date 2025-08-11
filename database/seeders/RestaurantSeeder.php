@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Restaurant;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 
 class RestaurantSeeder extends Seeder
@@ -15,9 +16,11 @@ class RestaurantSeeder extends Seeder
     {
         // Получаем root пользователя
         $rootUser = User::where('email', 'root@example.com')->first();
+        $managerUser = User::where('email', 'manager@example.com')->first();
+        $readerUser = User::where('email', 'reader@example.com')->first();
 
-        if (!$rootUser) {
-            $this->command->error('Root пользователь не найден. Убедитесь, что UserSeeder выполнен.');
+        if (!$rootUser || !$managerUser || !$readerUser) {
+            $this->command->error('Не найдены базовые пользователи (root/manager/reader). Убедитесь, что UserSeeder выполнен.');
             return;
         }
 
@@ -65,7 +68,18 @@ class RestaurantSeeder extends Seeder
         ]);
 
         // Добавляем root пользователя как владельца ресторана
+        // Гарантируем наличие ролей перед назначением
+        Role::firstOrCreate(['name' => 'restaurant_owner', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'restaurant_manager', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'telegram_user', 'guard_name' => 'web']);
+
         $grettoRestaurant->addUser($rootUser, 'restaurant_owner');
+
+        // Привязываем менеджера и назначаем роль restaurant_manager
+        $grettoRestaurant->addUser($managerUser, 'restaurant_manager');
+
+        // Привязываем читателя и назначаем роль telegram_user (читатель)
+        $grettoRestaurant->addUser($readerUser, 'telegram_user');
 
         $this->command->info('Ресторан Gretto успешно создан и связан с root пользователем.');
     }

@@ -16,10 +16,18 @@ class PermissionSeeder extends Seeder
      */
     public function run()
     {
-        $role = Role::create(['name' => 'root', 'guard_name' => 'web']);
-        $permission = Permission::create(['name' => 'root', 'guard_name' => 'web']);
+        // Базовая роль root (для bootstrap и локального доступа)
+        Role::firstOrCreate(['name' => 'root', 'guard_name' => 'web']);
 
-        $role = Role::create(['name' => 'telegram_user', 'guard_name' => 'web']);
-        $userPermission = Permission::create(['name' => 'telegram_user', 'guard_name' => 'web']);
+        // Минимальный набор permissions: должен совпадать с middleware AccountPermissionMiddleware
+        // restaurant.* и menu.*
+        $permissions = [
+            'restaurant.manage', 'restaurant.edit', 'restaurant.delete',
+            'menu.view', 'menu.create', 'menu.edit', 'menu.delete',
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+        }
     }
 }

@@ -200,6 +200,7 @@ export interface Restaurant {
 export interface Role {
   // columns
   id: string
+  team_id?: string | null
   name: string
   guard_name: string
   created_at?: Date | null

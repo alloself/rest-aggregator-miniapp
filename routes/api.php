@@ -31,7 +31,7 @@ $accountResources = [
 
 Route::middleware(['auth:sanctum'])->get('me', [AuthController::class, 'me']);
 
-Route::prefix('account')->middleware(['auth:sanctum', 'role:restaurant_owner|root'])->group(function () use ($accountResources) {
+Route::prefix('account')->middleware(['auth:sanctum', 'restaurant.team', 'account.permission'])->group(function () use ($accountResources) {
     Route::apiResources($accountResources);
 
     Route::prefix('destroy')->group(function () use ($accountResources) {
