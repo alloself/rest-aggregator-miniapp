@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\News;
 use App\Models\Restaurant;
+use App\Models\File;
 use Illuminate\Database\Seeder;
 
 class NewsSeeder extends Seeder
@@ -62,13 +63,33 @@ class NewsSeeder extends Seeder
         ];
 
         foreach ($newsData as $news) {
-            News::create([
+            $newsEntity = News::create([
                 'title' => $news['title'],
                 'slug' => $news['slug'],
                 'description' => $news['description'],
                 'order' => $news['order'],
                 'restaurant_id' => $grettoRestaurant->id,
             ]);
+
+            // Прикрепляем 1-2 случайных изображения к новости
+            $files = File::inRandomOrder()->take(random_int(1, 2))->get();
+
+            if ($files->isNotEmpty()) {
+                $order = 1;
+                $images = [];
+                foreach ($files as $file) {
+                    $images[] = [
+                        'id' => $file->id,
+                        'pivot' => [
+                            'key' => 'image',
+                            'order' => $order,
+                        ],
+                    ];
+                    $order++;
+                }
+
+                $newsEntity->syncImages($images);
+            }
         }
 
         $this->command->info('Создано ' . count($newsData) . ' новостей для ресторана Gretto.');

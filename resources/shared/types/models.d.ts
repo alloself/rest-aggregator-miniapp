@@ -89,6 +89,7 @@ export interface News {
   slug: string
   title: string
   description: string
+  is_published: boolean
   restaurant_id: string
   order: number
   deleted_at?: Date | null
@@ -220,24 +221,42 @@ export interface User {
   first_name: string
   last_name?: string | null
   middle_name?: string | null
-  email: string
+  email?: string | null
+  chat_id?: string | null
+  phone?: string | null
+  username?: string | null
+  avatar_url?: string | null
   email_verified_at?: Date | null
   created_at?: Date | null
   updated_at?: Date | null
   deleted_at?: Date | null
+  // mutators
+  full_avatar_url: string
   // overrides
   tokens: never
   notifications: never
   // relations
   restaurants?: Restaurant[]
+  friends?: User[]
+  friend_of?: User[]
   roles?: Role[]
   permissions?: Permission[]
+  images?: File[]
+  files?: File[]
   // counts
   restaurants_count: number
+  friends_count: number
+  friend_of_count: number
   roles_count: number
   permissions_count: number
+  images_count: number
+  files_count: number
   // exists
   restaurants_exists: boolean
+  friends_exists: boolean
+  friend_of_exists: boolean
   roles_exists: boolean
   permissions_exists: boolean
+  images_exists: boolean
+  files_exists: boolean
 }
