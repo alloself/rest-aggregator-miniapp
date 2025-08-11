@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, computed } from 'vue';
+import { onBeforeMount, computed, reactive } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRestaurantStore } from '@site/ts/stores/restaurant';
 import RestaurantCard from './RestaurantCard.vue';
@@ -52,21 +52,31 @@ const heroImages = computed(() => [
   },
 ]);
 
-const chefRecommendations = computed(() => [
+const chefRecommendations = reactive([
   {
-    id: '1',
-    name: 'Стейк рибай с овощами гриль',
-    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=300&h=200&fit=crop',
+    id: 'dish-1',
+    name: 'Стейк рибай',
+    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=240&h=240&fit=crop',
   },
   {
-    id: '2',
-    name: 'Паста карбонара с трюфелями',
-    image: 'https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=300&h=200&fit=crop',
+    id: 'dish-2',
+    name: 'Паста карбонара',
+    image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=240&h=240&fit=crop',
   },
   {
-    id: '3',
-    name: 'Тирамису от шефа',
-    image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=300&h=200&fit=crop',
+    id: 'dish-3',
+    name: 'Тирамису',
+    image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=240&h=240&fit=crop',
+  },
+  {
+    id: 'dish-4',
+    name: 'Салат Цезарь',
+    image: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=240&h=240&fit=crop',
+  },
+  {
+    id: 'dish-5',
+    name: 'Суп грибной',
+    image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=240&h=240&fit=crop',
   },
 ]);
 
