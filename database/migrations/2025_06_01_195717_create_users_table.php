@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('last_name')->nullable();
             $table->string('middle_name')->nullable();
             $table->string('email')->nullable();
-            $table->string('chat_id')->nullable();
             $table->string('phone')->nullable();
             $table->string('username')->nullable();
             $table->string('avatar_url')->nullable();

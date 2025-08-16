@@ -124,23 +124,22 @@ class PublishNewsToTelegramJob implements ShouldQueue
     {
         $chatIds = collect();
 
-        // Владелец
-        if ($restaurant->relationLoaded('user')) {
-            $owner = $restaurant->user;
-        } else {
-            /** @var User|null $owner */
-            $owner = $restaurant->user()->first();
+        // Владелец: берём chat_id из pivot restaurant_user
+        // Владелец: фиксируем chat_id из pivot restaurant_user, если владелец тоже привязан как пользователь
+        $owner = $restaurant->user()->first();
+        if ($owner) {
+            $ownerPivot = $restaurant->users()->where('users.id', $owner->id)->first();
+            if ($ownerPivot && !empty($ownerPivot->pivot?->chat_id)) {
+                $chatIds->push($ownerPivot->pivot->chat_id);
+            }
         }
 
-        if ($owner && !empty($owner->chat_id)) {
-            $chatIds->push($owner->chat_id);
-        }
-
-        // Пользователи M2M
-        $users = $restaurant->relationLoaded('users') ? $restaurant->users : $restaurant->users()->get();
+        // Пользователи M2M: chat_id из pivot
+        $users = $restaurant->users()->get();
         foreach ($users as $user) {
-            if (!empty($user->chat_id)) {
-                $chatIds->push($user->chat_id);
+            $pivotChatId = $user->pivot?->chat_id;
+            if (!empty($pivotChatId)) {
+                $chatIds->push($pivotChatId);
             }
         }
 
@@ -152,8 +151,9 @@ class PublishNewsToTelegramJob implements ShouldQueue
         setPermissionsTeamId($currentTeam);
 
         foreach ($usersWithRole as $user) {
-            if (!empty($user->chat_id)) {
-                $chatIds->push($user->chat_id);
+            $pivotChatId = $restaurant->users()->where('users.id', $user->id)->first()?->pivot?->chat_id;
+            if (!empty($pivotChatId)) {
+                $chatIds->push($pivotChatId);
             }
         }
 

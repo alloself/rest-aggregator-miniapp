@@ -94,6 +94,7 @@ class WebhookController extends Controller
 
         $text = (string) ($message['text'] ?? '');
         $chatId = $message['chat']['id'];
+        $chatType = (string) ($message['chat']['type'] ?? 'private');
         $from = $message['from'] ?? [];
 
         // Обработка команды /start
@@ -138,14 +139,23 @@ class WebhookController extends Controller
             $startParam = trim(substr($text, 7));
         }
 
-        // Создаем или обновляем пользователя
-        $user = $this->createOrUpdateFromTelegram($from, $service);
+        // Создаем или обновляем пользователя (без chat_id в users)
+        $user = $this->createOrUpdateFromTelegram($from, $service, $restaurant);
 
         if ($user) {
             Log::info('Пользователь сохранен при открытии Mini App', [
                 'user_id' => $user->id,
                 'chat_id' => $chatId,
                 'restaurant_id' => $restaurant->id,
+            ]);
+
+            // Привязываем пользователя к ресторану и назначаем роль telegram_user, если ещё не привязан
+            $restaurant->addUser($user, 'telegram_user');
+            // Обновляем chat_id/chat_type в пивоте restaurant_user
+            $restaurant->users()->updateExistingPivot($user->id, [
+                'chat_id' => (string) $chatId,
+                'chat_type' => 'private',
+                'updated_at' => now(),
             ]);
         }
 
@@ -495,7 +505,7 @@ class WebhookController extends Controller
     /**
      * Создать или обновить пользователя по данным из Telegram
      */
-    private function createOrUpdateFromTelegram(array $telegramUser, TelegramBotService $service): ?User
+    private function createOrUpdateFromTelegram(array $telegramUser, TelegramBotService $service, ?Restaurant $restaurant = null): ?User
     {
         try {
             Log::info('🔍 ОТЛАДКА: Начало создания/обновления пользователя', [
@@ -546,8 +556,11 @@ class WebhookController extends Controller
                 'step' => 'searching_existing_user'
             ]);
 
-            // Ищем пользователя по chat_id
-            $user = User::where('chat_id', $chatId)->first();
+            // Ищем пользователя по chat_id в pivot для текущего ресторана
+            $user = User::whereHas('restaurants', function($q) use ($chatId, $restaurant) {
+                $q->where('restaurant_id', $restaurant->id)
+                  ->where('chat_id', (string)$chatId);
+            })->first();
 
             if ($user) {
                 Log::info('✅ ОТЛАДКА: Найден существующий пользователь', [
@@ -642,7 +655,10 @@ class WebhookController extends Controller
             ]);
 
             // Находим пользователя по chat_id
-            $user = User::where('chat_id', (string)$chatId)->first();
+            $user = User::whereHas('restaurants', function($q) use ($chatId, $restaurant) {
+                $q->where('restaurant_id', $restaurant->id)
+                  ->where('chat_id', (string)$chatId);
+            })->first();
 
             if (!$user) {
                 Log::error('❌ ОТЛАДКА: Пользователь не найден!', [
@@ -700,7 +716,7 @@ class WebhookController extends Controller
                     }
 
                     // Пытаемся найти или создать друга в базе данных
-                    $friendUser = $this->findOrCreateFriendUser($userId, $sharedUser, $userInfo, $avatarUrl);
+                    $friendUser = $this->findOrCreateFriendUser($userId, $sharedUser, $userInfo, $avatarUrl, $restaurant);
                     
                     if ($friendUser) {
                         // Добавляем друга к текущему пользователю
@@ -888,7 +904,7 @@ class WebhookController extends Controller
     /**
      * Найти или создать пользователя-друга по данным из Telegram
      */
-    private function findOrCreateFriendUser(int $telegramId, array $sharedUser, ?array $userInfo, ?string $avatarUrl): ?User
+    private function findOrCreateFriendUser(int $telegramId, array $sharedUser, ?array $userInfo, ?string $avatarUrl, ?Restaurant $restaurant = null): ?User
     {
         try {
             Log::info('🔍 ОТЛАДКА: Поиск пользователя-друга', [
@@ -898,7 +914,10 @@ class WebhookController extends Controller
             ]);
 
             // Сначала пытаемся найти существующего пользователя по chat_id
-            $friendUser = User::where('chat_id', (string)$telegramId)->first();
+            $friendUser = User::whereHas('restaurants', function($q) use ($restaurant, $telegramId) {
+                $q->where('restaurant_id', $restaurant->id)
+                  ->where('chat_id', (string)$telegramId);
+            })->first();
 
             if ($friendUser) {
                 Log::info('✅ ОТЛАДКА: Пользователь-друг найден в базе', [
@@ -1030,7 +1049,10 @@ class WebhookController extends Controller
                 'step' => 'searching_user_for_contact'
             ]);
 
-            $user = User::where('chat_id', (string)$chatId)->first();
+            $user = User::whereHas('restaurants', function($q) use ($restaurant, $chatId) {
+                $q->where('restaurant_id', $restaurant->id)
+                  ->where('chat_id', (string)$chatId);
+            })->first();
 
             if (!$user) {
                 Log::error('❌ ОТЛАДКА: Пользователь не найден!', [
@@ -1262,7 +1284,9 @@ class WebhookController extends Controller
      */
     private function findByChatId(string $chatId): ?User
     {
-        return User::where('chat_id', $chatId)->first();
+        return User::whereHas('restaurants', function($q) use ($chatId) {
+            $q->where('chat_id', $chatId);
+        })->first();
     }
 
     /**
@@ -1270,6 +1294,8 @@ class WebhookController extends Controller
      */
     private function existsByChatId(string $chatId): bool
     {
-        return User::where('chat_id', $chatId)->exists();
+        return User::whereHas('restaurants', function($q) use ($chatId) {
+            $q->where('chat_id', $chatId);
+        })->exists();
     }
 }

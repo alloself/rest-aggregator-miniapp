@@ -42,7 +42,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'middle_name',
         'email',
         'password',
-        'chat_id',
         'phone',
         'username',
         'avatar_url',
