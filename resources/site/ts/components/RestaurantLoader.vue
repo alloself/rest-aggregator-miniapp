@@ -103,7 +103,6 @@ const props = withDefaults(defineProps<Props>(), {
     position: relative;
     z-index: 2;
     text-align: center;
-    max-width: 440px;
     width: 100%;
     padding: 0 16px;
     

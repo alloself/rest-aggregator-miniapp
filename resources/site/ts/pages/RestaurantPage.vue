@@ -1,6 +1,6 @@
 <template>
   <div class="restaurant-page">
-    <RestaurantPageContent :slug="route.params.slug as string" />
+    <RestaurantPageContent :slug="route.params.slug.toString()" />
   </div>
 </template>
 
@@ -17,7 +17,7 @@ const route = useRoute();
    ============================================================================= */
 
 .restaurant-page {
-  max-width: 440px;
+  width: 100%;
   margin: 0 auto;
   background-color: rgba(255, 254, 251, 0.97);
   min-height: 100vh;

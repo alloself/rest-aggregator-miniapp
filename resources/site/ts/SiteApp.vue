@@ -19,7 +19,7 @@
 /* Site App Component - PostCSS Nested */
 .site-app {
   min-height: 100vh;
-  max-width: 440px; /* Telegram Mini App width */
+  width: 100%;
   margin: 0 auto;
 }
 </style> 

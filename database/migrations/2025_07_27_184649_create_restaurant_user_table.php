@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('restaurant_user', function (Blueprint $table) {
             $table->id();
             $table->uuid('restaurant_id');
-            // Поле команды (team) для интеграции со Spatie Teams. Совпадает с restaurant_id
-            $table->uuid('team_id');
             $table->uuid('user_id');
             $table->string('chat_id')->nullable();
             $table->string('chat_type')->nullable(); // private, group, supergroup, channel
@@ -23,7 +21,6 @@ return new class extends Migration
 
             // Внешние ключи
             $table->foreign('restaurant_id')->references('id')->on('restaurants')->onDelete('cascade');
-            $table->foreign('team_id')->references('id')->on('restaurants')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             // Уникальная связь пользователь-ресторан
@@ -31,7 +28,6 @@ return new class extends Migration
 
             // Индексы для производительности
             $table->index('restaurant_id');
-            $table->index('team_id');
             $table->index('user_id');
         });
     }

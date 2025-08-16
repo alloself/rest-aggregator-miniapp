@@ -68,9 +68,9 @@ class Restaurant extends BaseModel
      */
     public function users(): BelongsToMany
     {
-        // Пивот содержит team_id для согласованности со Spatie Teams
+        // Пивот больше не хранит team_id; контекст команды = restaurant_id
         return $this->belongsToMany(User::class)
-            ->withPivot(['team_id', 'chat_id', 'chat_type'])
+            ->withPivot(['chat_id', 'chat_type'])
             ->withTimestamps();
     }
 
@@ -82,7 +82,6 @@ class Restaurant extends BaseModel
         // Добавляем пользователя к ресторану через many-to-many отношение
         if (!$this->users()->where('user_id', $user->id)->exists()) {
             $this->users()->attach($user->id, [
-                'team_id' => $this->id,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
