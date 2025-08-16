@@ -19,8 +19,8 @@ class AccountPermissionMiddleware
         }
 
         // Доступ к /api/account/* только для владельца или менеджера текущего ресторана (team)
-        // Телеграм-пользователь (и любые прочие роли без owner/manager) — запрещены
-        if (! $request->user()->hasAnyRole(['restaurant_owner', 'restaurant_manager'])) {
+        // root всегда разрешён (суперпользователь)
+        if (! $request->user()->hasAnyRole(['restaurant_owner', 'restaurant_manager', 'root'])) {
             abort(403, 'Forbidden');
         }
 

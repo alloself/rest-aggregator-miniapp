@@ -223,7 +223,6 @@ export interface User {
   last_name?: string | null
   middle_name?: string | null
   email?: string | null
-  chat_id?: string | null
   phone?: string | null
   username?: string | null
   avatar_url?: string | null

@@ -5,12 +5,12 @@
       :class="{ 'collapsible-text__content--expanded': isExpanded }"
       ref="contentRef"
     >
-      <p class="collapsible-text__text">
+      <div class="collapsible-text__text">
         <span 
           v-if="!isExpanded && shouldShowToggle"
           class="collapsible-text__text-truncated"
         >
-          {{ truncatedText }}... 
+          <span v-html="truncatedHtml"></span>... 
           <button 
             @click="expand"
             class="collapsible-text__toggle-inline"
@@ -18,10 +18,8 @@
             {{ expandButtonText }}
           </button>
         </span>
-        <span v-else>
-          {{ fullText }}
-        </span>
-      </p>
+        <span v-else v-html="sanitizedHtml"></span>
+      </div>
       
       <!-- Кнопка свернуть отдельно снизу по центру -->
       <div 
@@ -41,6 +39,7 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue'
+import DOMPurify from 'dompurify'
 
 interface Props {
   text: string
@@ -66,17 +65,23 @@ const shouldShowToggle = computed(() => {
   return props.text.length > props.characterLimit
 })
 
-const truncatedText = computed(() => {
-  if (props.text.length <= props.characterLimit) {
-    return props.text
-  }
-  // Обрезаем до лимита символов и ищем последний пробел, чтобы не обрезать слово
-  const truncated = props.text.substring(0, props.characterLimit)
+// Санация HTML через dompurify с белым списком тегов
+const sanitizedHtml = computed(() => {
+  const allowedTags = ['b','strong','i','em','u','s','p','br','ul','ol','li','h1','h2','h3','h4','h5','h6','span']
+  return DOMPurify.sanitize(props.text, {
+    ALLOWED_TAGS: allowedTags,
+    ALLOWED_ATTR: [],
+    USE_PROFILES: { html: true }
+  }) as string
+})
+
+const truncatedHtml = computed(() => {
+  const text = sanitizedHtml.value
+  if (text.length <= props.characterLimit) return text
+  const truncated = text.substring(0, props.characterLimit)
   const lastSpace = truncated.lastIndexOf(' ')
   return lastSpace > props.characterLimit * 0.8 ? truncated.substring(0, lastSpace) : truncated
 })
-
-const fullText = computed(() => props.text)
 
 // Methods
 const expand = async () => {

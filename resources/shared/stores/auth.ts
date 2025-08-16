@@ -22,7 +22,7 @@ export const useAuthStore = defineStore("auth", () => {
 
     async function fetchUser(): Promise<void> {
         try {
-            const response = await client.get<AuthUser>("/api/me");
+            const response = await client.get<AuthUser>("/api/account/me");
             user.value = response.data;
         } catch (error) {
             user.value = null;
