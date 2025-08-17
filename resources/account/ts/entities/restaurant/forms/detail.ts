@@ -1,4 +1,4 @@
-import type { ISmartFormField } from '@/shared/types';
+import type { ISmartFormField, News } from '@/shared/types';
 import { computed } from 'vue';
 import BaseInput from '@/shared/components/BaseInput.vue';
 import BaseWorkingHoursEditor from '@/shared/components/BaseWorkingHoursEditor.vue';
@@ -165,7 +165,14 @@ export const useRestaurantDetailFormFields = (props: { id?: string }) => {
             header: 'Порядок',
           },
         ],
-        detailComponent: NewsDetail,
+        detailComponent: {
+          component: NewsDetail,
+          props: {
+            onSave: (data: News) => {
+              console.log(data);
+            },
+          },
+        },
         initialValues: {
           restaurant_id: props.id,
         },
@@ -200,7 +207,14 @@ export const useRestaurantDetailFormFields = (props: { id?: string }) => {
             header: 'Порядок',
           },
         ],
-        detailComponent: EventsDetail,
+        detailComponent: {
+          component: EventsDetail,
+          props: {
+            onSave: (data: Event) => {
+              console.log(data);
+            },
+          },
+        },
         initialValues: {
           restaurant_id: props.id,
         },

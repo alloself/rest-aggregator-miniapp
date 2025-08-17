@@ -39,6 +39,7 @@ const {
   initialValues,
   entity,
   relations = [],
+  modal = false,
 } = defineProps<{
   fields: ISmartFormField[];
   title?: string;
@@ -48,9 +49,10 @@ const {
   initialValues?: Partial<T>;
   id?: string;
   relations?: string[];
+  modal?: boolean;
 }>();
 
-const emit = defineEmits<{ save: [value: FormContext<T>] }>();
+const emit = defineEmits<{ save: [value: FormContext<T>]; close: [] }>();
 
 const router = useRouter();
 
@@ -67,12 +69,16 @@ const onSave = async () => {
   });
 
   isLoading.value = false;
+  if (modal) {
+    emit('save', data);
+  } else {
   router.push({
     name: `${capitalize(entity)}Detail`,
     params: {
       id: data.id,
-    },
-  });
+      },
+    });
+  }
 };
 
 const onEdit = async () => {
@@ -83,6 +89,11 @@ const onEdit = async () => {
     },
   });
   form.value?.setValues(data);
+
+  if (modal) {
+    emit('save', data);
+  }
+
   isLoading.value = false;
 };
 
@@ -98,7 +109,11 @@ const getItem = async () => {
 };
 
 const onCancel = () => {
-  router.back();
+  if (modal) {
+    emit('close');
+  } else {
+    router.back();
+  }
 };
 
 onMounted(() => {

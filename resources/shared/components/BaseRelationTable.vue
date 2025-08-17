@@ -35,7 +35,10 @@ const { title, columns, entity, detailComponent, initialValues } = defineProps<{
   title: string;
   columns: IBaseColumn[];
   entity: string;
-  detailComponent: Component;
+  detailComponent: {
+    component: Component;
+    props: Record<string, unknown>;
+  };
   initialValues?: Record<string, unknown>;
 }>();
 
@@ -50,14 +53,16 @@ const items = defineModel<T[]>("modelValue", {
 const selectedItems = ref<T[]>([]);
 
 const toEdit = ({ data }: { data: T }) => {
-  pushComponent(detailComponent, {
+  pushComponent(detailComponent.component, {
     id: data.id,
     initialValues,
+    ...detailComponent.props,
   });
 };
 const toCreate = () => {
-  pushComponent(detailComponent, {
+  pushComponent(detailComponent.component, {
     initialValues,
+    ...detailComponent.props,
   });
 };
 </script>

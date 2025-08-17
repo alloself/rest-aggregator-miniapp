@@ -108,5 +108,3 @@ class AccountPermissionMiddleware
         return $map[$action] ?? null;
     }
 }
-
-
