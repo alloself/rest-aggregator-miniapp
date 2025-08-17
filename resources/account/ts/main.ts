@@ -16,15 +16,16 @@ async function initAccountApp() {
 
     await initClient();
 
-    const authStore = useAuthStore();
-
-    const { user } = storeToRefs(authStore);
-
-    await authStore.fetchUser();
-
     const currentPath = window.location.pathname;
     const loginUrl = router.resolve({ name: 'login' }).href;
     const isLoginPage = currentPath === loginUrl;
+
+    const authStore = useAuthStore();
+
+    const { user } = storeToRefs(authStore);
+    if (!isLoginPage) {
+      await authStore.fetchUser();
+    }
 
     if (!user.value && !isLoginPage) {
       window.location.href = loginUrl;
