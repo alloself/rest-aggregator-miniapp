@@ -14,6 +14,7 @@
         <div class="flex gap-4 mt-1">
           <div class="flex-1" />
           <Button label="Cancel" severity="secondary" outlined @click="onCancel" />
+          <Button v-if="id" label="Delete" severity="danger" outlined @click="remove" />
           <Button label="Save" @click="handleSubmit" />
         </div>
       </slot>
@@ -52,7 +53,7 @@ const {
   modal?: boolean;
 }>();
 
-const emit = defineEmits<{ save: [value: FormContext<T>]; close: [] }>();
+const emit = defineEmits<{ save: [value: T]; delete: [value: { id: string }]; close: [] }>();
 
 const router = useRouter();
 
@@ -121,4 +122,16 @@ onMounted(() => {
     getItem();
   }
 });
+
+/**
+ * Удалить сущность и эмитить событие для родителя (списка связей)
+ */
+const remove = async () => {
+  if (!id) return;
+  isLoading.value = true;
+  await client.delete(`${baseUrl}/${id}`);
+  isLoading.value = false;
+  emit('delete', { id });
+  onCancel();
+};
 </script>

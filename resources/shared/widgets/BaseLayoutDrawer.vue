@@ -18,6 +18,8 @@
         :is="currentComponent.component"
         v-bind="currentComponent.props"
         modal
+        @save="handleSave"
+        @delete="handleDelete"
         @close="closeComponent"
       />
     </keep-alive>
@@ -40,6 +42,36 @@ const currentComponent = computed(() => componentsStack.value[componentsStack.va
 
 const closeComponent = () => {
   componentsStack.value.pop();
+  if (componentsStack.value.length === 0) {
+    visible.value = false;
+  }
+};
+
+/**
+ * Проверить, является ли значение функцией-колбэком нужной сигнатуры
+ */
+const isCallback = (fn: unknown): fn is (payload: unknown) => void => typeof fn === 'function';
+
+/**
+ * Получить внешний колбэк save/delete, если он передан в props текущего компонента
+ */
+const getCallback = (name: 'onSave' | 'onDelete'): ((payload: unknown) => void) | null => {
+  const current = currentComponent.value;
+  if (!current || !current.props) return null;
+  const candidate = current.props[name];
+  return isCallback(candidate) ? candidate : null;
+};
+
+const handleSave = (payload: unknown) => {
+  const cb = getCallback('onSave');
+  if (cb) cb(payload);
+  closeComponent();
+};
+
+const handleDelete = (payload: unknown) => {
+  const cb = getCallback('onDelete');
+  if (cb) cb(payload);
+  closeComponent();
 };
 </script>
 
