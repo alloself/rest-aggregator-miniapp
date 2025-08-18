@@ -114,7 +114,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, type PropType } from 'vue';
+import { computed } from 'vue';
 import { Restaurant } from '@/shared';
 
 // Shared UI components
@@ -140,13 +140,11 @@ interface ContactInfo {
 
 interface Props {
   restaurant: Restaurant | null;
-  heroImages?: Array<{ url: string; alt: string }>;
   chefRecommendations?: ChefRecommendation[];
   contactInfo?: ContactInfo;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  heroImages: () => [],
   chefRecommendations: () => [],
   contactInfo: () => ({}),
 });

@@ -11,7 +11,6 @@
     <div v-else-if="restaurant" class="restaurant-page-content__wrapper">
       <RestaurantCard
         :restaurant="restaurant"
-        :hero-images="heroImages"
         :chef-recommendations="chefRecommendations"
         :contact-info="contactInfo"
         @show-menu="handleShowMenu"
@@ -38,19 +37,6 @@ const { slug } = defineProps<Props>();
 
 const store = useRestaurantStore();
 const { restaurant, loading, error } = storeToRefs(store);
-
-// Мок данные для примера (можно будет заменить реальными данными)
-const heroImages = computed(() => [
-  {
-    url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=400&fit=crop',
-    alt: 'Интерьер ресторана',
-  },
-  { url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=400&fit=crop', alt: 'Блюда ресторана' },
-  {
-    url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=400&fit=crop',
-    alt: 'Атмосфера ресторана',
-  },
-]);
 
 const chefRecommendations = reactive([
   {

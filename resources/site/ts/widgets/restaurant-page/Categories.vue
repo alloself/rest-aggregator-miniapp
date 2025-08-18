@@ -24,7 +24,7 @@ const { slug } = defineProps<{ slug: string }>();
 const categories = [
   { id: ECategory.News, label: 'Новости' },
   { id: ECategory.Events, label: 'События' },
-  { id: ECategory.Offers, label: 'Предложения' },
+  // { id: ECategory.Offers, label: 'Предложения' },
 ];
 
 const activeCategory = ref(categories[0].id);
