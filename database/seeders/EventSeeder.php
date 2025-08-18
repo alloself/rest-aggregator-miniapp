@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Event;
+use App\Models\File;
 use App\Models\Restaurant;
 use Illuminate\Database\Seeder;
 
@@ -86,7 +87,7 @@ class EventSeeder extends Seeder
         ];
 
         foreach ($eventsData as $event) {
-            Event::create([
+            $eventEntity = Event::create([
                 'title' => $event['title'],
                 'slug' => $event['slug'],
                 'subtitle' => $event['subtitle'],
@@ -97,6 +98,26 @@ class EventSeeder extends Seeder
                 'order' => $event['order'],
                 'restaurant_id' => $grettoRestaurant->id,
             ]);
+
+            // Прикрепляем 1-2 случайных изображения к событию (по аналогии с новостями)
+            $files = File::inRandomOrder()->take(random_int(1, 2))->get();
+
+            if ($files->isNotEmpty()) {
+                $order = 1;
+                $images = [];
+                foreach ($files as $file) {
+                    $images[] = [
+                        'id' => $file->id,
+                        'pivot' => [
+                            'key' => 'image',
+                            'order' => $order,
+                        ],
+                    ];
+                    $order++;
+                }
+
+                $eventEntity->syncImages($images);
+            }
         }
 
         $this->command->info('Создано ' . count($eventsData) . ' событий для ресторана Gretto.');
