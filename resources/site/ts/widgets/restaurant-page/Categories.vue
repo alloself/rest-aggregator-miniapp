@@ -8,10 +8,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import CategoryFilter from '@site/ts/features/category-filter/CategoryFilter.vue';
-import News from '@site/ts/features/news/News.vue';
-import Events from '@site/ts/features/events/Events.vue';
-import Offers from '@site/ts/features/offers/Offers.vue';
+import CategoryFilter from '../../features/category-filter/CategoryFilter.vue';
+import News from '../../features/restaurant-news/News.vue';
+import Events from '../../features/restaurant-events/Events.vue';
+import Offers from '../../features/restaurant-offers/Offers.vue';
 
 enum ECategory {
   News = 'news',

@@ -3,9 +3,9 @@ import { createPinia } from 'pinia';
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 
-import SiteApp from './SiteApp.vue';
+import SiteApp from './App.vue';
 import router from './router';
-import { initClient } from './shared/api/axios';
+import { initClient } from '../shared/api/axios';
 
 async function initSiteApp() {
   try {

@@ -11,7 +11,7 @@
 import { computed } from 'vue';
 import Button from 'primevue/button';
 import type { ButtonProps } from 'primevue';
-import { designTokens } from '../../../tokens';
+import { designTokens } from '../../config/tokens';
 
 interface AppButtonProps extends /* @vue-ignore */ ButtonProps {
   variant?: 'primary' | 'secondary' | 'help';

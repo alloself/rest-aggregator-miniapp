@@ -11,11 +11,11 @@
 </template>
 
 <script setup lang="ts">
-import { useNewsStore } from '@site/ts/stores/news';
+import { useNewsStore } from '../../entities/news';
 import { storeToRefs } from 'pinia';
 import { onBeforeMount } from 'vue';
 import NewsCard from './NewsCard.vue';
-import InfiniteScroll from '@site/ts/components/InfiniteScroll.vue';
+import InfiniteScroll from '../../shared/ui/InfiniteScroll.vue';
 
 const { slug } = defineProps<{ slug: string }>();
 

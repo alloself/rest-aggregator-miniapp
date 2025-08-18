@@ -118,14 +118,13 @@ import { computed } from 'vue';
 import { Restaurant } from '@/shared';
 
 // Shared UI components
-import { RestaurantHeroCarousel } from '@shared/ui';
-import { AppButton, AppImage, WorkingHours } from '@site/ts/shared/ui';
-import { Icon } from '@shared/ui';
+import { RestaurantHeroCarousel, Icon } from '@/shared';
+import { AppButton, AppImage, WorkingHours } from '../../shared/ui';
 
 // Local components
-import ContactDropdown from '@site/ts/components/ContactDropdown.vue';
-import CollapsibleText from '@site/ts/components/CollapsibleText.vue';
-import Categories from '@site/ts/widgets/restaurant-page/Categories.vue';
+import ContactDropdown from '../../shared/ui/ContactDropdown.vue';
+import CollapsibleText from '../../shared/ui/CollapsibleText.vue';
+import Categories from './Categories.vue';
 
 interface ChefRecommendation {
   id: string;

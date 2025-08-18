@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 
-import { AppButton } from '../shared/ui';
+import { AppButton } from './index';
 import { Icon } from '@/shared';
 
 // Props

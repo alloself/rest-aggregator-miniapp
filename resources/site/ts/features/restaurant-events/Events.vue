@@ -11,11 +11,11 @@
 </template>
 
 <script setup lang="ts">
-import { useEventsStore } from '@site/ts/stores/events';
+import { useEventsStore } from '../../entities/event';
 import { storeToRefs } from 'pinia';
 import { onBeforeMount } from 'vue';
 import EventCard from './EventCard.vue';
-import InfiniteScroll from '@site/ts/components/InfiniteScroll.vue';
+import InfiniteScroll from '../../shared/ui/InfiniteScroll.vue';
 
 const { slug } = defineProps<{ slug: string }>();
 

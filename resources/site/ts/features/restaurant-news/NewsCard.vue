@@ -31,8 +31,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import CollapsibleText from '@site/ts/components/CollapsibleText.vue';
-import { RestaurantHeroCarousel } from '@/shared/ui';
+import CollapsibleText from '../../shared/ui/CollapsibleText.vue';
+import { RestaurantHeroCarousel } from '@/shared';
 import type { News } from '@/shared';
 
 interface Props {
