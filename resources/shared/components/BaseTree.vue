@@ -1,7 +1,14 @@
 <template>
   <div>
     <h3>{{ title }}</h3>
-    <TreeTable :value="treeNodes" size="small">
+    <TreeTable
+      :value="treeNodes"
+      size="small"
+      selectionMode="single"
+      v-model:selectionKeys="selectedKeys"
+      :metaKeySelection="false"
+      @nodeSelect="onNodeSelect"
+    >
       <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" />
       <template #footer>
         <div class="flex">
@@ -14,7 +21,7 @@
 </template>
 
 <script setup lang="ts" generic="T extends IBaseEntity & IBaseTreeEntity<T>">
-import { Component, computed } from 'vue';
+import { Component, computed, ref } from 'vue';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import type { TreeNode } from 'primevue/treenode';
@@ -48,6 +55,8 @@ const items = defineModel<T[]>('modelValue', {
 const treeNodes = computed<TreeNode[]>(() => {
   return items.value.map((item) => transformToTreeNode(item));
 });
+
+const selectedKeys = ref<Record<string, boolean>>({});
 
 function transformToTreeNode(item: T): TreeNode {
   return {
@@ -94,5 +103,34 @@ const toCreate = () => {
     onSave: handleSaved,
     onDelete: handleDeleted,
   });
+};
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isTreeNodeValue(value: unknown): value is TreeNode {
+  return isObject(value) && 'data' in value;
+}
+
+const onNodeSelect = (payload: unknown) => {
+  let selectedData: T | null = null;
+
+  if (isTreeNodeValue(payload)) {
+    selectedData = payload.data as T;
+  } else if (isObject(payload)) {
+    if ('node' in payload) {
+      const nodeCandidate = (payload as Record<string, unknown>).node;
+      if (isTreeNodeValue(nodeCandidate)) {
+        selectedData = nodeCandidate.data as T;
+      }
+    } else if ('data' in payload) {
+      selectedData = (payload as Record<string, unknown>).data as T;
+    }
+  }
+
+  if (selectedData) {
+    toEdit({ data: selectedData });
+  }
 };
 </script>
