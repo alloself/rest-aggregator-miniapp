@@ -124,17 +124,6 @@ class PublishNewsToTelegramJob implements ShouldQueue
     {
         $chatIds = collect();
 
-        // Владелец: берём chat_id из pivot restaurant_user
-        // Владелец: фиксируем chat_id из pivot restaurant_user, если владелец тоже привязан как пользователь
-        $owner = $restaurant->user()->first();
-        if ($owner) {
-            $ownerPivot = $restaurant->users()->where('users.id', $owner->id)->first();
-            if ($ownerPivot && !empty($ownerPivot->pivot?->chat_id)) {
-                $chatIds->push($ownerPivot->pivot->chat_id);
-            }
-        }
-
-        // Пользователи M2M: chat_id из pivot
         $users = $restaurant->users()->get();
         foreach ($users as $user) {
             $pivotChatId = $user->pivot?->chat_id;

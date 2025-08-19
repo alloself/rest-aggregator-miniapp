@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Services\TelegramBotService;
+use App\Models\User;
 
 class Restaurant extends BaseModel
 {
@@ -27,7 +28,6 @@ class Restaurant extends BaseModel
         'average_receipt',
         'phone',
         'telegram_bot_token',
-        'user_id',
         'subtitle',
         'welcome_message'
     ];
@@ -58,9 +58,22 @@ class Restaurant extends BaseModel
         return $this->hasMany(Event::class);
     }
 
-    public function user(): BelongsTo
+    /**
+     * Получить владельца ресторана на основе роли restaurant_owner в контексте текущего ресторана (teams).
+     */
+    public function getOwner(): ?User
     {
-        return $this->belongsTo(User::class);
+        $currentTeam = getPermissionsTeamId();
+        setPermissionsTeamId($this->getKey());
+        /** @var User|null $owner */
+        $owner = User::role('restaurant_owner')->first();
+        setPermissionsTeamId($currentTeam);
+        return $owner;
+    }
+
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
     }
 
     /**
@@ -68,7 +81,6 @@ class Restaurant extends BaseModel
      */
     public function users(): BelongsToMany
     {
-        // Пивот больше не хранит team_id; контекст команды = restaurant_id
         return $this->belongsToMany(User::class)
             ->withPivot(['chat_id', 'chat_type'])
             ->withTimestamps();
@@ -87,7 +99,6 @@ class Restaurant extends BaseModel
             ]);
         }
 
-        // Если указана роль, назначаем её пользователю в контексте этого ресторана
         if ($role) {
             $user->assignRestaurantRole($this->id, $role);
         }

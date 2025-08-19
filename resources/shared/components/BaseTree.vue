@@ -6,7 +6,7 @@
       <template #footer>
         <div class="flex">
           <div class="flex-1" />
-          <Button type="button" icon="pi pi-plus" text @click="onCreate" />
+          <Button type="button" icon="pi pi-plus" text @click="toCreate" />
         </div>
       </template>
     </TreeTable>
@@ -14,18 +14,34 @@
 </template>
 
 <script setup lang="ts" generic="T extends IBaseEntity & IBaseTreeEntity<T>">
-import { computed } from "vue";
-import TreeTable from "primevue/treetable";
-import Column from "primevue/column";
-import type { TreeNode } from "primevue/treenode";
-import type { IBaseEntity, IBaseTreeEntity, IBaseColumn } from "../types";
+import { Component, computed } from 'vue';
+import TreeTable from 'primevue/treetable';
+import Column from 'primevue/column';
+import type { TreeNode } from 'primevue/treenode';
+import type { IBaseEntity, IBaseTreeEntity, IBaseColumn } from '../types';
+import { useRightDrawerStore } from '@/account/ts/features/rightDrawer/store';
 
-const { columns = [], title = "" } = defineProps<{
+const {
+  columns = [],
+  title = '',
+  detailComponent,
+  initialValues,
+} = defineProps<{
   columns?: IBaseColumn[];
   title?: string;
+  detailComponent: {
+    component: Component;
+    props: Record<string, unknown> & {
+      onSave?: (payload: IBaseEntity) => void;
+      onDelete?: (payload: { id: string }) => void;
+    };
+  };
+  initialValues?: Record<string, unknown>;
 }>();
 
-const items = defineModel<T[]>("items", {
+const { pushComponent } = useRightDrawerStore();
+
+const items = defineModel<T[]>('modelValue', {
   default: () => [],
 });
 
@@ -42,5 +58,41 @@ function transformToTreeNode(item: T): TreeNode {
   };
 }
 
-const onCreate = (): void => {};
+const handleSaved = (saved: T) => {
+  const index = items.value.findIndex((i) => i.id === saved.id);
+  if (index >= 0) {
+    const next = [...items.value];
+    next.splice(index, 1, saved);
+    items.value = next;
+  } else {
+    items.value = [...items.value, saved];
+  }
+  const external = detailComponent.props && detailComponent.props.onSave;
+  if (external) external(saved);
+};
+
+const handleDeleted = (payload: { id: string }) => {
+  const next = items.value.filter((i) => i.id !== payload.id);
+  items.value = next;
+  const external = detailComponent.props && detailComponent.props.onDelete;
+  if (external) external(payload);
+};
+
+const toEdit = ({ data }: { data: T }) => {
+  pushComponent(detailComponent.component, {
+    id: data.id,
+    initialValues,
+    ...detailComponent.props,
+    onSave: handleSaved,
+    onDelete: handleDeleted,
+  });
+};
+const toCreate = () => {
+  pushComponent(detailComponent.component, {
+    initialValues,
+    ...detailComponent.props,
+    onSave: handleSaved,
+    onDelete: handleDeleted,
+  });
+};
 </script>

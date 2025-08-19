@@ -24,7 +24,6 @@ class RestaurantResource extends JsonResource
             'address' => $this->address,
             'average_receipt' => $this->average_receipt,
             'yandex_metrica_code' => $this->yandex_metrica_code,
-            'user' => new UserResource($this->whenLoaded('user')),
             'files' => FileResource::collection($this->whenLoaded('files')),
             'images' => FileResource::collection($this->whenLoaded('images')),
             'news' => NewsResource::collection($this->whenLoaded('news')),

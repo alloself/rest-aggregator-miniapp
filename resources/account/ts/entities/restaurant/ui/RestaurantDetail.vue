@@ -36,10 +36,9 @@ const { user } = storeToRefs(authStore);
 
 const initialValues = computed<Partial<T>>(() => {
   return {
-    user_id: user.value?.id,
     working_hours: {},
   } as Partial<T>;
 });
 
-const relations = ["files", "images", "news", "events"];
+const relations = ["files", "images", "news", "events", "categories"];
 </script>

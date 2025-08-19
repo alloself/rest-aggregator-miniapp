@@ -64,7 +64,6 @@ class RestaurantSeeder extends Seeder
                     'startTime' => '09:00'
                 ]
             ],
-            'user_id' => $rootUser->id,
         ]);
 
         // Добавляем root пользователя как владельца ресторана

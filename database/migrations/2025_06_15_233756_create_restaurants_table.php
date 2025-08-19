@@ -24,8 +24,6 @@ return new class extends Migration
             $table->longText('welcome_message')->nullable();
             $table->json('working_hours')->nullable();
             $table->string('yandex_metrica_code')->nullable();
-            $table->uuid('user_id');
-            $table->foreign('user_id')->references('id')->on('users');
             $table->softDeletes();
             $table->timestamps();
         });

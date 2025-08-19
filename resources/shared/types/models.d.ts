@@ -171,27 +171,27 @@ export interface Restaurant {
   welcome_message?: string | null
   working_hours?: string[] | null
   yandex_metrica_code?: string | null
-  user_id: string
   deleted_at?: Date | null
   created_at?: Date | null
   updated_at?: Date | null
   // relations
   news?: News[]
   events?: Event[]
-  user?: User
+  categories?: Category[]
   users?: User[]
   images?: File[]
   files?: File[]
   // counts
   news_count: number
   events_count: number
+  categories_count: number
   users_count: number
   images_count: number
   files_count: number
   // exists
   news_exists: boolean
   events_exists: boolean
-  user_exists: boolean
+  categories_exists: boolean
   users_exists: boolean
   images_exists: boolean
   files_exists: boolean

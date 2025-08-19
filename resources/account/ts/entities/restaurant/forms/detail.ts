@@ -1,4 +1,4 @@
-import type { ISmartFormField, News } from '@/shared/types';
+import type { Category, ISmartFormField, News } from '@/shared/types';
 import { computed } from 'vue';
 import BaseInput from '@/shared/components/BaseInput.vue';
 import BaseWorkingHoursEditor from '@/shared/components/BaseWorkingHoursEditor.vue';
@@ -11,6 +11,7 @@ import BaseEditor from '@/shared/components/BaseEditor.vue';
 import BaseRelationTable from '@/shared/components/BaseRelationTable.vue';
 import { NewsDetail } from '../../news';
 import { EventsDetail } from '../../events';
+import { CategoryDetail } from '../../category';
 
 export const useRestaurantDetailFormFields = (props: { id?: string }) => {
   const fields = computed<ISmartFormField[]>(() => [
@@ -231,6 +232,17 @@ export const useRestaurantDetailFormFields = (props: { id?: string }) => {
             header: 'Название',
           },
         ],
+        detailComponent: {
+          component: CategoryDetail,
+          props: {
+            onSave: (data: Category) => {
+              console.log(data);
+            },
+          },
+        },
+        initialValues: {
+          restaurant_id: props.id,
+        },
       },
       key: 'categories',
     },
