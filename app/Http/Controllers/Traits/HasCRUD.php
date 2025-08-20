@@ -13,6 +13,11 @@ trait HasCRUD
     abstract public function model(): string;
 
     /**
+     * Абстрактный метод для получения класса ресурса
+     */
+    abstract public function resource(): string;
+
+    /**
      * Проверка доступности действия
      */
     public function hasAction(string $action): bool
@@ -50,7 +55,8 @@ trait HasCRUD
             ? $this->model()::getPaginateList($request->all(), $relations)
             : $this->model()::getList($request->all(), $relations);
 
-        return $data;
+        $resourceClass = $this->resource();
+        return $resourceClass::collection($data);
     }
 
     /**
@@ -66,7 +72,8 @@ trait HasCRUD
             $relations = $request->input('relations', []);
             $entity = $this->model()::createEntity($request->all(), $relations);
 
-            return $entity;
+            $resourceClass = $this->resource();
+            return new $resourceClass($entity);
         });
     }
 
@@ -90,7 +97,8 @@ trait HasCRUD
             $relations
         );
 
-        return $entity;
+        $resourceClass = $this->resource();
+        return new $resourceClass($entity);
     }
 
     /**
@@ -108,7 +116,8 @@ trait HasCRUD
             $relations = $request->input('relations', []);
 
             $entity->updateEntity($request->all(), $relations);
-            return $entity;
+            $resourceClass = $this->resource();
+            return new $resourceClass($entity);
         });
     }
 

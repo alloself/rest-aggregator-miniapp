@@ -4,6 +4,7 @@ namespace App\Providers;
 
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureModels();
+        JsonResource::withoutWrapping();
         Restaurant::observe(RestaurantObserver::class);
         News::observe(NewsObserver::class);
     }

@@ -24,7 +24,11 @@ async function initAccountApp() {
 
     const { user } = storeToRefs(authStore);
     if (!isLoginPage) {
-      await authStore.fetchUser();
+      try {
+        await authStore.fetchUser();
+      } catch (error) {
+        window.location.href = loginUrl;
+      }
     }
 
     if (!user.value && !isLoginPage) {
