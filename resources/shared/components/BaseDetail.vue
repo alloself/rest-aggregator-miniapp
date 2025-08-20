@@ -21,9 +21,9 @@
     </template>
   </Card>
 </template>
-<script setup lang="ts" generic="T extends IBaseEntity">
-import { FormContext } from 'vee-validate';
-import { IBaseEntity, ISmartFormField } from '../types';
+<script setup lang="ts" generic="T extends GenericObject">
+import { FormContext, GenericObject } from 'vee-validate';
+import { ISmartFormField } from '../types';
 import SmartForm from './SmartForm.vue';
 import { AxiosInstance } from 'axios';
 import { useFormSubmit } from '../composables';

@@ -9,7 +9,6 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Services\TelegramBotService;
 use App\Models\User;
@@ -35,7 +34,7 @@ class Restaurant extends BaseModel
 
     protected $casts = [
         'order' => 'integer',
-        'working_hours' => 'array',
+        'working_hours' => 'object',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
