@@ -28,6 +28,7 @@ class RestaurantResource extends JsonResource
             'images' => FileResource::collection($this->whenLoaded('images')),
             'news' => NewsResource::collection($this->whenLoaded('news')),
             'events' => EventResource::collection($this->whenLoaded('events')),
+            'categories' => CategoryResource::collection($this->whenLoaded('categories')),
         ];
     }
 }

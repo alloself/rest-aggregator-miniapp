@@ -13,38 +13,6 @@ trait HasCRUD
     abstract public function model(): string;
 
     /**
-     * Проверка доступности действия
-     */
-    public function hasAction(string $action): bool
-    {
-        return in_array($action, $this->actions ?? []);
-    }
-
-    /**
-     * Получение списка доступных действий
-     */
-    public function getActions(): array
-    {
-        return $this->actions ?? [];
-    }
-
-    /**
-     * Проверка и выполнение действия если оно доступно
-     */
-    public function executeActionIfAllowed(string $action, ...$parameters)
-    {
-        if (!$this->hasAction($action)) {
-            return response()->json(['message' => "Method {$action} is not allowed for this controller"], 405);
-        }
-
-        if (!method_exists($this, $action)) {
-            return response()->json(['message' => "Method {$action} is not implemented"], 500);
-        }
-
-        return $this->{$action}(...$parameters);
-    }
-
-    /**
      * Получение списка сущностей
      */
     public function index(Request $request)

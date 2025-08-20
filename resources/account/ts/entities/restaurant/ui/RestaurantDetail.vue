@@ -19,8 +19,6 @@ import { FormContext } from "vee-validate";
 import { computed, ref } from "vue";
 import BaseDetail from "../../../../../shared/components/BaseDetail.vue";
 import { Restaurant, IBaseEntity } from "../../../../../shared/types";
-import { useAuthStore } from "@/shared";
-import { storeToRefs } from "pinia";
 
 const { id } = defineProps<{
   id?: string;
@@ -30,15 +28,11 @@ const { fields } = useRestaurantDetailFormFields({id});
 
 const form = ref<FormContext<T>>();
 
-const authStore = useAuthStore();
-
-const { user } = storeToRefs(authStore);
-
 const initialValues = computed<Partial<T>>(() => {
   return {
     working_hours: {},
   } as Partial<T>;
 });
 
-const relations = ["files", "images", "news", "events", "categories"];
+const relations = ["files", "images", "news", "events", "categories.descendants"];
 </script>
