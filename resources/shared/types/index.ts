@@ -48,15 +48,6 @@ export interface ISmartFormField {
     readonly?: boolean;
 }
 
-export interface ISmartFormProps {
-    fields: ISmartFormField[];
-    form: FormContext | undefined | null;
-    initialValues?: Record<string, unknown>;
-    loading?: boolean;
-    readonly?: boolean;
-    initialItems?: Record<string, unknown>;
-}
-
 export type { AuthUser, LoginRequest, LoginResponse, AuthState } from "./auth";
 
 export function isApiError(obj: any): obj is ApiError {
