@@ -6,6 +6,7 @@
     :fields="fields"
     v-model:form="form"
     v-bind="$attrs"
+    :relations="['children']"
     :id="id"
   />
 </template>
@@ -23,7 +24,7 @@ const { id } = defineProps<{
   id?: string;
 }>();
 
-const { fields } = useCategoryDetailFormFields();
+const { fields } = useCategoryDetailFormFields({ id });
 
 const form = ref<FormContext<T>>();
 </script>

@@ -2,8 +2,11 @@ import type { ISmartFormField } from "@/shared/types";
 import { computed } from "vue";
 import InputText from "primevue/inputtext";
 import { z } from "zod";
+import BaseTree from "@/shared/components/BaseTree.vue";
+import CategoryDetail from "../ui/CategoryDetail.vue";
+import { Category } from "@/shared/types";
 
-export const useCategoryDetailFormFields = () => {
+export const useCategoryDetailFormFields = (props: { id?: string }) => {
     const fields = computed<ISmartFormField[]>(() => [
         {
             component: InputText,
@@ -21,6 +24,30 @@ export const useCategoryDetailFormFields = () => {
                 })
                 .min(1, "Название обязательно"),
         },
+        {
+            component: BaseTree,
+            props: {
+              title: 'Категории',
+              columns: [
+                {
+                  field: 'name',
+                  header: 'Название',
+                },
+              ],
+              detailComponent: {
+                component: CategoryDetail,
+                props: {
+                  onSave: (data: Category) => {
+                    console.log(data);
+                  },
+                },
+              },
+              initialValues: {
+                parent_id: props.id,
+              },
+            },
+            key: 'children',
+          },
     ]);
 
     return {
