@@ -26,7 +26,7 @@ const { id } = defineProps<{
 
 const { fields } = useRestaurantDetailFormFields({ id });
 
-const form = ref<FormContext<Restaurant>>();
+const form = ref<FormContext<Restaurant, Restaurant>>();
 
 const initialValues = {
   working_hours: {},

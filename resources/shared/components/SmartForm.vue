@@ -35,31 +35,32 @@
   </form>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="T extends GenericObject">
 import { computed, watch, Transition } from 'vue';
-import { useForm, Field, type FormContext } from 'vee-validate';
+import { useForm, Field, type FormContext, GenericObject } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { z } from 'zod';
+import { z, ZodSchema } from 'zod';
 import Message from 'primevue/message';
 import type { ISmartFormField } from '@/shared/types';
+// TODO: https://github.com/logaretm/vee-validate/issues/4870
+import { type PartialDeep } from 'type-fest';
 
 const {
   fields = [],
-  initialValues = {},
+  initialValues = {} as Partial<T>,
   initialItems = {},
 } = defineProps<{
   fields: ISmartFormField[];
-  form: FormContext | undefined | null;
-  initialValues?: Record<string, unknown>;
+  initialValues?: Partial<T>;
   loading?: boolean;
   readonly?: boolean;
-  initialItems?: Record<string, unknown>;
+  initialItems?: Record<string, T[]>;
 }>();
 
-const form = defineModel<FormContext>('form');
+const form = defineModel<FormContext<T, T>>('form');
 
 const validationSchema = computed(() => {
-  const schemaFields: Record<string, any> = {};
+  const schemaFields: Record<string, ZodSchema> = {};
 
   fields.forEach((field) => {
     if (field.rule) {
@@ -74,12 +75,13 @@ const validationSchema = computed(() => {
   return toTypedSchema(z.object(schemaFields));
 });
 
-const formContext = useForm({
+const formContext = useForm<T, T>({
   validationSchema,
-  initialValues,
+  initialValues: initialValues as PartialDeep<T>,
   keepValuesOnUnmount: true,
   validateOnMount: false,
 });
+
 form.value = formContext;
 
 const getInitialItems = (field: ISmartFormField) => {
@@ -102,15 +104,25 @@ const normalizedFields = computed(() => {
   });
 });
 
-const getFieldErrors = (field: ISmartFormField) => {
-  return formContext.errors.value[field.key] || '';
+const stringErrors = computed<Record<string, string | undefined>>(() => {
+  const result: Record<string, string | undefined> = {};
+  for (const [key, value] of Object.entries(formContext.errors.value)) {
+    if (typeof value === 'string' || typeof value === 'undefined') {
+      result[key] = value;
+    }
+  }
+  return result;
+});
+
+const getFieldErrors = (field: ISmartFormField): string => {
+  return stringErrors.value[field.key] ?? '';
 };
 
 watch(
   () => initialValues,
   (newValues) => {
     if (newValues && Object.keys(newValues).length) {
-      formContext.setValues(newValues);
+      formContext.setValues(newValues as PartialDeep<T>);
     }
   },
   { deep: true },

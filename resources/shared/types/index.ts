@@ -2,6 +2,7 @@ import { Component } from "vue";
 import type { ApiError, PaginatedResponse } from "./api";
 import type { User } from "./models";
 import { FormContext } from "vee-validate";
+import { ZodSchema } from "zod";
 export type * from "./models";
 
 export type {
@@ -44,7 +45,7 @@ export interface ISmartFormField {
     key: string;
     props?: Record<string, unknown>;
     events?: Record<string, Function>;
-    rule?: unknown;
+    rule?: ZodSchema;
     readonly?: boolean;
 }
 
