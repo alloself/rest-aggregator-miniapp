@@ -13,6 +13,23 @@ trait HasCRUD
     abstract public function model(): string;
 
     /**
+     * Проверка доступности действия
+     */
+    public function hasAction(string $action): bool
+    {
+        return in_array($action, $this->actions ?? []);
+    }
+
+    /**
+     * Получение списка доступных действий
+     */
+    public function getActions(): array
+    {
+        return $this->actions ?? [];
+    }
+
+
+    /**
      * Получение списка сущностей
      */
     public function index(Request $request)
@@ -48,7 +65,7 @@ trait HasCRUD
         return DB::transaction(function () use ($request) {
             $relations = $request->input('relations', []);
             $entity = $this->model()::createEntity($request->all(), $relations);
-            
+
             return $entity;
         });
     }
