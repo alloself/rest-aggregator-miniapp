@@ -33,6 +33,7 @@ export interface IBaseColumn {
 
 export interface IBaseTreeEntity<T extends IBaseEntity> {
     children?: T[];
+    parent_id?: string | null;
 }
 
 export interface IItems<T extends IBaseEntity> {

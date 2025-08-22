@@ -14,11 +14,20 @@ class CategoryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $childrenCollection = collect();
+
+        if ($this->relationLoaded('children')) {
+            $childrenCollection = $this->children;
+        } elseif ($this->relationLoaded('descendants')) {
+            $childrenCollection = $this->descendants->toTree();
+        }
+
         return [
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
             'order' => $this->order,
+            'children' => CategoryResource::collection($childrenCollection),
         ];
     }
 }
