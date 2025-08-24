@@ -93,6 +93,7 @@ const formatPrice = (price: number): string => {
   gap: 18px;
   padding: 0;
   position: relative;
+  min-height: 180px;
 }
 
 .event-card__image-container {
@@ -241,30 +242,5 @@ const formatPrice = (price: number): string => {
   font-weight: 400;
   line-height: 1;
   letter-spacing: -2%;
-}
-
-@media (max-width: 480px) {
-  .event-card {
-    padding: 12px;
-    gap: 12px;
-  }
-
-  .event-card__image-container {
-    width: 100px;
-    height: 100px;
-  }
-
-  .event-card__date-tag {
-    top: 12px;
-    right: 12px;
-  }
-
-  .event-card__title {
-    font-size: var(--font-size-body-md);
-  }
-
-  .event-card__description {
-    font-size: var(--font-size-body-sm);
-  }
 }
 </style>

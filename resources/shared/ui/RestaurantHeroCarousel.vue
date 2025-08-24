@@ -137,7 +137,7 @@ defineExpose({
 .restaurant-hero-carousel {
   position: relative;
   width: 100%;
-  border-radius: v-bind(borderRadius);
+  border-radius: 0 0 40px 40px;
   overflow: hidden;
   background-color: #f4f3f3;
 

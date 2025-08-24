@@ -13,6 +13,12 @@ const routes = [
     component: () => import('../../pages/RestaurantPage.vue'),
     props: true,
   },
+  {
+    path: '/restaurant/:slug/event/:eventId',
+    name: 'event',
+    component: () => import('../../pages/EventPage.vue'),
+    props: true,
+  },
 ];
 
 const router = createRouter({

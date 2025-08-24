@@ -1,3 +1,3 @@
 // Event Entity - FSD Architecture
-export { useEventsStore } from './model';
+export { useEventsStore, useEventStore } from './model';
 export type * from './model';

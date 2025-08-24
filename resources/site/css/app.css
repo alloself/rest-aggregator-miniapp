@@ -103,6 +103,8 @@
     --padding-card: 20px;
     --padding-section: 15px;
     --padding-small: 5px;
+    --padding-card-body-y: 18px;
+    --padding-card-body-x: 12px;
 
     /* Размеры элементов */
     --size-icon-small: 13px;
@@ -290,6 +292,11 @@
 :where(.p-button).p-disabled,
 .p-disabled :where(.p-button) {
     opacity: var(--opacity-disabled);
+}
+
+/* Card */
+.p-card .p-card-body {
+    padding: var(--padding-card-body-y) var(--padding-card-body-x);
 }
 
 html,

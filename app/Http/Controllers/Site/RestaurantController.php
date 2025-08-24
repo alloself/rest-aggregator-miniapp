@@ -58,6 +58,30 @@ class RestaurantController extends Controller
         ]);
     }
 
+    public function event(string $slug, string $eventId)
+    {
+        try {
+            $restaurant = Restaurant::where('slug', $slug)->firstOrFail();
+            
+            $event = $restaurant->events()
+                ->with(['images', 'files'])
+                ->where('id', $eventId)
+                ->firstOrFail();
+
+            return new EventResource($event);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Событие не найдено',
+                'error' => 'Event not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Произошла ошибка при загрузке события',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * Получить связанные элементы ресторана (новости, события и т.д.)
      */
