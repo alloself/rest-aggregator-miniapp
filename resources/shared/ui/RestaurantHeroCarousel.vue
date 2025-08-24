@@ -13,7 +13,7 @@
       </div>
 
       <!-- Pagination dots -->
-      <div class="swiper-pagination restaurant-hero-carousel__pagination"></div>
+      <div class="swiper-pagination restaurant-hero-carousel__pagination" v-if="showPagination"></div>
     </div>
   </div>
 </template>
@@ -63,50 +63,47 @@ const initSwiper = async () => {
 
   await nextTick();
 
-  // Small delay to ensure DOM is fully rendered
-  setTimeout(() => {
-    if (!swiperContainer.value) return;
+  if (!swiperContainer.value) return;
 
-    // Initialize Swiper instance with explicit configuration
-    swiperInstance = new Swiper(swiperContainer.value, {
-      modules: [Pagination, Autoplay],
-      slidesPerView: 1,
-      spaceBetween: 0,
-      loop: props.images.length > 1,
+  // Initialize Swiper instance with explicit configuration
+  swiperInstance = new Swiper(swiperContainer.value, {
+    modules: [Pagination, Autoplay],
+    slidesPerView: 1,
+    spaceBetween: 0,
+    loop: props.images.length > 1,
 
-      // Pagination configuration
-      pagination: props.showPagination
-        ? {
-            el: '.restaurant-hero-carousel__pagination',
-            clickable: true,
-            bulletClass: 'restaurant-hero-carousel__bullet',
-            bulletActiveClass: 'restaurant-hero-carousel__bullet--active',
-            type: 'bullets' as const,
-            dynamicBullets: false,
-            renderBullet: (index: number, className: string) => {
-              return `<span class="${className}" data-index="${index}"></span>`;
-            },
-          }
-        : false,
+    // Pagination configuration
+    pagination: props.showPagination
+      ? {
+          el: '.restaurant-hero-carousel__pagination',
+          clickable: true,
+          bulletClass: 'restaurant-hero-carousel__bullet',
+          bulletActiveClass: 'restaurant-hero-carousel__bullet--active',
+          type: 'bullets' as const,
+          dynamicBullets: false,
+          renderBullet: (index: number, className: string) => {
+            return `<span class="${className}" data-index="${index}"></span>`;
+          },
+        }
+      : false,
 
-      // Autoplay
-      autoplay: props.autoplay
-        ? {
-            delay: props.autoplay,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true,
-          }
-        : false,
+    // Autoplay
+    autoplay: props.autoplay
+      ? {
+          delay: props.autoplay,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true,
+        }
+      : false,
 
-      // Touch settings
-      touchRatio: 1,
-      touchAngle: 45,
-      grabCursor: true,
+    // Touch settings
+    touchRatio: 1,
+    touchAngle: 45,
+    grabCursor: true,
 
-      // Speed
-      speed: 300,
-    });
-  }, 100);
+    // Speed
+    speed: 300,
+  });
 };
 
 // Cleanup Swiper

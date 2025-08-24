@@ -6,6 +6,7 @@ import Aura from '@primeuix/themes/aura';
 import SiteApp from './App.vue';
 import router from './router';
 import { initClient } from '../shared/api/axios';
+import '@site/ts/shared/lib/dayjs';
 
 async function initSiteApp() {
   try {

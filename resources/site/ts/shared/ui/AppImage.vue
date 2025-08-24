@@ -105,6 +105,12 @@ const handleError = (event: Event) => {
     &--fill { object-fit: fill; }
     &--none { object-fit: none; }
     &--scale-down { object-fit: scale-down; }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   }
 }
 

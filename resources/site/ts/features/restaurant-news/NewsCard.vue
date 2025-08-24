@@ -4,7 +4,7 @@
       <RestaurantHeroCarousel
         :images="imageItems"
         :autoplay="4000"
-        :show-pagination="true"
+        :show-pagination="imageItems.length > 1"
         height="220px"
         border-radius="20px"
         pagination-bottom="24px"
@@ -34,6 +34,7 @@ import { computed } from 'vue';
 import CollapsibleText from '../../shared/ui/CollapsibleText.vue';
 import { RestaurantHeroCarousel } from '@/shared';
 import type { News } from '@/shared';
+import { dayjs } from '@site/ts/shared/lib/dayjs';
 
 interface Props {
   item: News;
@@ -57,9 +58,7 @@ const imageItems = computed(() => {
 
 const formattedDate = computed(() => {
   if (!createdAt.value) return '';
-
-  const date = new Date(createdAt.value);
-  return date.toLocaleDateString('ru-RU');
+  return dayjs(createdAt.value).format('DD.MM.YYYY');
 });
 </script>
 

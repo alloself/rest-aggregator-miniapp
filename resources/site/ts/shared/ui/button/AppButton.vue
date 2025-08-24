@@ -18,19 +18,15 @@ interface AppButtonProps extends /* @vue-ignore */ ButtonProps {
   fullWidth?: boolean;
 }
 
-const props = withDefaults(defineProps<AppButtonProps>(), {
-  variant: 'primary',
-  size: 'medium',
-  fullWidth: false,
-});
+const { variant = 'primary', size = 'medium', fullWidth = false } = defineProps<AppButtonProps>();
 
 const emit = defineEmits<{
   click: [event: Event];
 }>();
 
 const buttonClasses = computed(() => {
-  const sizeClass = `app-button--size-${props.size}`;
-  const widthClass = props.fullWidth ? 'app-button--full' : '';
+  const sizeClass = `app-button--size-${size}`;
+  const widthClass = fullWidth ? 'app-button--full' : '';
   return [sizeClass, widthClass].filter(Boolean).join(' ');
 });
 

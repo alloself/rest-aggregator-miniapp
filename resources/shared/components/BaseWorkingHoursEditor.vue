@@ -109,6 +109,7 @@
 import Panel from 'primevue/panel';
 import DatePicker from 'primevue/datepicker';
 import Button from 'primevue/button';
+import { dayjs } from '@site/ts/shared/lib/dayjs';
 
 // Типы для часов работы
 interface DaySchedule {
@@ -184,11 +185,8 @@ const setDayOff = (dayKey: DayKey) => {
  */
 const parseTime = (timeString?: string): Date | null => {
     if (!timeString) return null;
-    
     const [hours, minutes] = timeString.split(':').map(Number);
-    const date = new Date();
-    date.setHours(hours, minutes, 0, 0);
-    return date;
+    return dayjs().hour(hours).minute(minutes).second(0).millisecond(0).toDate();
 };
 
 /**
@@ -196,10 +194,7 @@ const parseTime = (timeString?: string): Date | null => {
  */
 const formatTime = (date: Date | null): string => {
     if (!date) return '';
-    
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
+    return dayjs(date).format('HH:mm');
 };
 
 /**

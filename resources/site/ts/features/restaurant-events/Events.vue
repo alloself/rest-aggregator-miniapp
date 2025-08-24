@@ -27,3 +27,6 @@ onBeforeMount(async () => {
   await getEventsData(slug);
 });
 </script>
+
+<style scoped>
+</style>
