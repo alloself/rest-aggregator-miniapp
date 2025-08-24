@@ -17,8 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('order')->default(0);
 
-            $table->uuid('restaurant_id')->nullable();
-            $table->foreign('restaurant_id')->references('id')->on('restaurants');
+            // removed restaurant_id in favor of polymorphic categorizables pivot
 
             $table->unsignedInteger('_lft')->default(0);
             $table->unsignedInteger('_rgt')->default(0);

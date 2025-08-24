@@ -12,6 +12,7 @@ import BaseRelationTable from '@/shared/components/BaseRelationTable.vue';
 import { NewsDetail } from '../../news';
 import { EventsDetail } from '../../events';
 import { CategoryDetail } from '../../category';
+import { CATEGORY_BASE_URL } from '../../category/const';
 
 export const useRestaurantDetailFormFields = (props: { id?: string }) => {
   const fields = computed<ISmartFormField[]>(() => [
@@ -174,9 +175,7 @@ export const useRestaurantDetailFormFields = (props: { id?: string }) => {
             },
           },
         },
-        initialValues: {
-          restaurant_id: props.id,
-        },
+        initialValues: {},
       },
       key: 'news',
     },
@@ -210,14 +209,6 @@ export const useRestaurantDetailFormFields = (props: { id?: string }) => {
         ],
         detailComponent: {
           component: EventsDetail,
-          props: {
-            onSave: (data: Event) => {
-              console.log(data);
-            },
-          },
-        },
-        initialValues: {
-          restaurant_id: props.id,
         },
       },
       key: 'events',
@@ -234,15 +225,9 @@ export const useRestaurantDetailFormFields = (props: { id?: string }) => {
         ],
         detailComponent: {
           component: CategoryDetail,
-          props: {
-            onSave: (data: Category) => {
-              console.log(data);
-            },
-          },
         },
-        initialValues: {
-          restaurant_id: props.id,
-        },
+        client: client,
+        baseUrl: CATEGORY_BASE_URL,
       },
       key: 'categories',
     },

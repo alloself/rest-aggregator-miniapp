@@ -14,7 +14,7 @@ class RestaurantController extends Controller
     public function show(string $slug)
     {
         try {
-            $restaurant = Restaurant::with(['user', 'files', 'images'])
+            $restaurant = Restaurant::with(['files', 'images'])
                 ->where('slug', $slug)
                 ->first();
 

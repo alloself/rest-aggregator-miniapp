@@ -10,6 +10,9 @@ use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use App\Models\Pivot\Categorizable;
+use App\Models\Category;
 use App\Services\TelegramBotService;
 use App\Models\User;
 
@@ -70,10 +73,15 @@ class Restaurant extends BaseModel
         return $owner;
     }
 
-    public function categories(): HasMany
+    public function categories(): MorphToMany
     {
-        return $this->hasMany(Category::class);
+        return $this->morphToMany(Category::class, 'categorizable')
+            ->using(Categorizable::class)
+            ->withPivot(['id', 'key', 'order'])
+            ->withTimestamps();
     }
+
+    
 
     /**
      * Получить пользователей, связанных с рестораном (many-to-many)

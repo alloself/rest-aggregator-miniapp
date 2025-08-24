@@ -3,10 +3,7 @@ import { ref } from 'vue';
 
 import { Restaurant } from '@/shared';
 import { client } from '../../shared/api/axios';
-
-interface RestaurantApiResponse {
-  data: Restaurant;
-}
+import { isAxiosError } from 'axios';
 
 export const useRestaurantStore = defineStore('restaurant', () => {
   const restaurant = ref<Restaurant | null>(null);
@@ -16,17 +13,17 @@ export const useRestaurantStore = defineStore('restaurant', () => {
   const getRestaurantData = async (slug: string) => {
     loading.value = true;
     error.value = null;
-    restaurant.value = null; // Сбрасываем предыдущие данные
+    restaurant.value = null;
 
     try {
-      const response = await client.get<RestaurantApiResponse>(`api/site/restaurants/${slug}`);
-      restaurant.value = response.data.data;
-    } catch (e: any) {
+      const response = await client.get<Restaurant>(`api/site/restaurants/${slug}`);
+      restaurant.value = response.data;
+    } catch (e: unknown) {
       restaurant.value = null;
 
-      if (e.response?.status === 404) {
+      if (isAxiosError(e) && e.response?.status === 404) {
         error.value = 'Ресторан не найден';
-      } else if (e.response?.data?.message) {
+      } else if (isAxiosError(e) && e.response?.data?.message) {
         error.value = e.response.data.message;
       } else {
         error.value = 'Произошла ошибка при загрузке ресторана';

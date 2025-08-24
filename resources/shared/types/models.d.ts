@@ -4,18 +4,20 @@ export interface Category {
   slug: string
   name: string
   order: number
-  restaurant_id?: string | null
   _lft: number
   _rgt: number
   parent_id?: string | null
   created_at?: Date | null
   updated_at?: Date | null
   // relations
+  restaurants?: Restaurant[]
   parent?: Category
   children?: Category[]
   // counts
+  restaurants_count: number
   children_count: number
   // exists
+  restaurants_exists: boolean
   parent_exists: boolean
   children_exists: boolean
 }
@@ -138,6 +140,18 @@ export interface Permission {
   roles_exists: boolean
   users_exists: boolean
   permissions_exists: boolean
+}
+
+export interface Categorizable {
+  // columns
+  id: string
+  category_id: string
+  categorizable_type: string
+  categorizable_id: string
+  key?: string | null
+  order: number
+  created_at?: Date | null
+  updated_at?: Date | null
 }
 
 export interface Fileable {
