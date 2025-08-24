@@ -31,7 +31,7 @@ const emit = defineEmits<{
 
 const selectCategory = (categoryId: string) => {
   const category = props.categories.find((cat) => cat.id === categoryId);
-  if (category && !category.disabled) {
+  if (category) {
     emit('categoryChange', categoryId, category);
   }
 };
@@ -55,26 +55,7 @@ const selectCategory = (categoryId: string) => {
 }
 
 /* Scrolling indicators - опционально */
-.category-filter::before,
-.category-filter::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 20px;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.category-filter::before {
-  left: 0;
-  background: linear-gradient(to right, #ffffff, transparent);
-}
-
-.category-filter::after {
-  right: 0;
-  background: linear-gradient(to left, #ffffff, transparent);
-}
+/* Убраны белые градиенты по бокам, создававшие эффект внутренней тени */
 
 .category-filter__item {
   flex: 1;

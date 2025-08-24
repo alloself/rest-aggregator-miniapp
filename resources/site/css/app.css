@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'tailwindcss-primeui';
 @import './widgets/restaurant-page/styles.css';
 
 /* CSS Variables для Design Tokens */
@@ -188,7 +189,109 @@
     --letter-spacing-caption-bold: -3%;
 }
 
-/* Global styles для предотвращения выхода изображений за край экрана */
+
+:root {
+    --bg-card: var(--color-bg-card);
+    --text-primary: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --surface-default: var(--color-surface-default);
+    --border-default: var(--color-border-default);
+    --border-radius-full: var(--radius-full);
+    --border-radius-medium: var(--radius-medium);
+    --border-radius-card: var(--radius-card);
+    --box-shadow-card: var(--shadow-card);
+    --box-shadow-elevated: var(--shadow-elevated);
+    --transition-default: var(--transition-default);
+    --transition-fast: var(--transition-fast);
+}
+
+:where(.p-button) {
+    border-radius: var(--radius-button);
+    transition: background-color var(--transition-default), border-color var(--transition-default), color var(--transition-default);
+}
+
+:where(.p-button).p-button-secondary {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+}
+
+:where(.p-button).p-button-secondary:hover {
+    background-color: var(--color-bg-secondary-hover);
+    border-color: var(--color-bg-secondary-hover);
+    color: var(--color-text-primary);
+}
+
+:where(.p-button).p-button-secondary:active {
+    background-color: var(--color-bg-secondary-active);
+    border-color: var(--color-bg-secondary-active);
+    color: var(--color-text-primary);
+}
+
+:where(.p-button).p-button-secondary:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+:where(.p-button).p-button-help {
+    background-color: var(--color-accent-primary);
+    border-color: var(--color-accent-primary);
+    color: var(--color-text-primary);
+}
+
+:where(.p-button).p-button-help:hover {
+    background-color: var(--color-accent-primary-hover);
+    border-color: var(--color-accent-primary-hover);
+    color: var(--color-text-primary);
+}
+
+:where(.p-button).p-button-help:active {
+    background-color: var(--color-accent-primary-active);
+    border-color: var(--color-accent-primary-active);
+    color: var(--color-text-primary);
+}
+
+:where(.p-button).p-button-help:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+:where(.p-button).app-button--size-small {
+    height: var(--size-button-height-small);
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: var(--font-size-body-sm);
+}
+
+:where(.p-button).app-button--size-medium {
+    height: var(--size-button-height-medium);
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: var(--font-size-body-md);
+}
+
+:where(.p-button).app-button--size-large {
+    height: var(--size-button-height-large);
+    padding-left: 32px;
+    padding-right: 32px;
+    font-size: var(--font-size-body-lg);
+}
+
+:where(.p-button).app-button--full {
+    width: 100%;
+}
+
+:where(.p-button).p-button-icon-only {
+    width: 60px;
+}
+
+/* Disabled state */
+:where(.p-button)[disabled],
+:where(.p-button).p-disabled,
+.p-disabled :where(.p-button) {
+    opacity: var(--opacity-disabled);
+}
+
 html,
 body {
     overflow-x: hidden;
@@ -204,7 +307,6 @@ img {
     height: auto;
 }
 
-/* Специальные правила для Telegram Mini App */
 @media (max-width: 440px) {
     html,
     body {

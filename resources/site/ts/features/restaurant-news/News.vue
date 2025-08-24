@@ -4,7 +4,7 @@
     :error="error"
     :has-more="hasMore"
     :is-loading-more="isLoadingMore"
-    :on-load-more="loadMore"
+    :on-load-more="newsStore.loadMore"
   >
     <NewsCard v-for="item in news" :key="item.id" :item="item" />
   </InfiniteScroll>
@@ -19,11 +19,10 @@ import InfiniteScroll from '../../shared/ui/InfiniteScroll.vue';
 
 const { slug } = defineProps<{ slug: string }>();
 
-const store = useNewsStore();
-const { news, loading, error, hasMore, isLoadingMore } = storeToRefs(store);
-const { getNewsData, loadMore } = store;
+const newsStore = useNewsStore();
+const { news, loading, error, hasMore, isLoadingMore } = storeToRefs(newsStore);
 
 onBeforeMount(async () => {
-  await store.getNewsData(slug);
+  await newsStore.getNewsData(slug);
 });
 </script>

@@ -31,7 +31,7 @@ import { useRestaurantStore } from '../entities/restaurant';
 import RestaurantCard from '../widgets/restaurant-page/RestaurantCard.vue';
 
 const route = useRoute();
-const slug = computed(() => route.params.slug.toString());
+const slug = computed(() => (typeof route.params.slug === 'string' ? route.params.slug : ''));
 
 const store = useRestaurantStore();
 const { restaurant, loading, error } = storeToRefs(store);
@@ -82,7 +82,9 @@ const handleShowPhotos = () => {
 };
 
 onBeforeMount(async () => {
-  await store.getRestaurantData(slug.value);
+  if (slug.value) {
+    await store.getRestaurantData(slug.value);
+  }
 });
 </script>
 

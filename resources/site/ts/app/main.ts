@@ -22,7 +22,10 @@ async function initSiteApp() {
         options: {
           prefix: 'p',
           darkModeSelector: '.dark',
-          cssLayer: false,
+          cssLayer: {
+            name: 'primevue',
+            order: 'theme, base, primevue',
+          },
         },
       },
     });

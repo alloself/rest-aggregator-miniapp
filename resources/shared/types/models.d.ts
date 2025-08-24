@@ -63,7 +63,7 @@ export interface Event {
 export interface File {
   // columns
   id: string
-  url: unknown
+  url: string
   name: string
   extension: string
   created_at?: Date | null

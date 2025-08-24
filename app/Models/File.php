@@ -16,7 +16,7 @@ class File extends BaseModel
         'extension',
     ];
 
-    public function getUrlAttribute($value)
+    public function getUrlAttribute($value): string
     {
         return asset(Storage::url($value));
     }

@@ -3,7 +3,7 @@
     <div class="event-card__image-container">
       <AppImage
         v-if="item.images?.[0]"
-        :src="item.images[0].url as string"
+        :src="item.images[0].url"
         :alt="item.title"
         class="event-card__image"
         object-fit="cover"
@@ -41,22 +41,18 @@
 </template>
 
 <script setup lang="ts">
-import type { Event } from '@/shared';
+import type { Event as EventItem } from '@/shared';
 import AppImage from '@site/ts/shared/ui/AppImage.vue';
 import Icon from '@shared/ui/Icon.vue';
 
-interface Props {
-  item: Event;
-}
-
-const { item } = defineProps<Props>();
+const { item } = defineProps<{ item: EventItem }>();
 
 const emit = defineEmits<{
-  click: [event: Event];
+  click: [item: EventItem];
 }>();
 
-const handleCardClick = (event: Event) => {
-  emit('click', event);
+const handleCardClick = () => {
+  emit('click', item);
 };
 
 const formatDate = (date: Date): string => {
