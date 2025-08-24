@@ -183,7 +183,7 @@ export interface Restaurant {
   address?: string | null
   description?: string | null
   welcome_message?: string | null
-  working_hours?: Record<string, unknown> | null
+  working_hours?: WorkingHours | null
   yandex_metrica_code?: string | null
   deleted_at?: Date | null
   created_at?: Date | null

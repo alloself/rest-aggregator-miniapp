@@ -1,19 +1,18 @@
 <template>
-  <div class="restaurant-hero-carousel">
-    <div class="swiper restaurant-hero-carousel__swiper" ref="swiperContainer">
+  <div class="hero-carousel">
+    <div class="swiper hero-carousel__swiper" ref="swiperContainer">
       <div class="swiper-wrapper">
-        <div v-for="(image, index) in images" :key="index" class="swiper-slide restaurant-hero-carousel__slide">
+        <div v-for="(image, index) in images" :key="index" class="swiper-slide hero-carousel__slide">
           <img
             :src="image.url"
-            :alt="image.alt || `Фото ресторана ${index + 1}`"
-            class="restaurant-hero-carousel__image"
+            :alt="image.alt || `Слайд ${index + 1}`"
+            class="hero-carousel__image"
             loading="lazy"
           />
         </div>
       </div>
 
-      <!-- Pagination dots -->
-      <div class="swiper-pagination restaurant-hero-carousel__pagination" v-if="showPagination"></div>
+      <div class="swiper-pagination hero-carousel__pagination" v-if="showPagination"></div>
     </div>
   </div>
 </template>
@@ -25,14 +24,14 @@ import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-interface RestaurantImage {
+interface HeroImage {
   url: string;
   alt?: string;
 }
 
 interface Props {
   /** Массив изображений для карусели */
-  images: RestaurantImage[];
+  images: HeroImage[];
   /** Автоматическая прокрутка (мс) */
   autoplay?: number | false;
   /** Показывать ли пагинацию */
@@ -53,11 +52,9 @@ const props = withDefaults(defineProps<Props>(), {
   paginationBottom: '48px',
 });
 
-// Refs
 const swiperContainer = ref<HTMLElement>();
 let swiperInstance: Swiper | null = null;
 
-// Initialize Swiper
 const initSwiper = async () => {
   if (!swiperContainer.value || props.images.length === 0) return;
 
@@ -65,21 +62,19 @@ const initSwiper = async () => {
 
   if (!swiperContainer.value) return;
 
-  // Initialize Swiper instance with explicit configuration
   swiperInstance = new Swiper(swiperContainer.value, {
     modules: [Pagination, Autoplay],
     slidesPerView: 1,
     spaceBetween: 0,
     loop: props.images.length > 1,
 
-    // Pagination configuration
     pagination: props.showPagination
       ? {
-          el: '.restaurant-hero-carousel__pagination',
+          el: '.hero-carousel__pagination',
           clickable: true,
-          bulletClass: 'restaurant-hero-carousel__bullet',
-          bulletActiveClass: 'restaurant-hero-carousel__bullet--active',
-          type: 'bullets' as const,
+          bulletClass: 'hero-carousel__bullet',
+          bulletActiveClass: 'hero-carousel__bullet--active',
+          type: 'bullets',
           dynamicBullets: false,
           renderBullet: (index: number, className: string) => {
             return `<span class="${className}" data-index="${index}"></span>`;
@@ -87,7 +82,6 @@ const initSwiper = async () => {
         }
       : false,
 
-    // Autoplay
     autoplay: props.autoplay
       ? {
           delay: props.autoplay,
@@ -96,17 +90,13 @@ const initSwiper = async () => {
         }
       : false,
 
-    // Touch settings
     touchRatio: 1,
     touchAngle: 45,
     grabCursor: true,
-
-    // Speed
     speed: 300,
   });
 };
 
-// Cleanup Swiper
 const destroySwiper = () => {
   if (swiperInstance) {
     swiperInstance.destroy(true, true);
@@ -114,7 +104,6 @@ const destroySwiper = () => {
   }
 };
 
-// Lifecycle
 onMounted(() => {
   initSwiper();
 });
@@ -123,7 +112,6 @@ onBeforeUnmount(() => {
   destroySwiper();
 });
 
-// Expose swiper instance for parent component
 defineExpose({
   swiper: () => swiperInstance,
   slideTo: (index: number) => swiperInstance?.slideTo(index),
@@ -133,11 +121,10 @@ defineExpose({
 </script>
 
 <style>
-/* Restaurant Hero Carousel Component - PostCSS Nested */
-.restaurant-hero-carousel {
+.hero-carousel {
   position: relative;
   width: 100%;
-  border-radius: 0 0 40px 40px;
+  border-radius: v-bind(borderRadius);
   overflow: hidden;
   background-color: #f4f3f3;
 
@@ -154,7 +141,6 @@ defineExpose({
     align-items: center;
     justify-content: center;
 
-    /* Loading state */
     &::before {
       content: '';
       position: absolute;
@@ -180,12 +166,11 @@ defineExpose({
     object-fit: cover;
     object-position: center;
 
-    &[loading] ~ .restaurant-hero-carousel__slide::before {
+    &[loading] ~ .hero-carousel__slide::before {
       opacity: 1;
     }
   }
 
-  /* Custom Pagination Styles */
   &__pagination {
     position: absolute !important;
     bottom: v-bind(paginationBottom) !important;
@@ -203,7 +188,6 @@ defineExpose({
     justify-content: center !important;
     align-items: center !important;
 
-    /* Fallback если Swiper не инициализируется */
     &:empty::after {
       content: '● ● ●';
       color: rgba(255, 255, 255, 0.6);
@@ -252,9 +236,8 @@ defineExpose({
   }
 }
 
-/* Responsive */
 @media (max-width: 480px) {
-  .restaurant-hero-carousel {
+  .hero-carousel {
     border-radius: 0 0 20px 20px;
 
     &__pagination {
@@ -269,3 +252,4 @@ defineExpose({
   }
 }
 </style>
+

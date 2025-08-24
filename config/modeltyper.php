@@ -199,6 +199,7 @@ return [
     */
     'custom_mappings' => [
         // 'binary' => 'Blob',
+        'working_hours' => 'WorkingHours',
     ],
 
     /*

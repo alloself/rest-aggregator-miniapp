@@ -2,7 +2,7 @@
   <div class="restaurant-card">
     <!-- Hero Carousel -->
     <div class="restaurant-card__hero-carousel">
-      <RestaurantHeroCarousel :images="images" :autoplay="4000" height="298px" />
+      <HeroCarousel :images="images" :autoplay="4000" height="300px" />
     </div>
 
     <!-- Restaurant Card -->
@@ -104,7 +104,7 @@
       </div>
     </section>
 
-    <Categories :slug="restaurant.slug" />
+    <Categories v-if="restaurant?.slug" :slug="restaurant.slug" />
 
     <!-- Footer -->
     <div class="restaurant-card__footer">
@@ -118,7 +118,8 @@ import { computed } from 'vue';
 import { Restaurant } from '@/shared';
 
 // Shared UI components
-import { RestaurantHeroCarousel, Icon } from '@/shared';
+import { Icon } from '@/shared';
+import HeroCarousel from '@shared/ui/HeroCarousel.vue';
 import { AppButton, AppImage, WorkingHours } from '../../shared/ui';
 
 // Local components

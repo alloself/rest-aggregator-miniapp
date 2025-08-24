@@ -1,7 +1,7 @@
 <template>
   <article class="news-card">
     <div class="news-card__media" v-if="imageItems.length > 0">
-      <RestaurantHeroCarousel
+      <HeroCarousel
         :images="imageItems"
         :autoplay="4000"
         :show-pagination="imageItems.length > 1"
@@ -31,10 +31,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import CollapsibleText from '../../shared/ui/CollapsibleText.vue';
-import { RestaurantHeroCarousel } from '@/shared';
-import type { News } from '@/shared';
 import { dayjs } from '@site/ts/shared/lib/dayjs';
+import HeroCarousel from '@shared/ui/HeroCarousel.vue';
+import CollapsibleText from '../../shared/ui/CollapsibleText.vue';
+import type { News } from '@/shared';
 
 interface Props {
   item: News;
