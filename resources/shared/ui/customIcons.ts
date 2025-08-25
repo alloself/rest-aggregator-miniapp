@@ -12,6 +12,8 @@ export const customIconMap = {
   booking: () => import('~icons/custom/booking'),
   chief: () => import('~icons/custom/chief'),
   arrow: () => import('~icons/custom/arrow'),
+  calendar: () => import('~icons/custom/calendar'),
+  'telegram-icon-fill': () => import('~icons/custom/telegram-icon-fill'),
 };
 
 export type CustomIconName = keyof typeof customIconMap;

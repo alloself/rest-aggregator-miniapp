@@ -21,7 +21,7 @@
 
         <!-- Кнопка назад -->
         <button class="event-page__back-button" @click="handleBackClick">
-          <Icon name="mdi:chevron-left" class="event-page__back-icon" />
+          <Icon name="arrow" :size="18" class="event-page__back-icon" />
         </button>
 
         <!-- Контент поверх изображения -->
@@ -36,7 +36,7 @@
             <!-- Дата и время -->
             <div class="event-page__info-card">
               <div class="event-page__info-row">
-                <Icon name="mdi:calendar" class="event-page__info-icon" />
+                <Icon name="calendar" class="event-page__info-icon" />
                 <span class="event-page__info-text">{{ formatDate(event.start_at) }}</span>
               </div>
               <div class="event-page__info-row">
@@ -64,7 +64,7 @@
       <div class="event-page__bottom-panel">
         <button class="event-page__book-button" @click="handleBooking">Забронировать</button>
         <button class="event-page__telegram-button" @click="handleTelegramShare">
-          <Icon name="telegram" class="event-page__telegram-icon" />
+          <Icon name="telegram-icon-fill" class="event-page__telegram-icon" />
         </button>
       </div>
     </div>
@@ -135,15 +135,12 @@ onBeforeMount(async () => {
 .event-page {
   width: 100%;
   margin: 0 auto;
-  background-color: var(--background-primary);
   min-height: 100vh;
   overflow-x: hidden;
   padding: 0;
   position: relative;
 }
 
-.event-page__loading,
-.event-page__error,
 .event-page__not-found {
   display: flex;
   align-items: center;
@@ -151,11 +148,6 @@ onBeforeMount(async () => {
   min-height: 60vh;
   text-align: center;
   padding: 40px 20px;
-}
-
-.event-page__error {
-  color: var(--color-accent-warning);
-  font-size: var(--font-size-body-md);
 }
 
 .event-page__not-found {
@@ -181,62 +173,6 @@ onBeforeMount(async () => {
   height: 100vh;
   max-height: 1137px;
   overflow: hidden;
-}
-
-/* Карусель изображений */
-.event-page__carousel {
-  position: relative;
-  width: 100%;
-  height: 287px;
-  overflow: hidden;
-  border-radius: 0 0 40px 40px;
-}
-
-.event-page__carousel-track {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.event-page__carousel-slide {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-}
-
-.event-page__carousel-slide--active {
-  opacity: 1;
-}
-
-.event-page__carousel-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.event-page__carousel-placeholder {
-  width: 100%;
-  height: 100%;
-  background: var(--surface-default);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-}
-
-/* Overlay градиент */
-.event-page__overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0) 50%);
-  pointer-events: none;
 }
 
 /* Кнопка назад */
@@ -269,38 +205,6 @@ onBeforeMount(async () => {
   color: #ffffff;
 }
 
-/* Индикаторы карусели */
-.event-page__indicators {
-  position: absolute;
-  bottom: 44px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-}
-
-.event-page__indicators-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 50px;
-}
-
-.event-page__indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #f5f5f5;
-  opacity: 0.3;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.event-page__indicator--active {
-  background: #ffffff;
-  opacity: 1;
-}
-
 /* Контент поверх изображения */
 .event-page__overlay-content {
   position: absolute;
@@ -321,7 +225,6 @@ onBeforeMount(async () => {
 }
 
 .event-page__title {
-  font-family: Inter;
   font-weight: 500;
   font-size: 18px;
   line-height: 1.1;
@@ -338,13 +241,16 @@ onBeforeMount(async () => {
 }
 
 .event-page__info-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(238, 238, 238, 0.5);
   border-radius: 20px;
-  padding: 20px 20px 20px 59px;
+  padding: 20px 32px;
   backdrop-filter: blur(10px);
   position: relative;
+  gap: 25px;
   flex: 1;
-  min-width: 237px;
 }
 
 .event-page__info-row {
@@ -366,11 +272,9 @@ onBeforeMount(async () => {
 }
 
 .event-page__info-text {
-  font-family: Inter;
   font-weight: 500;
   font-size: 14px;
   line-height: 1;
-  letter-spacing: -2%;
   color: #000000;
 }
 
@@ -378,69 +282,40 @@ onBeforeMount(async () => {
 .event-page__price-card {
   background: rgba(238, 238, 238, 0.5);
   border-radius: 20px;
-  padding: 10px 10px 10px 0px;
+  padding: 20px;
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
-  gap: 7px;
-  width: 153px;
+  gap: 8px;
+  justify-content: center;
+  width: fit-content;
   height: 56px;
-  position: relative;
-}
-
-.event-page__price-icon {
-  position: absolute;
-  left: 43px;
-  top: 22px;
-  width: 16px;
-  height: 12px;
-  color: #000000;
 }
 
 .event-page__price-text {
-  position: absolute;
-  left: 68px;
-  top: 21px;
-  font-family: Inter;
   font-weight: 500;
   font-size: 14px;
   line-height: 1;
-  letter-spacing: -2%;
-  color: #000000;
 }
 
 /* Карточка описания */
 .event-page__description-card {
   background: rgba(238, 238, 238, 0.5);
   border-radius: 20px;
-  padding: 15px 10px;
+  padding: 22px 30px;
   backdrop-filter: blur(10px);
-  position: relative;
 }
 
 .event-page__description-title {
-  position: absolute;
-  left: 30px;
-  top: 22px;
-  font-family: Inter;
   font-weight: 500;
   font-size: 16px;
   line-height: 1.1;
-  letter-spacing: -1%;
-  color: #000000;
-  margin: 0;
+  margin-bottom: 16px;
 }
 
 .event-page__description-text {
-  position: absolute;
-  left: 30px;
-  top: 56px;
-  right: 30px;
-  font-family: Inter;
-  font-weight: 500;
   font-size: 16px;
   line-height: 1.3;
-  color: #000000;
   margin: 0;
   max-height: 417px;
   overflow-y: auto;
@@ -469,7 +344,6 @@ onBeforeMount(async () => {
   border: none;
   border-radius: 30px;
   color: #000000;
-  font-family: Inter;
   font-weight: 500;
   font-size: 16px;
   line-height: 1.21;
@@ -526,24 +400,8 @@ onBeforeMount(async () => {
     gap: 8px;
   }
 
-  .event-page__info-card {
-    min-width: auto;
-    flex: 1;
-    padding: 16px 16px 16px 45px;
-  }
-
-  .event-page__price-card {
-    width: 120px;
-    padding: 8px 8px 8px 0px;
-  }
-
   .event-page__price-icon {
     left: 35px;
-  }
-
-  .event-page__price-text {
-    left: 55px;
-    font-size: 13px;
   }
 
   .event-page__bottom-panel {
