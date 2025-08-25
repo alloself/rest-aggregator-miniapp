@@ -13,8 +13,10 @@
 </template>
 
 <script setup lang="ts">
+import { ECategory } from '../../shared';
+
 interface Category {
-  id: string;
+  id: ECategory;
   label: string;
 }
 
@@ -26,10 +28,10 @@ interface CategoryFilterProps {
 const props = defineProps<CategoryFilterProps>();
 
 const emit = defineEmits<{
-  categoryChange: [categoryId: string, category: Category];
+  categoryChange: [categoryId: ECategory, category: Category];
 }>();
 
-const selectCategory = (categoryId: string) => {
+const selectCategory = (categoryId: ECategory) => {
   const category = props.categories.find((cat) => cat.id === categoryId);
   if (category) {
     emit('categoryChange', categoryId, category);

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\BaseCRUDController;
 use App\Models\Category;
-use App\Http\Resources\CategoryResource;
+use App\Http\Resources\Account\CategoryResource;
 
 class CategoryController extends BaseCRUDController
 {

@@ -1,3 +1,9 @@
+import { Array } from '@/shared/types/pivots'
+import { Array } from '@/shared/types/pivots'
+import { Array } from '@/shared/types/pivots'
+import { Array } from '@/shared/types/pivots'
+import { Array } from '@/shared/types/pivots'
+
 export interface Category {
   // columns
   id: string
@@ -9,28 +15,35 @@ export interface Category {
   parent_id?: string | null
   created_at?: Date | null
   updated_at?: Date | null
-  // relations
-  restaurants?: Restaurant[]
-  parent?: Category
-  children?: Category[]
-  // counts
-  restaurants_count: number
-  children_count: number
-  // exists
-  restaurants_exists: boolean
-  parent_exists: boolean
-  children_exists: boolean
+  // overrides
+  restaurants: Array<Restaurant & { pivot?: CategoryRestaurantPivot }>
+  dishes: Array<Dish>
+  children: Array<Category>
+  parent: Category
 }
 
 export interface Dish {
   // columns
-  id: number
+  id: string
   slug: string
   name: string
+  description?: string | null
+  price?: number | null
   category_id: string
   order: number
   created_at?: Date | null
   updated_at?: Date | null
+  // relations
+  category?: Category
+  images?: File[]
+  files?: File[]
+  // counts
+  images_count: number
+  files_count: number
+  // exists
+  category_exists: boolean
+  images_exists: boolean
+  files_exists: boolean
 }
 
 export interface Event {
@@ -183,32 +196,25 @@ export interface Restaurant {
   address?: string | null
   description?: string | null
   welcome_message?: string | null
-  working_hours?: WorkingHours | null
+  working_hours?: Record<string, unknown> | null
   yandex_metrica_code?: string | null
   deleted_at?: Date | null
   created_at?: Date | null
   updated_at?: Date | null
+  // overrides
+  categories: Array<Category & { pivot?: CategoryRestaurantPivot }>
+  images: Array<File & { pivot?:FileablePivot }>
+  files: Array<File & { pivot?:FileablePivot }>
+  users: Array<User & { pivot?:UserRestaurantPivot }>
   // relations
   news?: News[]
   events?: Event[]
-  categories?: Category[]
-  users?: User[]
-  images?: File[]
-  files?: File[]
   // counts
   news_count: number
   events_count: number
-  categories_count: number
-  users_count: number
-  images_count: number
-  files_count: number
   // exists
   news_exists: boolean
   events_exists: boolean
-  categories_exists: boolean
-  users_exists: boolean
-  images_exists: boolean
-  files_exists: boolean
 }
 
 export interface Role {
@@ -249,9 +255,10 @@ export interface User {
   // overrides
   tokens: never
   notifications: never
+  friends: Array<User & { pivot?:UserFriendPivot }>
+  friend_of: Array<User & { pivot?:UserFriendPivot }>
   // relations
   restaurants?: Restaurant[]
-  friends?: User[]
   friend_of?: User[]
   roles?: Role[]
   permissions?: Permission[]
@@ -259,7 +266,6 @@ export interface User {
   files?: File[]
   // counts
   restaurants_count: number
-  friends_count: number
   friend_of_count: number
   roles_count: number
   permissions_count: number
@@ -267,7 +273,6 @@ export interface User {
   files_count: number
   // exists
   restaurants_exists: boolean
-  friends_exists: boolean
   friend_of_exists: boolean
   roles_exists: boolean
   permissions_exists: boolean

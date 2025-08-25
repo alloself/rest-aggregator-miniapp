@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Account;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class NewsResource extends JsonResource
+class DishResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,14 +17,17 @@ class NewsResource extends JsonResource
         return [
             'id' => $this->id,
             'slug' => $this->slug,
-            'title' => $this->title,
+            'name' => $this->name,
             'description' => $this->description,
+            'price' => $this->price,
             'order' => $this->order,
+            'category_id' => $this->category_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'restaurant' => $this->whenLoaded('restaurant'),
-            'files' => FileResource::collection($this->whenLoaded('files')),
             'images' => FileResource::collection($this->whenLoaded('images')),
+            'files' => FileResource::collection($this->whenLoaded('files')),
         ];
     }
 }
+
+

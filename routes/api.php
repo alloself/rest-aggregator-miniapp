@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Account\CategoryController;
 use App\Http\Controllers\Account\RestaurantController;
+use App\Http\Controllers\Account\DishController;
 use App\Http\Controllers\Account\FileController;
 use App\Http\Controllers\Site\RestaurantController as SiteRestaurantController;
 use App\Http\Controllers\Account\NewsController;
@@ -27,6 +28,7 @@ $accountResources = [
     'files' => FileController::class,
     'news' => NewsController::class,
     'events' => EventController::class,
+    'dishes' => DishController::class,
 ];
 
 

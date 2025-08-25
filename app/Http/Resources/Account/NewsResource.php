@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Account;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class EventResource extends JsonResource
+class NewsResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,9 +18,6 @@ class EventResource extends JsonResource
             'id' => $this->id,
             'slug' => $this->slug,
             'title' => $this->title,
-            'subtitle' => $this->subtitle,
-            'start_at' => $this->start_at,
-            'price' => $this->price,
             'description' => $this->description,
             'order' => $this->order,
             'created_at' => $this->created_at,

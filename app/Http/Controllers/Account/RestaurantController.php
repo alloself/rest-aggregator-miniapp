@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\BaseCRUDController;
 use App\Models\Restaurant;
-use App\Http\Resources\RestaurantResource;
+use App\Http\Resources\Account\RestaurantResource;
 
 class RestaurantController extends BaseCRUDController
 {

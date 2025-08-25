@@ -58,7 +58,7 @@ const imageItems = computed(() => {
 
 const formattedDate = computed(() => {
   if (!createdAt.value) return '';
-  return dayjs(createdAt.value).format('DD.MM.YYYY');
+  return dayjs().diff(dayjs(createdAt.value), 'day') > 1 ? dayjs(createdAt.value).format('DD.MM.YYYY') : dayjs(createdAt.value).format('HH:mm');
 });
 </script>
 
@@ -94,7 +94,7 @@ const formattedDate = computed(() => {
 
 .news-card__date {
   margin-top: 4px;
-  text-align: right;
+  text-align: left;
   font-size: 12px;
   color: rgba(0, 0, 0, 0.45);
 }

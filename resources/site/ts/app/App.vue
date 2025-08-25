@@ -1,8 +1,14 @@
 <template>
-  <div class="site-app container mx-auto">
-    <router-view />
-  </div>
+  <BottomSheetProvider>
+    <div class="site-app container mx-auto">
+      <router-view />
+    </div>
+  </BottomSheetProvider>
 </template>
+
+<script setup lang="ts">
+import { BottomSheetProvider } from '../shared/ui'
+</script>
 
 <style>
 .site-app {

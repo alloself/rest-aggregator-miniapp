@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Site;
 
+use App\Http\Resources\Account\CategoryResource;
+use App\Http\Resources\Account\FileResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -23,11 +25,8 @@ class RestaurantResource extends JsonResource
             'working_hours' => $this->working_hours,
             'address' => $this->address,
             'average_receipt' => $this->average_receipt,
-            'yandex_metrica_code' => $this->yandex_metrica_code,
             'files' => FileResource::collection($this->whenLoaded('files')),
             'images' => FileResource::collection($this->whenLoaded('images')),
-            'news' => NewsResource::collection($this->whenLoaded('news')),
-            'events' => EventResource::collection($this->whenLoaded('events')),
             'categories' => CategoryResource::collection($this->whenLoaded('categories')),
         ];
     }

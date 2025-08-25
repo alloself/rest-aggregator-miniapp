@@ -4,4 +4,5 @@ import 'dayjs/locale/ru';
 dayjs.locale('ru');
 
 export { dayjs };
+export default dayjs;
 
