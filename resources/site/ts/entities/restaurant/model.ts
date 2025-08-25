@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-import { Category, PivotData, Restaurant } from '@/shared';
+import { Categorizable, Category, Restaurant } from '@/shared';
 import { client } from '../../shared/api/axios';
 import { isAxiosError } from 'axios';
 
 export interface RestaurantResource extends Restaurant {
-  categories: Array<Category & { pivot: PivotData }>;
+  categories: Array<Category & { pivot: Categorizable }>;
 }
 
 export const useRestaurantStore = defineStore('restaurant', () => {
