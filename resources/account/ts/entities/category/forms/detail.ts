@@ -5,6 +5,8 @@ import { z } from "zod";
 import BaseTree from "@/shared/components/BaseTree.vue";
 import CategoryDetail from "../ui/CategoryDetail.vue";
 import { Category } from "@/shared/types";
+import BaseRelationTable from "@/shared/components/BaseRelationTable.vue";
+import { DishesDetail } from "../../dishes/index";
 
 export const useCategoryDetailFormFields = (props: { id?: string }) => {
     const fields = computed<ISmartFormField[]>(() => [
@@ -47,6 +49,25 @@ export const useCategoryDetailFormFields = (props: { id?: string }) => {
               },
             },
             key: 'children',
+          },
+        {
+            component: BaseRelationTable,
+            props: {
+              title: 'Блюда',
+              entity: 'dishes',
+              columns: [
+                { field: 'name', header: 'Название' },
+                { field: 'order', header: 'Порядок' },
+              ],
+              detailComponent: {
+                component: DishesDetail,
+                props: {},
+              },
+              initialValues: {
+                category_id: props.id,
+              },
+            },
+            key: 'dishes',
           },
     ]);
 

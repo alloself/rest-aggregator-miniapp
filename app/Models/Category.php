@@ -10,6 +10,7 @@ use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use App\Models\Restaurant;
 use App\Models\Pivot\Categorizable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends BaseModel
 {
@@ -52,6 +53,11 @@ class Category extends BaseModel
             ->using(Categorizable::class)
             ->withPivot(['id', 'key', 'order'])
             ->withTimestamps();
+    }
+
+    public function dishes(): HasMany
+    {
+        return $this->hasMany(Dish::class);
     }
 
     /**

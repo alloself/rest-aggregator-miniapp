@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Account;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -27,6 +27,7 @@ class CategoryResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'order' => $this->order,
+            'dishes' => DishResource::collection($this->whenLoaded('dishes')),
             'pivot' => $this->when(isset($this->pivot), fn () => [
                 'id' => $this->pivot->id ?? null,
                 'key' => $this->pivot->key ?? null,

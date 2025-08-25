@@ -12,12 +12,7 @@ import CategoryFilter from '../../features/category-filter/CategoryFilter.vue';
 import News from '../../features/restaurant-news/News.vue';
 import Events from '../../features/restaurant-events/Events.vue';
 import Offers from '../../features/restaurant-offers/Offers.vue';
-
-enum ECategory {
-  News = 'news',
-  Events = 'events',
-  Offers = 'offers',
-}
+import { ECategory } from '../../shared';
 
 const { slug } = defineProps<{ slug: string }>();
 
@@ -28,7 +23,7 @@ const categories = [
 ];
 
 const activeCategory = ref(categories[0].id);
-const onCategoryChange = (categoryId: string) => {
+const onCategoryChange = (categoryId: ECategory) => {
   activeCategory.value = categoryId;
 };
 

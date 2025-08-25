@@ -29,7 +29,7 @@
               <Icon name="clock" size="16" color="gray" />
             </div>
             <div class="restaurant-card__detail-schedule">
-              <WorkingHours :working-hours="restaurant.working_hours" />
+              <WorkingHours :working-hours="restaurant.working_hours as any" />
             </div>
           </div>
 
@@ -83,16 +83,21 @@
 
       <div class="restaurant-card__chef-items">
         <!-- Featured Large Item -->
-        <div v-if="featuredDish" class="restaurant-card__chef-featured">
+        <div v-if="chefRecommendations" class="restaurant-card__chef-featured">
           <div class="restaurant-card__chef-featured-image">
             <Icon name="chief" class="restaurant-card__chef-image" />
           </div>
         </div>
 
         <!-- Regular Items -->
-        <div v-for="dish in regularDishes" :key="dish.id" class="restaurant-card__chef-item">
+        <div
+          v-for="dish in chefRecommendations"
+          :key="dish.id"
+          class="restaurant-card__chef-item"
+          @click="handleDishClick(dish)"
+        >
           <AppImage
-            :src="dish.image"
+            :src="dish.images?.[0]?.url || ''"
             :alt="dish.name"
             width="120"
             height="120"
@@ -115,23 +120,19 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Restaurant } from '@/shared';
+import { Dish, Restaurant } from '@/shared';
 
 // Shared UI components
 import { Icon } from '@/shared';
 import HeroCarousel from '@shared/ui/HeroCarousel.vue';
 import { AppButton, AppImage, WorkingHours } from '../../shared/ui';
+import { bottomSheet } from '../../shared/lib/composables';
 
 // Local components
 import ContactDropdown from '../../shared/ui/ContactDropdown.vue';
 import CollapsibleText from '../../shared/ui/CollapsibleText.vue';
 import Categories from './Categories.vue';
-
-interface ChefRecommendation {
-  id: string;
-  name: string;
-  image: string;
-}
+import { DishBottomSheet } from '../../entities/dish/ui';
 
 interface ContactInfo {
   phone?: string;
@@ -140,7 +141,7 @@ interface ContactInfo {
 
 interface Props {
   restaurant: Restaurant | null;
-  chefRecommendations?: ChefRecommendation[];
+  chefRecommendations?: Dish[];
   contactInfo?: ContactInfo;
 }
 
@@ -156,10 +157,6 @@ const emit = defineEmits<{
 }>();
 
 const images = computed(() => props.restaurant?.images || []);
-
-const featuredDish = computed(() => props.chefRecommendations[0] || null);
-
-const regularDishes = computed(() => props.chefRecommendations);
 
 const formattedAverageReceipt = computed(() => {
   if (!props.restaurant?.average_receipt) return '';
@@ -186,5 +183,14 @@ const showBar = () => {
 
 const showPhotos = () => {
   emit('showPhotos');
+};
+
+/**
+ * Обработка клика по блюду - открытие bottom sheet
+ */
+const handleDishClick = (dish: Dish) => {
+  bottomSheet.open(DishBottomSheet, {
+    dish,
+  });
 };
 </script>

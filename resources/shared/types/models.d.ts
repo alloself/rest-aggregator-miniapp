@@ -11,26 +11,42 @@ export interface Category {
   updated_at?: Date | null
   // relations
   restaurants?: Restaurant[]
+  dishes?: Dish[]
   parent?: Category
   children?: Category[]
   // counts
   restaurants_count: number
+  dishes_count: number
   children_count: number
   // exists
   restaurants_exists: boolean
+  dishes_exists: boolean
   parent_exists: boolean
   children_exists: boolean
 }
 
 export interface Dish {
   // columns
-  id: number
+  id: string
   slug: string
   name: string
+  description?: string | null
+  price?: number | null
   category_id: string
   order: number
   created_at?: Date | null
   updated_at?: Date | null
+  // relations
+  category?: Category
+  images?: File[]
+  files?: File[]
+  // counts
+  images_count: number
+  files_count: number
+  // exists
+  category_exists: boolean
+  images_exists: boolean
+  files_exists: boolean
 }
 
 export interface Event {

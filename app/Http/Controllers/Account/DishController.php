@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\BaseCRUDController;
-use App\Models\File;
-use App\Http\Resources\Account\FileResource;
+use App\Models\Dish;
+use App\Http\Resources\Account\DishResource;
 
-class FileController extends BaseCRUDController
+class DishController extends BaseCRUDController
 {
     public function model(): string
     {
-        return File::class;
+        return Dish::class;
     }
 
     public function resource(): string
     {
-        return FileResource::class;
+        return DishResource::class;
     }
-
-    
 }
+
+

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Site;
 
 use App\Models\Restaurant;
-use App\Http\Resources\RestaurantResource;
-use App\Http\Resources\NewsResource;
-use App\Http\Resources\EventResource;
+use App\Http\Resources\Site\RestaurantResource;
+use App\Http\Resources\Account\NewsResource;
+use App\Http\Resources\Account\EventResource;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -14,7 +14,12 @@ class RestaurantController extends Controller
     public function show(string $slug)
     {
         try {
-            $restaurant = Restaurant::with(['files', 'images'])
+            $restaurant = Restaurant::with(['files', 'images','categories' => [
+                'dishes' => [
+                    'files',
+                    'images'
+                ],
+            ]])
                 ->where('slug', $slug)
                 ->first();
 

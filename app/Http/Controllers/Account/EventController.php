@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\BaseCRUDController;
 use App\Models\Event;
-use App\Http\Resources\EventResource;
+use App\Http\Resources\Account\EventResource;
 
 class EventController extends BaseCRUDController
 {

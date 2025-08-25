@@ -6,7 +6,7 @@
     :fields="fields"
     v-model:form="form"
     v-bind="$attrs"
-    :relations="['children']"
+    :relations="['children','dishes']"
     :id="id"
   />
 </template>

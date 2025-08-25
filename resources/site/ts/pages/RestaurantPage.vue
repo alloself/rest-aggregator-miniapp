@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, computed, reactive } from 'vue';
+import { onBeforeMount, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useRestaurantStore } from '../entities/restaurant';
@@ -36,33 +36,12 @@ const slug = computed(() => (typeof route.params.slug === 'string' ? route.param
 const store = useRestaurantStore();
 const { restaurant, loading, error } = storeToRefs(store);
 
-const chefRecommendations = reactive([
-  {
-    id: 'dish-1',
-    name: 'Стейк рибай',
-    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=240&h=240&fit=crop',
-  },
-  {
-    id: 'dish-2',
-    name: 'Паста карбонара',
-    image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=240&h=240&fit=crop',
-  },
-  {
-    id: 'dish-3',
-    name: 'Тирамису',
-    image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=240&h=240&fit=crop',
-  },
-  {
-    id: 'dish-4',
-    name: 'Салат Цезарь',
-    image: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=240&h=240&fit=crop',
-  },
-  {
-    id: 'dish-5',
-    name: 'Суп грибной',
-    image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=240&h=240&fit=crop',
-  },
-]);
+const chefRecommendations = computed(() => {
+  const categories = restaurant.value?.categories ?? [];
+  const chief = categories.find((c) => c?.pivot?.key === 'chief_recommendations');
+
+  return chief?.dishes ?? [];
+});
 
 const contactInfo = computed(() => ({
   phone: '+7 (495) 123-45-67',

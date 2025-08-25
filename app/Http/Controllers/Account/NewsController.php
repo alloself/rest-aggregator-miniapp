@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\BaseCRUDController;
 use App\Models\News;
-use App\Http\Resources\NewsResource;
+use App\Http\Resources\Account\NewsResource;
 
 class NewsController extends BaseCRUDController
 {
