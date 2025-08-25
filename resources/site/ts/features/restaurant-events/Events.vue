@@ -32,7 +32,7 @@ const handleEventClick = (event: Event) => {
     name: 'event',
     params: {
       slug: slug,
-      eventId: event.id,
+      eventSlug: event.slug,
     },
   });
 };

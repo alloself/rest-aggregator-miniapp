@@ -19,9 +19,6 @@
           :paginationBottom="'12px'"
         />
 
-        <!-- Overlay градиент -->
-        <div class="event-page__overlay"></div>
-
         <!-- Кнопка назад -->
         <button class="event-page__back-button" @click="handleBackClick">
           <Icon name="mdi:chevron-left" class="event-page__back-icon" />
@@ -89,7 +86,7 @@ const route = useRoute();
 const router = useRouter();
 
 const slug = computed(() => (typeof route.params.slug === 'string' ? route.params.slug : ''));
-const eventId = computed(() => (typeof route.params.eventId === 'string' ? route.params.eventId : ''));
+const eventSlug = computed(() => (typeof route.params.eventSlug === 'string' ? route.params.eventSlug : ''));
 
 const store = useEventStore();
 const { event, loading, error } = storeToRefs(store);
@@ -128,8 +125,8 @@ const handleTelegramShare = () => {
 };
 
 onBeforeMount(async () => {
-  if (slug.value && eventId.value) {
-    await store.getEventData(slug.value, eventId.value);
+  if (slug.value && eventSlug.value) {
+    await store.getEventData(slug.value, eventSlug.value);
   }
 });
 </script>

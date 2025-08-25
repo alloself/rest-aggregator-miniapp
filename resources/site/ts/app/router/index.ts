@@ -14,7 +14,7 @@ const routes = [
     props: true,
   },
   {
-    path: '/restaurant/:slug/event/:eventId',
+    path: '/restaurant/:slug/event/:eventSlug',
     name: 'event',
     component: () => import('../../pages/EventPage.vue'),
     props: true,

@@ -46,7 +46,7 @@ Route::prefix('site')->group(function () {
     Route::get('restaurants/{slug}', [SiteRestaurantController::class, 'show']);
     Route::get('restaurants/{slug}/news', [SiteRestaurantController::class, 'news']);
     Route::get('restaurants/{slug}/events', [SiteRestaurantController::class, 'events']);
-    Route::get('restaurants/{slug}/events/{eventId}', [SiteRestaurantController::class, 'event']);
+    Route::get('restaurants/{slug}/events/{eventSlug}', [SiteRestaurantController::class, 'event']);
 });
 
 Route::post('telegram/webhook/{restaurant}', [TelegramWebhookController::class, 'handle']);

@@ -24,13 +24,13 @@ export const useEventStore = defineStore('event', () => {
   const loading = ref(false);
   const error = ref<string | null>(null);
 
-  const getEventData = async (slug: string, eventId: string) => {
+  const getEventData = async (slug: string, event_slug: string) => {
     loading.value = true;
     error.value = null;
     event.value = null;
 
     try {
-      const response = await client.get<Event>(`api/site/restaurants/${slug}/events/${eventId}`);
+      const response = await client.get<Event>(`api/site/restaurants/${slug}/events/${event_slug}`);
       event.value = response.data;
     } catch (e: unknown) {
       event.value = null;

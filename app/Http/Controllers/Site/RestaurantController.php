@@ -58,14 +58,14 @@ class RestaurantController extends Controller
         ]);
     }
 
-    public function event(string $slug, string $eventId)
+    public function event(string $slug, string $eventSlug)
     {
         try {
             $restaurant = Restaurant::where('slug', $slug)->firstOrFail();
             
             $event = $restaurant->events()
                 ->with(['images', 'files'])
-                ->where('id', $eventId)
+                ->where('slug', $eventSlug)
                 ->firstOrFail();
 
             return new EventResource($event);
