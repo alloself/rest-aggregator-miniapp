@@ -9,54 +9,53 @@
     </div>
     <div v-else-if="event" class="event-page__content">
       <!-- Карусель изображений с overlay контентом -->
-      <div class="event-page__hero">
-        <!-- Карусель изображений -->
-        <HeroCarousel
-          :images="carousel_images"
-          :height="'287px'"
-          :autoplay="false"
-          :showPagination="(event.images?.length || 0) > 1"
-          :paginationBottom="'12px'"
-        />
 
-        <!-- Кнопка назад -->
-        <button class="event-page__back-button" @click="handleBackClick">
-          <Icon name="arrow" :size="18" class="event-page__back-icon" />
-        </button>
+      <!-- Карусель изображений -->
+      <HeroCarousel
+        :images="carousel_images"
+        :height="'287px'"
+        :autoplay="false"
+        :showPagination="(event.images?.length || 0) > 1"
+        :paginationBottom="'12px'"
+      />
 
-        <!-- Контент поверх изображения -->
-        <div class="event-page__overlay-content">
-          <!-- Заголовок события -->
-          <div class="event-page__title-card">
-            <h1 class="event-page__title">{{ event.title }}</h1>
-          </div>
+      <!-- Кнопка назад -->
+      <button class="event-page__back-button" @click="handleBackClick">
+        <Icon name="arrow" :size="18" class="event-page__back-icon" />
+      </button>
 
-          <!-- Информационные карточки -->
-          <div class="event-page__info-cards">
-            <!-- Дата и время -->
-            <div class="event-page__info-card">
-              <div class="event-page__info-row">
-                <Icon name="calendar" class="event-page__info-icon" />
-                <span class="event-page__info-text">{{ formatDate(event.start_at) }}</span>
-              </div>
-              <div class="event-page__info-row">
-                <Icon name="clock" class="event-page__info-icon" />
-                <span class="event-page__info-text">{{ formatTime(event.start_at) }}</span>
-              </div>
+      <!-- Контент поверх изображения -->
+      <div class="event-page__overlay-content">
+        <!-- Заголовок события -->
+        <div class="event-page__title-card">
+          <h1 class="event-page__title">{{ event.title }}</h1>
+        </div>
+
+        <!-- Информационные карточки -->
+        <div class="event-page__info-cards">
+          <!-- Дата и время -->
+          <div class="event-page__info-card">
+            <div class="event-page__info-row">
+              <Icon name="calendar" class="event-page__info-icon" />
+              <span class="event-page__info-text">{{ formatDate(event.start_at) }}</span>
             </div>
-
-            <!-- Цена -->
-            <div v-if="event.price" class="event-page__price-card">
-              <Icon name="card" class="event-page__price-icon" />
-              <span class="event-page__price-text">{{ formatPrice(event.price) }}</span>
+            <div class="event-page__info-row">
+              <Icon name="clock" class="event-page__info-icon" />
+              <span class="event-page__info-text">{{ formatTime(event.start_at) }}</span>
             </div>
           </div>
 
-          <!-- Описание -->
-          <div class="event-page__description-card">
-            <h3 class="event-page__description-title">О событии</h3>
-            <div class="event-page__description-text" v-html="event.description"></div>
+          <!-- Цена -->
+          <div v-if="event.price" class="event-page__price-card">
+            <Icon name="card" class="event-page__price-icon" />
+            <span class="event-page__price-text">{{ formatPrice(event.price) }}</span>
           </div>
+        </div>
+
+        <!-- Описание -->
+        <div class="event-page__description-card">
+          <h3 class="event-page__description-title">О событии</h3>
+          <div class="event-page__description-text" v-html="event.description"></div>
         </div>
       </div>
 

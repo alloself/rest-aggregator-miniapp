@@ -6,6 +6,8 @@
         class="bottom-sheet-backdrop"
         :style="{ zIndex: props.zIndex }"
         @click="handleBackdropClick"
+        @wheel.prevent.self
+        @touchmove.prevent.self
       >
         <transition name="bottom-sheet" appear>
           <div
@@ -36,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 
 interface BottomSheetProps {
   visible: boolean
@@ -169,7 +171,77 @@ onUnmounted(() => {
   } catch (error) {
     // Игнорируем ошибки DOM манипуляций при размонтировании
   }
+  // Разблокируем скролл, если он был заблокирован этим компонентом
+  try {
+    unlockBodyScroll()
+  } catch (error) {}
 })
+
+/**
+ * Блокирует прокрутку body, фиксируя текущую позицию прокрутки.
+ */
+function lockBodyScroll() {
+  try {
+    const body = document.body
+    const currentCount = Number(body.getAttribute('data-scroll-lock-count') || '0')
+    body.setAttribute('data-scroll-lock-count', String(currentCount + 1))
+    if (currentCount > 0) return
+
+    const scrollY = window.scrollY || window.pageYOffset || 0
+    body.setAttribute('data-scroll-lock-y', String(scrollY))
+    body.style.position = 'fixed'
+    body.style.top = `-${scrollY}px`
+    body.style.left = '0'
+    body.style.right = '0'
+    body.style.width = '100%'
+    body.style.overflow = 'hidden'
+  } catch (error) {
+    // Ничего не делаем при ошибках доступа к DOM
+  }
+}
+
+/**
+ * Снимает блокировку прокрутки body и восстанавливает позицию прокрутки.
+ */
+function unlockBodyScroll() {
+  try {
+    const body = document.body
+    const currentCount = Number(body.getAttribute('data-scroll-lock-count') || '0')
+    const next = Math.max(0, currentCount - 1)
+    body.setAttribute('data-scroll-lock-count', String(next))
+    if (next > 0) return
+
+    const yAttr = body.getAttribute('data-scroll-lock-y') || '0'
+    const y = Number(yAttr) || 0
+
+    body.style.position = ''
+    body.style.top = ''
+    body.style.left = ''
+    body.style.right = ''
+    body.style.width = ''
+    body.style.overflow = ''
+
+    body.removeAttribute('data-scroll-lock-y')
+    window.scrollTo(0, y)
+  } catch (error) {
+    // Ничего не делаем при ошибках доступа к DOM
+  }
+}
+
+/**
+ * Следим за видимостью шита и блокируем/разблокируем прокрутку страницы.
+ */
+watch(
+  () => props.visible,
+  (isVisible) => {
+    if (isVisible) {
+      lockBodyScroll()
+      return
+    }
+    unlockBodyScroll()
+  },
+  { immediate: true }
+)
 </script>
 
 <style>
@@ -218,6 +290,7 @@ onUnmounted(() => {
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 }
 
