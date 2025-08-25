@@ -164,6 +164,7 @@ const collapse = async () => {
 
 <style>
 .collapsible-text {
+  text-align: left;
   &__content {
     transition: all 0.3s ease-out;
   }

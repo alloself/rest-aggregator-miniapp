@@ -58,7 +58,7 @@ const imageItems = computed(() => {
 
 const formattedDate = computed(() => {
   if (!createdAt.value) return '';
-  return dayjs().diff(dayjs(createdAt.value), 'day') > 1 ? dayjs(createdAt.value).format('DD.MM.YYYY') : dayjs(createdAt.value).format('HH:mm');
+  return dayjs(createdAt.value).fromNow();
 });
 </script>
 
