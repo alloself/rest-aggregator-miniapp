@@ -11,9 +11,9 @@
       :height="sheet.options?.height"
       :custom-class="sheet.options?.class"
       :z-index="sheet.options?.zIndex"
-      @close="() => close(sheet.id)"
+      @close="close(sheet.id)"
     >
-      <component :is="sheet.component" v-bind="sheet.props" @close="() => close(sheet.id)" />
+      <component :is="sheet.component" v-bind="sheet.props" @close="close(sheet.id)" />
     </BottomSheet>
   </div>
 </template>
@@ -25,7 +25,9 @@ import { useBottomSheet, BottomSheet } from '../shared';
 const { state, close, closeAll } = useBottomSheet();
 
 onBeforeUnmount(() => {
-  closeAll();
+  if (state.sheets.length > 0) {
+    closeAll();
+  }
 });
 </script>
 
