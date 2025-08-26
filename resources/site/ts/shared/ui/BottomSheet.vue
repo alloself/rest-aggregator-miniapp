@@ -25,7 +25,7 @@
             <div v-if="props.showHandle" class="bottom-sheet__handle">
               <div class="bottom-sheet__handle-line"></div>
             </div>
-            
+
             <!-- Контент -->
             <div class="bottom-sheet__content">
               <slot />
@@ -38,16 +38,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 
 interface BottomSheetProps {
-  visible: boolean
-  showHandle?: boolean
-  closableByBackdrop?: boolean  
-  closableBySwipe?: boolean
-  height?: number
-  customClass?: string
-  zIndex?: number
+  visible: boolean;
+  showHandle?: boolean;
+  closableByBackdrop?: boolean;
+  closableBySwipe?: boolean;
+  height?: number;
+  customClass?: string;
+  zIndex?: number;
 }
 
 const props = withDefaults(defineProps<BottomSheetProps>(), {
@@ -56,35 +56,33 @@ const props = withDefaults(defineProps<BottomSheetProps>(), {
   closableBySwipe: true,
   height: 60,
   customClass: '',
-  zIndex: 1000
-})
+  zIndex: 1000,
+});
 
 const emit = defineEmits<{
-  close: []
-}>()
+  close: [];
+}>();
 
 // Стили для sheet
 const sheetStyles = computed(() => ({
-  maxHeight: `${props.height}vh`
-}))
+  maxHeight: `${props.height}vh`,
+}));
 
-const sheetClasses = computed(() => [
-  'bottom-sheet--default'
-])
+const sheetClasses = computed(() => ['bottom-sheet--default']);
 
 // Реактивные переменные для drag&drop
-const sheetRef = ref<HTMLElement>()
-const isDragging = ref(false)
-const startY = ref(0)
-const currentY = ref(0)
-const sheetHeight = ref(0)
+const sheetRef = ref<HTMLElement>();
+const isDragging = ref(false);
+const startY = ref(0);
+const currentY = ref(0);
+const sheetHeight = ref(0);
 
 /**
  * Обработка клика по backdrop
  */
 function handleBackdropClick() {
   if (props.closableByBackdrop) {
-    emit('close')
+    emit('close');
   }
 }
 
@@ -92,30 +90,30 @@ function handleBackdropClick() {
  * Начало touch события
  */
 function handleTouchStart(event: TouchEvent) {
-  if (!props.closableBySwipe) return
-  
-  isDragging.value = true
-  startY.value = event.touches[0].clientY
-  
+  if (!props.closableBySwipe) return;
+
+  isDragging.value = true;
+  startY.value = event.touches[0].clientY;
+
   if (sheetRef.value) {
-    sheetHeight.value = sheetRef.value.offsetHeight
+    sheetHeight.value = sheetRef.value.offsetHeight;
   }
 }
 
 /**
- * Движение touch события  
+ * Движение touch события
  */
 function handleTouchMove(event: TouchEvent) {
-  if (!isDragging.value || !props.closableBySwipe || !sheetRef.value) return
-  
-  currentY.value = event.touches[0].clientY
-  const deltaY = currentY.value - startY.value
-  
+  if (!isDragging.value || !props.closableBySwipe || !sheetRef.value) return;
+
+  currentY.value = event.touches[0].clientY;
+  const deltaY = currentY.value - startY.value;
+
   // Только если свайпаем вниз
   if (deltaY > 0) {
     try {
-      const transform = `translateY(${deltaY}px)`
-      sheetRef.value.style.transform = transform
+      const transform = `translateY(${deltaY}px)`;
+      sheetRef.value.style.transform = transform;
     } catch (error) {
       // Игнорируем ошибки DOM манипуляций
     }
@@ -126,25 +124,25 @@ function handleTouchMove(event: TouchEvent) {
  * Окончание touch события
  */
 function handleTouchEnd() {
-  if (!isDragging.value || !props.closableBySwipe || !sheetRef.value) return
-  
-  const deltaY = currentY.value - startY.value
-  const threshold = sheetHeight.value * 0.3 // 30% от высоты
-  
+  if (!isDragging.value || !props.closableBySwipe || !sheetRef.value) return;
+
+  const deltaY = currentY.value - startY.value;
+  const threshold = sheetHeight.value * 0.3; // 30% от высоты
+
   if (deltaY > threshold) {
-    emit('close')
+    emit('close');
   } else {
     try {
       // Возвращаем на место
-      sheetRef.value.style.transform = 'translateY(0)'
+      sheetRef.value.style.transform = 'translateY(0)';
     } catch (error) {
       // Игнорируем ошибки DOM манипуляций
     }
   }
-  
-  isDragging.value = false
-  startY.value = 0
-  currentY.value = 0
+
+  isDragging.value = false;
+  startY.value = 0;
+  currentY.value = 0;
 }
 
 /**
@@ -152,80 +150,72 @@ function handleTouchEnd() {
  */
 function handleEscapeKey(event: KeyboardEvent) {
   if (event.key === 'Escape' && props.visible) {
-    emit('close')
+    emit('close');
   }
 }
 
 onMounted(() => {
-  document.addEventListener('keydown', handleEscapeKey)
-})
+  document.addEventListener('keydown', handleEscapeKey);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleEscapeKey)
-  
+  document.removeEventListener('keydown', handleEscapeKey);
+
   // Очищаем стили при размонтировании
   try {
     if (sheetRef.value) {
-      sheetRef.value.style.transform = ''
+      sheetRef.value.style.transform = '';
     }
   } catch (error) {
     // Игнорируем ошибки DOM манипуляций при размонтировании
   }
   // Разблокируем скролл, если он был заблокирован этим компонентом
   try {
-    unlockBodyScroll()
+    unlockBodyScroll();
   } catch (error) {}
-})
+});
 
 /**
  * Блокирует прокрутку body, фиксируя текущую позицию прокрутки.
  */
 function lockBodyScroll() {
-  try {
-    const body = document.body
-    const currentCount = Number(body.getAttribute('data-scroll-lock-count') || '0')
-    body.setAttribute('data-scroll-lock-count', String(currentCount + 1))
-    if (currentCount > 0) return
+  const body = document.body;
+  const currentCount = Number(body.getAttribute('data-scroll-lock-count') || '0');
+  body.setAttribute('data-scroll-lock-count', String(currentCount + 1));
+  if (currentCount > 0) return;
 
-    const scrollY = window.scrollY || window.pageYOffset || 0
-    body.setAttribute('data-scroll-lock-y', String(scrollY))
-    body.style.position = 'fixed'
-    body.style.top = `-${scrollY}px`
-    body.style.left = '0'
-    body.style.right = '0'
-    body.style.width = '100%'
-    body.style.overflow = 'hidden'
-  } catch (error) {
-    // Ничего не делаем при ошибках доступа к DOM
-  }
+  const scrollY = window.scrollY || window.pageYOffset || 0;
+  body.setAttribute('data-scroll-lock-y', String(scrollY));
+  body.style.position = 'fixed';
+  body.style.top = `-${scrollY}px`;
+  body.style.left = '0';
+  body.style.right = '0';
+  body.style.width = '100%';
+  body.style.overflow = 'hidden';
 }
 
 /**
  * Снимает блокировку прокрутки body и восстанавливает позицию прокрутки.
  */
 function unlockBodyScroll() {
-  try {
-    const body = document.body
-    const currentCount = Number(body.getAttribute('data-scroll-lock-count') || '0')
-    const next = Math.max(0, currentCount - 1)
-    body.setAttribute('data-scroll-lock-count', String(next))
-    if (next > 0) return
+  const body = document.body;
+  const currentCount = Number(body.getAttribute('data-scroll-lock-count') || '0');
+  const next = Math.max(0, currentCount - 1);
+  body.setAttribute('data-scroll-lock-count', String(next));
+  if (next > 0) return;
 
-    const yAttr = body.getAttribute('data-scroll-lock-y') || '0'
-    const y = Number(yAttr) || 0
+  const yAttr = body.getAttribute('data-scroll-lock-y') || '0';
+  const y = Number(yAttr) || 0;
 
-    body.style.position = ''
-    body.style.top = ''
-    body.style.left = ''
-    body.style.right = ''
-    body.style.width = ''
-    body.style.overflow = ''
+  body.style.position = '';
+  body.style.top = '';
+  body.style.left = '';
+  body.style.right = '';
+  body.style.width = '';
+  body.style.overflow = '';
 
-    body.removeAttribute('data-scroll-lock-y')
-    window.scrollTo(0, y)
-  } catch (error) {
-    // Ничего не делаем при ошибках доступа к DOM
-  }
+  body.removeAttribute('data-scroll-lock-y');
+  window.scrollTo(0, y);
 }
 
 /**
@@ -235,13 +225,13 @@ watch(
   () => props.visible,
   (isVisible) => {
     if (isVisible) {
-      lockBodyScroll()
-      return
+      lockBodyScroll();
+      return;
     }
-    unlockBodyScroll()
+    unlockBodyScroll();
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 </script>
 
 <style>
@@ -260,32 +250,32 @@ watch(
 
 .bottom-sheet {
   width: 100%;
-  background-color: #FFFEFD;
+  background-color: #fffefd;
   border-radius: 20px 20px 0 0;
   box-shadow: 4px 4px 16px 8px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   position: relative;
-  
+
   &__handle {
     display: flex;
     justify-content: center;
     padding: 10px;
     cursor: grab;
-    
+
     &:active {
       cursor: grabbing;
     }
   }
-  
+
   &__handle-line {
     width: 48px;
     height: 5px;
     background-color: rgba(0, 0, 0, 0.15);
     border-radius: 2.5px;
   }
-  
+
   &__content {
     flex: 1;
     overflow-y: auto;

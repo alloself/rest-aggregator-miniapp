@@ -20,8 +20,6 @@
         </span>
         <span v-else v-html="sanitizedHtml"></span>
       </div>
-      
-      <!-- Кнопка свернуть отдельно снизу по центру -->
       <div 
         v-if="isExpanded && shouldShowToggle"
         class="collapsible-text__collapse-container"
