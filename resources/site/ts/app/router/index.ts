@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-// Simple routes for site
 const routes = [
   {
     path: '/',

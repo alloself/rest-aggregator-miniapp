@@ -9,37 +9,33 @@ import { initClient } from '../shared/api/axios';
 import '@site/ts/shared/lib/dayjs';
 
 async function initSiteApp() {
-  try {
-    const app = createApp(SiteApp);
+  const app = createApp(SiteApp);
 
-    const pinia = createPinia();
-    app.use(pinia);
+  const pinia = createPinia();
+  app.use(pinia);
 
-    app.use(router);
+  app.use(router);
 
-    app.use(PrimeVue, {
-      theme: {
-        preset: Aura,
-        options: {
-          prefix: 'p',
-          darkModeSelector: '.dark',
-          cssLayer: {
-            name: 'primevue',
-            order: 'theme, base, primevue',
-          },
+  app.use(PrimeVue, {
+    theme: {
+      preset: Aura,
+      options: {
+        prefix: 'p',
+        darkModeSelector: '.dark',
+        cssLayer: {
+          name: 'primevue',
+          order: 'theme, base, primevue',
         },
       },
-    });
+    },
+  });
 
-    await initClient();
+  await initClient();
 
-    const mountPoint = document.getElementById('site-app');
-    if (mountPoint) {
-      app.mount(mountPoint);
-      mountPoint.classList.add('mounted');
-    }
-  } catch (error) {
-    console.error('Site App: initialization failed', error);
+  const mountPoint = document.getElementById('site-app');
+  if (mountPoint) {
+    app.mount(mountPoint);
+    mountPoint.classList.add('mounted');
   }
 }
 

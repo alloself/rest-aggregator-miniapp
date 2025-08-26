@@ -10,7 +10,7 @@
     "format:check": "prettier --check ."
   },
   "devDependencies": {
-    "@iconify/json": "^2.2.377",
+    "@iconify/json": "^2.2.378",
     "@primevue/auto-import-resolver": "^4.3.7",
     "@tailwindcss/postcss": "^4.1.12",
     "@types/dompurify": "^3.2.0",
@@ -20,7 +20,7 @@
     "dompurify": "^3.2.6",
     "fast-glob": "^3.3.3",
     "fs-extra": "^11.3.1",
-    "laravel-vite-plugin": "^2.0.0",
+    "laravel-vite-plugin": "^2.0.1",
     "postcss": "^8.5.6",
     "postcss-nested": "^7.0.2",
     "tailwindcss": "^4.1.12",
@@ -50,8 +50,8 @@
     "tailwindcss-primeui": "^0.6.1",
     "typescript": "^5.9.2",
     "vee-validate": "^4.15.1",
-    "vue": "^3.5.19",
+    "vue": "^3.5.20",
     "vue-router": "^4.5.1",
-    "zod": "^3.24.1"
+    "zod": "^3.25.76"
   }
 }
