@@ -10,8 +10,10 @@ use App\Http\Controllers\AggregatorController;
 |
 */
 
+Route::get('/', [AggregatorController::class, 'site'])->name('site');
+
+Route::get('/restaurant/{any?}', [AggregatorController::class, 'site'])->where('any', '.*')->name('site');
+
 Route::get('/account/{any?}', [AggregatorController::class, 'account'])->where('any', '.*')->name('account');
 
 Route::get('/admin', [AggregatorController::class, 'admin'])->name('admin');
-
-Route::get('/', [AggregatorController::class, 'site'])->name('site');
