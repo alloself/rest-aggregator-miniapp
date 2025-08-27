@@ -1,82 +1,116 @@
-import { ref, reactive, markRaw, onBeforeUnmount } from 'vue'
-import type { BottomSheetOptions, BottomSheetItem, BottomSheetState } from '../../types/bottom-sheet'
+import { markRaw, ref, Component } from 'vue';
+import type { BottomSheetOptions, BottomSheetItem } from '../../types/bottom-sheet';
 
-// Глобальное состояние
-const state = reactive<BottomSheetState>({
-  sheets: [],
-  isAnimating: false
-})
+const sheets = ref<BottomSheetItem[]>([])
 
-let idCounter = 0
+let idCounter = 0;
 
-function generateId(): string {
-  return `sheet-${++idCounter}`
+export function lockBodyScroll(): void {
+  const body = document.body;
+  const current_count_attr = body.getAttribute('data-scroll-lock-count') || '0';
+  const current_count = Number(current_count_attr);
+  body.setAttribute('data-scroll-lock-count', String(current_count + 1));
+  if (current_count > 0) return;
+
+  const scroll_y = window.scrollY || window.pageYOffset || 0;
+  body.setAttribute('data-scroll-lock-y', String(scroll_y));
+  body.style.position = 'fixed';
+  body.style.top = `-${scroll_y}px`;
+  body.style.left = '0';
+  body.style.right = '0';
+  body.style.width = '100%';
+  body.style.overflow = 'hidden';
 }
 
-/**
- * Открыть bottom sheet
- */
-function open(component: any, props: Record<string, any> = {}, options: BottomSheetOptions = {}): string {
-  const id = generateId()
-  
-  const defaultOptions: BottomSheetOptions = {
-    showHandle: true,
-    closableByBackdrop: true,
-    closableBySwipe: true,
-    height: 60,
-    zIndex: 1000 + state.sheets.length
-  }
-  
-  const item: BottomSheetItem = {
-    id,
-    component: markRaw(component),
-    props,
-    options: { ...defaultOptions, ...options }
-  }
-  
-  state.sheets.push(item)
-  return id
-}
+export function unlockBodyScroll(): void {
+  const body = document.body;
+  const current_count_attr = body.getAttribute('data-scroll-lock-count') || '0';
+  const next = Math.max(0, Number(current_count_attr) - 1);
+  body.setAttribute('data-scroll-lock-count', String(next));
+  if (next > 0) return;
 
-/**
- * Закрыть по ID
- */
-function close(id: string): void {
-  const index = state.sheets.findIndex(sheet => sheet.id === id)
-  if (index > -1) {
-    state.sheets.splice(index, 1)
-  }
-}
+  const y_attr = body.getAttribute('data-scroll-lock-y') || '0';
+  const y = Number(y_attr) || 0;
 
-/**
- * Закрыть последний
- */
-function closeLast(): void {
-  if (state.sheets.length > 0) {
-    state.sheets.pop()
-  }
-}
+  body.style.position = '';
+  body.style.top = '';
+  body.style.left = '';
+  body.style.right = '';
+  body.style.width = '';
+  body.style.overflow = '';
 
-/**
- * Закрыть все
- */
-function closeAll(): void {
-  state.sheets.splice(0)
+  body.removeAttribute('data-scroll-lock-y');
+  window.scrollTo(0, y);
 }
 
 export function useBottomSheet() {
+  function generateId(): string {
+    return `sheet-${++idCounter}`;
+  }
+
+  /**
+   * Открыть bottom sheet
+   */
+  function open(component: Component, props: Record<string, any> = {}, options: BottomSheetOptions = {}): string {
+    const id = generateId();
+
+    const defaultOptions: BottomSheetOptions = {
+      showHandle: true,
+      closableByBackdrop: true,
+      closableBySwipe: true,
+      height: 60,
+      zIndex: 1000 + sheets.value.length,
+    };
+
+    const item: BottomSheetItem = {
+      id,
+      component: markRaw(component),
+      props,
+      options: { ...defaultOptions, ...options },
+    };
+
+    sheets.value.push(item);
+    lockBodyScroll();
+    return id;
+  }
+
+  /**
+   * Закрыть по ID
+   */
+  function close(id: string): void {
+    const index = sheets.value.findIndex((sheet) => sheet.id === id);
+    if (index > -1) {
+      sheets.value.splice(index, 1);
+      unlockBodyScroll();
+    }
+  }
+
+  /**
+   * Закрыть последний
+   */
+  function closeLast(): void {
+    if (sheets.value.length > 0) {
+      sheets.value.pop();
+      unlockBodyScroll();
+    }
+  }
+
+  /**
+   * Закрыть все
+   */
+  function closeAll(): void {
+    const count = sheets.value.length;
+    sheets.value.splice(0);
+    for (let i = 0; i < count; i += 1) {
+      unlockBodyScroll();
+    }
+  }
+
   return {
-    state,
+    sheets,
     open,
     close,
     closeLast,
-    closeAll
-  }
-}
-
-export const bottomSheet = {
-  open,
-  close,
-  closeLast,
-  closeAll
+    closeAll,
+  };
 }

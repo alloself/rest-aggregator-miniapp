@@ -31,16 +31,11 @@ export interface BottomSheetItem {
   options?: BottomSheetOptions
 }
 
-export interface BottomSheetState {
-  sheets: BottomSheetItem[]
-  isAnimating: boolean
-}
-
 export interface BottomSheetMethods {
   /**
    * Открыть новый bottom sheet
    */
-  open: (component: any, props?: Record<string, any>, options?: BottomSheetOptions) => string
+  open: (component: Component, props?: Record<string, unknown>, options?: BottomSheetOptions) => string
   /**
    * Закрыть конкретный bottom sheet по ID
    */

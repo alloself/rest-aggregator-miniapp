@@ -20,6 +20,20 @@
     </div>
 
     <div v-else class="restaurant-page__not-found">Ресторан не найден</div>
+
+    <BottomSheet
+      v-for="sheet in sheets"
+      :key="sheet.id"
+      :show-handle="sheet.options?.showHandle"
+      :closable-by-backdrop="sheet.options?.closableByBackdrop"
+      :closable-by-swipe="sheet.options?.closableBySwipe"
+      :height="sheet.options?.height"
+      :custom-class="sheet.options?.class"
+      :z-index="sheet.options?.zIndex"
+      @close="close(sheet.id)"
+    >
+      <component :is="sheet.component" v-bind="sheet.props" @close="close(sheet.id)" />
+    </BottomSheet>
   </div>
 </template>
 
@@ -29,6 +43,8 @@ import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useRestaurantStore } from '../entities/restaurant';
 import RestaurantCard from '../widgets/restaurant-page/RestaurantCard.vue';
+import { useBottomSheet, BottomSheet } from '../shared';
+import PhotoReels from '@/shared/components/PhotoReels.vue';
 
 const route = useRoute();
 const slug = computed(() => (typeof route.params.slug === 'string' ? route.params.slug : ''));
@@ -39,14 +55,18 @@ const { restaurant, loading, error } = storeToRefs(store);
 const chefRecommendations = computed(() => {
   const categories = restaurant.value?.categories ?? [];
   const chief = categories.find((c) => c?.pivot?.key === 'chief_recommendations');
-
-  return chief?.dishes ?? [];
+  return Array.isArray(chief?.dishes) ? chief!.dishes : [];
 });
 
 const contactInfo = computed(() => ({
   phone: '+7 (495) 123-45-67',
   telegram: 'restaurant_bot',
 }));
+
+const galleryImages = computed(() => {
+  const images = restaurant.value?.images ?? [];
+  return images.filter((img) => img?.pivot?.key === 'gallery');
+});
 
 const handleShowMenu = () => {
   console.log('Показать меню');
@@ -56,7 +76,19 @@ const handleShowBar = () => {
   console.log('Показать бар');
 };
 
+const { sheets, close, open } = useBottomSheet();
+
 const handleShowPhotos = () => {
+  if (galleryImages.value.length === 0) return;
+
+  open(PhotoReels, { images: galleryImages.value, showPagination: true }, {
+    showHandle: true,
+    closableByBackdrop: true,
+    closableBySwipe: true,
+    height: 90,
+    zIndex: 1200,
+    class: 'restaurant-page__photos-sheet',
+  });
   console.log('Показать фото');
 };
 
@@ -104,5 +136,17 @@ onBeforeMount(async () => {
 
 .restaurant-page__wrapper {
   width: 100%;
+}
+
+/* BottomSheet с галереей: фиксированная высота и учет handle */
+.restaurant-page__photos-sheet {
+  height: 80vh;
+  max-height: 80vh;
+
+  .bottom-sheet__content {
+    height: calc(100% - 25px);
+    overflow: hidden;
+    padding: 0;
+  }
 }
 </style>

@@ -120,19 +120,19 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Dish, Restaurant } from '@/shared';
 
 // Shared UI components
 import { Icon } from '@/shared';
 import HeroCarousel from '@shared/ui/HeroCarousel.vue';
 import { AppButton, AppImage, WorkingHours } from '../../shared/ui';
-import { bottomSheet } from '../../shared/lib/composables';
 
 // Local components
 import ContactDropdown from '../../shared/ui/ContactDropdown.vue';
 import CollapsibleText from '../../shared/ui/CollapsibleText.vue';
 import Categories from './Categories.vue';
 import { DishBottomSheet } from '../../entities/dish/ui';
+import { useBottomSheet } from '../../shared';
+import { DishResourceData, RestaurantResourceData } from '@/shared/types/resources';
 
 interface ContactInfo {
   phone?: string;
@@ -140,8 +140,8 @@ interface ContactInfo {
 }
 
 interface Props {
-  restaurant: Restaurant | null;
-  chefRecommendations?: Dish[];
+  restaurant: RestaurantResourceData | null;
+  chefRecommendations?: DishResourceData[];
   contactInfo?: ContactInfo;
 }
 
@@ -155,6 +155,8 @@ const emit = defineEmits<{
   showBar: [];
   showPhotos: [];
 }>();
+
+const { open } = useBottomSheet();
 
 const images = computed(() => props.restaurant?.images || []);
 
@@ -185,11 +187,8 @@ const showPhotos = () => {
   emit('showPhotos');
 };
 
-/**
- * Обработка клика по блюду - открытие bottom sheet
- */
-const handleDishClick = (dish: Dish) => {
-  bottomSheet.open(DishBottomSheet, {
+const handleDishClick = (dish: DishResourceData) => {
+  open(DishBottomSheet, {
     dish,
   });
 };

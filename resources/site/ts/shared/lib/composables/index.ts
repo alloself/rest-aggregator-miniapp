@@ -1,2 +1,1 @@
-// Composables - переиспользуемая логика Vue
-export { useBottomSheet, bottomSheet } from './useBottomSheet'
+export { useBottomSheet } from './useBottomSheet'

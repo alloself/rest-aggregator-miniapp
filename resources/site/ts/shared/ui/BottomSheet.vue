@@ -2,7 +2,6 @@
   <Teleport to="body">
     <transition name="bottom-sheet-backdrop" appear>
       <div
-        v-if="visible"
         class="bottom-sheet-backdrop"
         :style="{ zIndex: props.zIndex }"
         @click="handleBackdropClick"
@@ -11,7 +10,6 @@
       >
         <transition name="bottom-sheet" appear>
           <div
-            v-if="visible"
             ref="sheetRef"
             class="bottom-sheet"
             :class="[sheetClasses, props.customClass]"
@@ -41,7 +39,6 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 
 interface BottomSheetProps {
-  visible: boolean;
   showHandle?: boolean;
   closableByBackdrop?: boolean;
   closableBySwipe?: boolean;
@@ -109,35 +106,22 @@ function handleTouchMove(event: TouchEvent) {
   currentY.value = event.touches[0].clientY;
   const deltaY = currentY.value - startY.value;
 
-  // Только если свайпаем вниз
   if (deltaY > 0) {
-    try {
-      const transform = `translateY(${deltaY}px)`;
-      sheetRef.value.style.transform = transform;
-    } catch (error) {
-      // Игнорируем ошибки DOM манипуляций
-    }
+    const transform = `translateY(${deltaY}px)`;
+    sheetRef.value.style.transform = transform;
   }
 }
 
-/**
- * Окончание touch события
- */
 function handleTouchEnd() {
   if (!isDragging.value || !props.closableBySwipe || !sheetRef.value) return;
 
   const deltaY = currentY.value - startY.value;
-  const threshold = sheetHeight.value * 0.3; // 30% от высоты
+  const threshold = sheetHeight.value * 0.3;
 
   if (deltaY > threshold) {
     emit('close');
   } else {
-    try {
-      // Возвращаем на место
-      sheetRef.value.style.transform = 'translateY(0)';
-    } catch (error) {
-      // Игнорируем ошибки DOM манипуляций
-    }
+    sheetRef.value.style.transform = 'translateY(0)';
   }
 
   isDragging.value = false;
@@ -145,11 +129,8 @@ function handleTouchEnd() {
   currentY.value = 0;
 }
 
-/**
- * Обработка клавиши Escape
- */
 function handleEscapeKey(event: KeyboardEvent) {
-  if (event.key === 'Escape' && props.visible) {
+  if (event.key === 'Escape') {
     emit('close');
   }
 }
@@ -161,77 +142,10 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('keydown', handleEscapeKey);
 
-  // Очищаем стили при размонтировании
-  try {
-    if (sheetRef.value) {
-      sheetRef.value.style.transform = '';
-    }
-  } catch (error) {
-    // Игнорируем ошибки DOM манипуляций при размонтировании
+  if (sheetRef.value) {
+    sheetRef.value.style.transform = '';
   }
-  // Разблокируем скролл, если он был заблокирован этим компонентом
-  try {
-    unlockBodyScroll();
-  } catch (error) {}
 });
-
-/**
- * Блокирует прокрутку body, фиксируя текущую позицию прокрутки.
- */
-function lockBodyScroll() {
-  const body = document.body;
-  const currentCount = Number(body.getAttribute('data-scroll-lock-count') || '0');
-  body.setAttribute('data-scroll-lock-count', String(currentCount + 1));
-  if (currentCount > 0) return;
-
-  const scrollY = window.scrollY || window.pageYOffset || 0;
-  body.setAttribute('data-scroll-lock-y', String(scrollY));
-  body.style.position = 'fixed';
-  body.style.top = `-${scrollY}px`;
-  body.style.left = '0';
-  body.style.right = '0';
-  body.style.width = '100%';
-  body.style.overflow = 'hidden';
-}
-
-/**
- * Снимает блокировку прокрутки body и восстанавливает позицию прокрутки.
- */
-function unlockBodyScroll() {
-  const body = document.body;
-  const currentCount = Number(body.getAttribute('data-scroll-lock-count') || '0');
-  const next = Math.max(0, currentCount - 1);
-  body.setAttribute('data-scroll-lock-count', String(next));
-  if (next > 0) return;
-
-  const yAttr = body.getAttribute('data-scroll-lock-y') || '0';
-  const y = Number(yAttr) || 0;
-
-  body.style.position = '';
-  body.style.top = '';
-  body.style.left = '';
-  body.style.right = '';
-  body.style.width = '';
-  body.style.overflow = '';
-
-  body.removeAttribute('data-scroll-lock-y');
-  window.scrollTo(0, y);
-}
-
-/**
- * Следим за видимостью шита и блокируем/разблокируем прокрутку страницы.
- */
-watch(
-  () => props.visible,
-  (isVisible) => {
-    if (isVisible) {
-      lockBodyScroll();
-      return;
-    }
-    unlockBodyScroll();
-  },
-  { immediate: true },
-);
 </script>
 
 <style>

@@ -1,16 +1,12 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-
-import { Categorizable, Category, Restaurant } from '@/shared';
 import { client } from '../../shared/api/axios';
 import { isAxiosError } from 'axios';
+import { RestaurantResourceData } from '@/shared/types/resources';
 
-export interface RestaurantResource extends Restaurant {
-  categories: Array<Category & { pivot: Categorizable }>;
-}
 
 export const useRestaurantStore = defineStore('restaurant', () => {
-  const restaurant = ref<RestaurantResource | null>(null);
+  const restaurant = ref<RestaurantResourceData | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
 
@@ -20,7 +16,7 @@ export const useRestaurantStore = defineStore('restaurant', () => {
     restaurant.value = null;
 
     try {
-      const response = await client.get<RestaurantResource>(`api/site/restaurants/${slug}`);
+      const response = await client.get<RestaurantResourceData>(`api/site/restaurants/${slug}`);
       restaurant.value = response.data;
     } catch (e: unknown) {
       restaurant.value = null;
