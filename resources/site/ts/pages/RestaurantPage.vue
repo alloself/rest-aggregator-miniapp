@@ -20,21 +20,8 @@
     </div>
 
     <div v-else class="restaurant-page__not-found">Ресторан не найден</div>
-
-    <BottomSheet
-      v-for="sheet in sheets"
-      :key="sheet.id"
-      :show-handle="sheet.options?.showHandle"
-      :closable-by-backdrop="sheet.options?.closableByBackdrop"
-      :closable-by-swipe="sheet.options?.closableBySwipe"
-      :height="sheet.options?.height"
-      :custom-class="sheet.options?.class"
-      :z-index="sheet.options?.zIndex"
-      @close="close(sheet.id)"
-    >
-      <component :is="sheet.component" v-bind="sheet.props" @close="close(sheet.id)" />
-    </BottomSheet>
   </div>
+  <BottomSheetContainer />
 </template>
 
 <script setup lang="ts">
@@ -43,11 +30,15 @@ import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useRestaurantStore } from '../entities/restaurant';
 import RestaurantCard from '../widgets/restaurant-page/RestaurantCard.vue';
-import { useBottomSheet, BottomSheet } from '../shared';
+import { BottomSheetContainer } from '../features/bottom-sheet';
 import PhotoReels from '@/shared/components/PhotoReels.vue';
+import { useBottomSheet } from '../shared';
+
+const { slug } = defineProps<{ slug?: string }>();
 
 const route = useRoute();
-const slug = computed(() => (typeof route.params.slug === 'string' ? route.params.slug : ''));
+
+const { open } = useBottomSheet();
 
 const store = useRestaurantStore();
 const { restaurant, loading, error } = storeToRefs(store);
@@ -76,26 +67,27 @@ const handleShowBar = () => {
   console.log('Показать бар');
 };
 
-const { sheets, close, open } = useBottomSheet();
-
 const handleShowPhotos = () => {
   if (galleryImages.value.length === 0) return;
 
-  open(PhotoReels, { images: galleryImages.value, showPagination: true }, {
-    showHandle: true,
-    closableByBackdrop: true,
-    closableBySwipe: true,
-    height: 90,
-    zIndex: 1200,
-    class: 'restaurant-page__photos-sheet',
-  });
-  console.log('Показать фото');
+  open(
+    PhotoReels,
+    { images: galleryImages.value, showPagination: true },
+    {
+      showHandle: true,
+      closableByBackdrop: true,
+      closableBySwipe: true,
+      height: 90,
+      zIndex: 1200,
+      class: 'restaurant-page__photos-sheet',
+    },
+  );
 };
 
 onBeforeMount(async () => {
-  if (slug.value) {
-    await store.getRestaurantData(slug.value);
-  }
+  const param = slug || route.params.slug.toString();
+
+  store.getRestaurantData(param);
 });
 </script>
 

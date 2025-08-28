@@ -1,11 +1,11 @@
 import { markRaw, ref, Component } from 'vue';
 import type { BottomSheetOptions, BottomSheetItem } from '../../types/bottom-sheet';
 
-const sheets = ref<BottomSheetItem[]>([])
+const sheets = ref<BottomSheetItem[]>([]);
 
 let idCounter = 0;
 
-export function lockBodyScroll(): void {
+export const lockBodyScroll = (): void => {
   const body = document.body;
   const current_count_attr = body.getAttribute('data-scroll-lock-count') || '0';
   const current_count = Number(current_count_attr);
@@ -22,7 +22,7 @@ export function lockBodyScroll(): void {
   body.style.overflow = 'hidden';
 }
 
-export function unlockBodyScroll(): void {
+export const unlockBodyScroll = (): void => {
   const body = document.body;
   const current_count_attr = body.getAttribute('data-scroll-lock-count') || '0';
   const next = Math.max(0, Number(current_count_attr) - 1);
@@ -43,15 +43,13 @@ export function unlockBodyScroll(): void {
   window.scrollTo(0, y);
 }
 
-export function useBottomSheet() {
-  function generateId(): string {
+export const useBottomSheet = () => {
+  const generateId = (): string => {
     return `sheet-${++idCounter}`;
-  }
+  };
 
-  /**
-   * Открыть bottom sheet
-   */
-  function open(component: Component, props: Record<string, any> = {}, options: BottomSheetOptions = {}): string {
+
+  const open = (component: Component, props: Record<string, unknown> = {}, options: BottomSheetOptions = {}): string => {
     const id = generateId();
 
     const defaultOptions: BottomSheetOptions = {
@@ -62,49 +60,47 @@ export function useBottomSheet() {
       zIndex: 1000 + sheets.value.length,
     };
 
-    const item: BottomSheetItem = {
+    sheets.value.push({
       id,
       component: markRaw(component),
       props,
       options: { ...defaultOptions, ...options },
-    };
-
-    sheets.value.push(item);
+    });
     lockBodyScroll();
     return id;
-  }
+  };
 
   /**
    * Закрыть по ID
    */
-  function close(id: string): void {
+  const close = (id: string): void => {
     const index = sheets.value.findIndex((sheet) => sheet.id === id);
     if (index > -1) {
       sheets.value.splice(index, 1);
       unlockBodyScroll();
     }
-  }
+  };
 
   /**
    * Закрыть последний
    */
-  function closeLast(): void {
+  const closeLast = (): void => {
     if (sheets.value.length > 0) {
       sheets.value.pop();
       unlockBodyScroll();
     }
-  }
+  };
 
   /**
    * Закрыть все
    */
-  function closeAll(): void {
+  const closeAll = (): void => {
     const count = sheets.value.length;
     sheets.value.splice(0);
     for (let i = 0; i < count; i += 1) {
       unlockBodyScroll();
     }
-  }
+  };
 
   return {
     sheets,
