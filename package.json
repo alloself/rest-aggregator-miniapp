@@ -41,6 +41,7 @@
     "chart.js": "^4.5.0",
     "dayjs": "^1.11.15",
     "lodash": "^4.17.21",
+    "pdfjs-dist": "^5.4.54",
     "pinia": "^3.0.3",
     "prettier": "^3.6.2",
     "primeicons": "^7.0.0",

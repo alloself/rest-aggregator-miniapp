@@ -46,7 +46,7 @@
 
   <Dialog v-model:visible="showDialog" modal header="Создать файл">
     <div class="flex flex-col gap-4">
-      <FileUpload customUpload mode="basic" @select="onSelect" :accept="acceptType" :maxFileSize="1000000">
+      <FileUpload customUpload mode="basic" @select="onSelect" :accept="acceptType">
       </FileUpload>
     </div>
     <template #footer>
