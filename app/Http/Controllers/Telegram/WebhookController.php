@@ -740,6 +740,16 @@ class WebhookController extends Controller
                                 'step' => 'friend_successfully_added'
                             ]);
 
+                            // Пытаемся отправить приветственное сообщение приглашенному пользователю
+                            $this->tryGreetInvitedUser(
+                                invitedTelegramId: $userId,
+                                inviterChatId: (int) $chatId,
+                                inviterName: trim(($user->first_name ?? '') . (isset($user->last_name) ? ' ' . $user->last_name : '')),
+                                restaurant: $restaurant,
+                                service: $service,
+                                invitedDisplayName: trim(($sharedUser['first_name'] ?? '') . (isset($sharedUser['last_name']) ? ' ' . $sharedUser['last_name'] : ''))
+                            );
+
                         } catch (Throwable $e) {
                             Log::error('❌ ОТЛАДКА: Ошибка добавления друга', [
                                 'error' => $e->getMessage(),
@@ -801,6 +811,60 @@ class WebhookController extends Controller
 
             // Заменяем клавиатуру даже при ошибке
             $this->setAppKeyboard($chatId, $service, $restaurant);
+        }
+    }
+
+    /**
+     * Попробовать отправить приветственное сообщение приглашенному пользователю.
+     * Если бот не может инициировать чат, отправляет приглашателю ссылку /start для друга.
+     */
+    private function tryGreetInvitedUser(int $invitedTelegramId, int $inviterChatId, string $inviterName, Restaurant $restaurant, TelegramBotService $service, string $invitedDisplayName = ''): void
+    {
+        try {
+            $greetingText = "Привет" . ($invitedDisplayName ? ", {$invitedDisplayName}" : "") . "! {$inviterName} пригласил(а) вас в {$restaurant->name}. Откройте бота, чтобы посмотреть меню, фото и события, а также чтобы мы могли оставаться на связи.";
+
+            $service->sendMessage([
+                'chat_id' => $invitedTelegramId,
+                'text' => $greetingText,
+            ]);
+
+            Log::info('✅ Отправлено приветственное сообщение приглашенному пользователю', [
+                'restaurant_id' => $restaurant->id,
+                'invited_telegram_id' => $invitedTelegramId,
+                'inviter_chat_id' => $inviterChatId,
+            ]);
+
+            return;
+        } catch (Throwable $e) {
+            Log::warning('⚠️ Не удалось отправить приветствие приглашенному пользователю (возможно, чат не инициализирован)', [
+                'error' => $e->getMessage(),
+                'restaurant_id' => $restaurant->id,
+                'invited_telegram_id' => $invitedTelegramId,
+                'inviter_chat_id' => $inviterChatId,
+            ]);
+        }
+
+        // Пытаемся отправить приглашателю ссылку с deep-link для друга
+        try {
+            $botInfo = $service->getMe();
+            $botUsername = $botInfo['result']['username'] ?? null;
+
+            $payload = 'r' . $restaurant->id . '-i' . $inviterChatId;
+            $startLink = $botUsername ? ("https://t.me/{$botUsername}?start={$payload}") : null;
+
+            $fallbackText = 'Мы не смогли написать приглашенному пользователю. '
+                . 'Попросите его начать чат с ботом' . ($startLink ? ": {$startLink}" : '.') ;
+
+            $service->sendMessage([
+                'chat_id' => $inviterChatId,
+                'text' => $fallbackText,
+            ]);
+        } catch (Throwable $e) {
+            Log::warning('⚠️ Не удалось отправить fallback-сообщение приглашателю', [
+                'error' => $e->getMessage(),
+                'restaurant_id' => $restaurant->id,
+                'inviter_chat_id' => $inviterChatId,
+            ]);
         }
     }
 
