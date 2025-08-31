@@ -18,6 +18,7 @@ return new class extends Migration
             $table->longText('subtitle')->nullable();
             $table->string('average_receipt')->nullable();
             $table->string('phone')->nullable();
+            $table->string('bot_username')->nullable();
             $table->string('telegram_bot_token')->nullable();
             $table->string('address')->nullable();
             $table->longText('description')->nullable();
