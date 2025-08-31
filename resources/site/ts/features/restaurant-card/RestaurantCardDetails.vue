@@ -27,9 +27,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { RestaurantResourceData } from '@/shared/types/resources';
+import type { RestaurantResourceData } from '@shared/types/resources';
 import { Icon } from '@/shared';
-import { WorkingHours } from '../../../shared/ui';
+import { WorkingHours } from '../../shared/ui';
 
 interface Props {
   restaurant: RestaurantResourceData | null;

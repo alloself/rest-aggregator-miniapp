@@ -1,0 +1,68 @@
+.feed-tabs {
+    @apply flex overflow-x-auto px-[15px] mb-[16px] gap-[6px];
+
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.feed-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.feed-tabs__item {
+    @apply flex-1 flex items-center justify-center gap-[6px] px-[16px] py-[10px] min-h-[39px] whitespace-nowrap select-none cursor-pointer;
+
+    @apply text-[var(--font-size-body-default)] font-medium tracking-[-0.05em] text-[var(--color-text-primary)];
+
+    @apply rounded-[var(--radius-button)] bg-[var(--color-bg-secondary)] border border-transparent transition-all duration-200;
+}
+
+.feed-tabs__item:hover:not(:disabled) {
+    @apply bg-[var(--color-bg-secondary-hover)];
+}
+
+.feed-tabs__item--active {
+    @apply bg-transparent border-[var(--color-border-default)];
+}
+
+.feed-tabs__item--active:hover {
+    @apply bg-[var(--color-bg-secondary)];
+}
+
+.feed-tabs__item:disabled {
+    @apply cursor-not-allowed opacity-[var(--opacity-disabled)];
+}
+
+.feed-tabs__item:disabled:hover {
+    @apply bg-transparent;
+}
+
+.feed-tabs__item .mdi-icon {
+    flex-shrink: 0;
+}
+
+.feed-tabs__item .p-badge {
+    @apply text-[10px] min-w-[16px] h-[16px] leading-none px-[4px] py-0;
+}
+
+@keyframes fadeInCategory {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 375px) {
+    .feed-tabs {
+        @apply px-[12px] gap-[4px];
+    }
+
+    .feed-tabs__item {
+        @apply px-[12px] py-[8px] text-[var(--font-size-body-tiny)];
+    }
+}

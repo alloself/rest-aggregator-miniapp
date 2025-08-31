@@ -1,0 +1,16 @@
+.infinite-scroll {
+    @apply flex flex-col gap-4;
+}
+
+.infinite-scroll__content {
+    @apply flex flex-col gap-4;
+}
+
+.infinite-scroll__state {
+    @apply text-sm;
+    color: var(--color-text-secondary);
+}
+
+.infinite-scroll__sentinel {
+    @apply h-px;
+}

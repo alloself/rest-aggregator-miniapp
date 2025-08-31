@@ -19,12 +19,10 @@
             @touchmove="handleTouchMove"
             @touchend="handleTouchEnd"
           >
-            <!-- Handle для свайпа -->
             <div v-if="props.showHandle" class="bottom-sheet__handle">
               <div class="bottom-sheet__handle-line"></div>
             </div>
 
-            <!-- Контент -->
             <div class="bottom-sheet__content">
               <slot />
             </div>
@@ -60,33 +58,25 @@ const emit = defineEmits<{
   close: [];
 }>();
 
-// Стили для sheet
 const sheetStyles = computed(() => ({
   maxHeight: `${props.height}vh`,
 }));
 
 const sheetClasses = computed(() => ['bottom-sheet--default']);
 
-// Реактивные переменные для drag&drop
 const sheetRef = ref<HTMLElement>();
 const isDragging = ref(false);
 const startY = ref(0);
 const currentY = ref(0);
 const sheetHeight = ref(0);
 
-/**
- * Обработка клика по backdrop
- */
-function handleBackdropClick() {
+const handleBackdropClick = () => {
   if (props.closableByBackdrop) {
     emit('close');
   }
-}
+};
 
-/**
- * Начало touch события
- */
-function handleTouchStart(event: TouchEvent) {
+const handleTouchStart = (event: TouchEvent) => {
   if (!props.closableBySwipe) return;
 
   isDragging.value = true;
@@ -95,12 +85,9 @@ function handleTouchStart(event: TouchEvent) {
   if (sheetRef.value) {
     sheetHeight.value = sheetRef.value.offsetHeight;
   }
-}
+};
 
-/**
- * Движение touch события
- */
-function handleTouchMove(event: TouchEvent) {
+const handleTouchMove = (event: TouchEvent) => {
   if (!isDragging.value || !props.closableBySwipe || !sheetRef.value) return;
 
   currentY.value = event.touches[0].clientY;
@@ -110,9 +97,9 @@ function handleTouchMove(event: TouchEvent) {
     const transform = `translateY(${deltaY}px)`;
     sheetRef.value.style.transform = transform;
   }
-}
+};
 
-function handleTouchEnd() {
+const handleTouchEnd = () => {
   if (!isDragging.value || !props.closableBySwipe || !sheetRef.value) return;
 
   const deltaY = currentY.value - startY.value;
@@ -127,13 +114,13 @@ function handleTouchEnd() {
   isDragging.value = false;
   startY.value = 0;
   currentY.value = 0;
-}
+};
 
-function handleEscapeKey(event: KeyboardEvent) {
+const handleEscapeKey = (event: KeyboardEvent) => {
   if (event.key === 'Escape') {
     emit('close');
   }
-}
+};
 
 onMounted(() => {
   document.addEventListener('keydown', handleEscapeKey);
@@ -147,93 +134,3 @@ onUnmounted(() => {
   }
 });
 </script>
-
-<style>
-/* Bottom Sheet Component - PostCSS Nested */
-.bottom-sheet-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: flex-end;
-  backdrop-filter: blur(2px);
-}
-
-.bottom-sheet {
-  width: 100%;
-  background-color: #fffefd;
-  border-radius: 20px 20px 0 0;
-  box-shadow: 4px 4px 16px 8px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-
-  &__handle {
-    display: flex;
-    justify-content: center;
-    padding: 10px;
-    cursor: grab;
-
-    &:active {
-      cursor: grabbing;
-    }
-  }
-
-  &__handle-line {
-    width: 48px;
-    height: 5px;
-    background-color: rgba(0, 0, 0, 0.15);
-    border-radius: 2.5px;
-  }
-
-  &__content {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-  }
-}
-
-/* Анимации */
-.bottom-sheet-backdrop-enter-active,
-.bottom-sheet-backdrop-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.bottom-sheet-backdrop-enter-from,
-.bottom-sheet-backdrop-leave-to {
-  opacity: 0;
-}
-
-.bottom-sheet-enter-active {
-  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.bottom-sheet-leave-active {
-  transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.bottom-sheet-enter-from,
-.bottom-sheet-leave-to {
-  transform: translateY(100%);
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-  .bottom-sheet {
-    border-radius: 16px 16px 0 0;
-  }
-}
-
-/* Стили для iOS */
-@supports (-webkit-touch-callout: none) {
-  .bottom-sheet {
-    /* Убираем подсветку при тапе на iOS */
-    -webkit-tap-highlight-color: transparent;
-  }
-}
-</style>

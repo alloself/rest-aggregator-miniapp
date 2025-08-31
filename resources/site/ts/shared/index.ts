@@ -1,9 +1,8 @@
-export * from './ui'
-export * from './lib'
-
+export * from './ui';
+export * from './lib';
 
 export enum ECategory {
-    News = 'news',
-    Events = 'events',
-    Offers = 'offers',
-  }
+  News = 'news',
+  Events = 'events',
+  Offers = 'offers',
+}

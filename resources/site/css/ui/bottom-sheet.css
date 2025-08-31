@@ -1,0 +1,58 @@
+.bottom-sheet-backdrop {
+    @apply fixed inset-0 flex items-end bg-black/50 [backdrop-filter:var(--shadow-backdrop)];
+}
+
+.bottom-sheet {
+    @apply w-full flex flex-col relative overflow-hidden bg-[var(--color-bg-card)] rounded-t-[var(--radius-card)] rounded-b-none shadow-[var(--shadow-bottom)];
+}
+
+.bottom-sheet__handle {
+    @apply flex justify-center p-[var(--spacing-xl)] cursor-grab;
+}
+
+.bottom-sheet__handle:active {
+    @apply cursor-grabbing;
+}
+
+.bottom-sheet__handle-line {
+    @apply w-12 h-[5px] bg-[var(--color-border-light)] rounded-[2.5px];
+}
+
+.bottom-sheet__content {
+    @apply flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch];
+}
+
+.bottom-sheet-backdrop-enter-active,
+.bottom-sheet-backdrop-leave-active {
+    @apply transition-opacity duration-300 ease-[ease];
+}
+
+.bottom-sheet-backdrop-enter-from,
+.bottom-sheet-backdrop-leave-to {
+    @apply opacity-0;
+}
+
+.bottom-sheet-enter-active {
+    @apply transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)];
+}
+
+.bottom-sheet-leave-active {
+    @apply transition-transform duration-[250ms] ease-[cubic-bezier(0.32,0.72,0,1)];
+}
+
+.bottom-sheet-enter-from,
+.bottom-sheet-leave-to {
+    @apply transform translate-y-full;
+}
+
+@media (max-width: 768px) {
+    .bottom-sheet {
+        @apply rounded-t-[16px] rounded-b-none;
+    }
+}
+
+@supports (-webkit-touch-callout: none) {
+    .bottom-sheet {
+        @apply [-webkit-tap-highlight-color:transparent];
+    }
+}

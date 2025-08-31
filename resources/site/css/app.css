@@ -1,6 +1,25 @@
 @import 'tailwindcss';
 @import 'tailwindcss-primeui';
-@import './widgets/restaurant-page/styles.css';
+
+@import './ui/app-card.css';
+@import './ui/app-image.css';
+@import './ui/bottom-sheet.css';
+@import './ui/collapsible-text.css';
+@import './ui/infinite-scroll.css';
+@import './ui/pdf-bottom-sheet.css';
+
+@import './widgets/restaurant-card.css';
+@import './widgets/chef-recommendations.css';
+
+@import './pages/event-page.css';
+@import './pages/restaurant-page.css';
+
+@import './features/event-card.css';
+@import './features/feed-tabs.css';
+@import './features/news-card.css';
+@import './features/working-hours.css';
+@import './features/contact-dropdown.css';
+@import './features/dish-bottom-sheet.css';
 
 /* CSS Variables для Design Tokens */
 @theme {
@@ -191,7 +210,6 @@
     --letter-spacing-caption-bold: -3%;
 }
 
-
 :root {
     --bg-card: var(--color-bg-card);
     --text-primary: var(--color-text-primary);
@@ -209,7 +227,10 @@
 
 :where(.p-button) {
     border-radius: var(--radius-button);
-    transition: background-color var(--transition-default), border-color var(--transition-default), color var(--transition-default);
+    transition:
+        background-color var(--transition-default),
+        border-color var(--transition-default),
+        color var(--transition-default);
 }
 
 :where(.p-button).p-button-secondary {
@@ -323,4 +344,3 @@ img {
         object-fit: cover;
     }
 }
-

@@ -1,0 +1,60 @@
+.contact-dropdown {
+    @apply relative inline-block;
+}
+
+.contact-dropdown * {
+    @apply box-border;
+}
+
+.contact-dropdown__trigger {
+    @apply w-[59px] h-[39px];
+}
+
+.contact-dropdown__icon {
+    @apply w-[19px] h-[18px] text-[var(--color-text-primary)];
+}
+
+.contact-dropdown__menu {
+    @apply absolute right-0 top-[calc(100%+8px)] bg-[var(--color-white-pure)] rounded-[var(--radius-small)] shadow-[var(--shadow-button)] w-[177px] min-h-[134px] z-[100] py-[var(--spacing-xs)] px-0 animate-[dropdown-appear_0.2s_ease-out];
+}
+
+.contact-dropdown__item {
+    @apply flex items-center w-full cursor-pointer px-[var(--spacing-lg)] py-[var(--spacing-xs)] gap-[var(--gap-xlarge)] transition-[background-color_var(--transition-default)] min-h-[44px];
+}
+
+.contact-dropdown__item:hover {
+    @apply bg-[var(--color-bg-secondary)];
+}
+
+.contact-dropdown__item-icon {
+    @apply flex items-center justify-center shrink-0 text-[var(--color-text-primary)];
+}
+
+.contact-dropdown__item-icon--phone {
+    @apply w-[22px] h-[22px];
+}
+.contact-dropdown__item-icon--telegram {
+    @apply w-[18px] h-[18px];
+}
+.contact-dropdown__item-icon--booking {
+    @apply w-[18px] h-[18px];
+}
+
+.contact-dropdown__item-text {
+    @apply text-[var(--font-size-body-default)] font-[var(--font-weight-body-default)] leading-[var(--line-height-body-default)] tracking-[var(--letter-spacing-body-default)] text-[var(--color-text-primary)];
+}
+
+.contact-dropdown__divider {
+    @apply h-px bg-[var(--color-border-light)] my-0 mx-[var(--spacing-lg)];
+}
+
+@keyframes dropdown-appear {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

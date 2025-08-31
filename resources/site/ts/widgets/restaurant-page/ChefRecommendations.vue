@@ -1,18 +1,18 @@
 <template>
-  <section v-if="chefRecommendations.length > 0" class="restaurant-card__chef-section">
-    <h2 class="restaurant-card__chef-title">Шеф рекомендует</h2>
+  <section v-if="chefRecommendations.length > 0" class="chef-recommendations__section">
+    <h2 class="chef-recommendations__title">Шеф рекомендует</h2>
 
-    <div class="restaurant-card__chef-items">
-      <div v-if="chefRecommendations" class="restaurant-card__chef-featured">
-        <div class="restaurant-card__chef-featured-image">
-          <Icon name="chief" class="restaurant-card__chef-image" />
+    <div class="chef-recommendations__items">
+      <div v-if="chefRecommendations" class="chef-recommendations__featured">
+        <div class="chef-recommendations__featured-image">
+          <Icon name="chief" class="chef-recommendations__image" />
         </div>
       </div>
 
       <div
         v-for="dish in chefRecommendations"
         :key="dish.id"
-        class="restaurant-card__chef-item"
+        class="chef-recommendations__item"
         @click="handleDishClick(dish)"
       >
         <AppImage
@@ -22,7 +22,7 @@
           height="120"
           object-fit="cover"
           border-radius="lg"
-          class="restaurant-card__chef-image restaurant-card__chef-image--regular"
+          class="chef-recommendations__image chef-recommendations__image--regular"
         />
       </div>
     </div>
@@ -34,7 +34,7 @@ import { toRefs } from 'vue';
 import { Icon } from '@/shared';
 import { AppImage } from '../../shared/ui';
 import { useBottomSheet } from '../../shared';
-import { DishBottomSheet } from '../../entities/dish/ui';
+import DishBottomSheet from '../../features/dish-bottom-sheet/DishBottomSheet.vue';
 import type { DishResourceData } from '@/shared/types/resources';
 
 interface Props {
@@ -46,9 +46,6 @@ const { chefRecommendations } = toRefs(props);
 
 const { open } = useBottomSheet();
 
-/**
- * Открывает BottomSheet с информацией о блюде
- */
 const handleDishClick = (dish: DishResourceData) => {
   open(DishBottomSheet, { dish });
 };

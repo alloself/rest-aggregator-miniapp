@@ -1,0 +1,75 @@
+.app-image {
+    @apply relative inline-block overflow-hidden bg-[var(--surface-default)];
+}
+
+.app-image--radius-none {
+    @apply rounded-[0px];
+}
+
+.app-image--radius-sm {
+    @apply rounded-[var(--radius-small)];
+}
+
+.app-image--radius-md {
+    @apply rounded-[var(--radius-medium)];
+}
+
+.app-image--radius-lg {
+    @apply rounded-[var(--radius-large)];
+}
+
+.app-image--radius-xl {
+    @apply rounded-[var(--radius-xlarge)];
+}
+
+.app-image--radius-full {
+    @apply rounded-[var(--radius-full)];
+}
+
+.app-image__img {
+    @apply w-full h-full;
+    transition: all var(--transition-default);
+}
+
+.app-image__img img {
+    @apply w-full h-full object-cover;
+}
+
+.app-image__img--cover {
+    @apply object-cover;
+}
+
+.app-image__img--contain {
+    @apply object-contain;
+}
+
+.app-image__img--fill {
+    @apply object-fill;
+}
+
+.app-image__img--none {
+    @apply object-none;
+}
+
+.app-image__img--scale-down {
+    @apply object-scale-down;
+}
+
+.image-loading {
+    @apply absolute inset-0 flex items-center justify-center bg-[var(--surface-default)];
+}
+
+.image-loading__spinner {
+    @apply w-6 h-6 rounded-[var(--radius-full)] border-2 border-[var(--color-border-light)];
+    border-top-color: var(--color-accent-primary);
+    animation: app-image-spin 1s linear infinite;
+}
+
+@keyframes app-image-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

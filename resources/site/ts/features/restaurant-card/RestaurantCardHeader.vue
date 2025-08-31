@@ -10,11 +10,11 @@
 </template>
 
 <script setup lang="ts">
-import type { RestaurantResourceData } from '@/shared/types/resources';
+import type { RestaurantResourceData } from '@shared/types/resources';
 
 interface Props {
   restaurant: RestaurantResourceData | null;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 </script>

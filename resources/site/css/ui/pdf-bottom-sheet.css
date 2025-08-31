@@ -1,0 +1,23 @@
+.pdf-bottom-sheet {
+    @apply flex flex-col h-full;
+}
+
+.pdf-bottom-sheet__header {
+    @apply flex items-center justify-between py-[12px] px-[14px];
+}
+
+.pdf-bottom-sheet__title {
+    @apply text-[var(--font-size-body-sm)] font-[var(--font-weight-caption-bold)] text-[var(--color-text-primary)];
+}
+
+.pdf-bottom-sheet__download {
+    @apply text-[var(--font-size-body-tiny)] text-[var(--color-telegram-blue-dark)] no-underline cursor-pointer;
+}
+
+.pdf-bottom-sheet__empty {
+    @apply p-[var(--spacing-2xl)] text-[var(--font-size-body-sm)] text-[var(--color-text-secondary)];
+}
+
+.pdf-bottom-sheet__viewer {
+    @apply flex-1 w-full border-0;
+}

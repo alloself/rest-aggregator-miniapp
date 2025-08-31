@@ -49,9 +49,9 @@ import CollapsibleText from '../../shared/ui/CollapsibleText.vue';
 import Feed from './Feed.vue';
 import { DishResourceData, RestaurantResourceData } from '@/shared/types/resources';
 import ChefRecommendations from './ChefRecommendations.vue';
-import RestaurantCardHeader from './ui/RestaurantCardHeader.vue';
-import RestaurantCardDetails from './ui/RestaurantCardDetails.vue';
-import RestaurantCardActions from './ui/RestaurantCardActions.vue';
+import RestaurantCardHeader from '../../features/restaurant-card/RestaurantCardHeader.vue';
+import RestaurantCardDetails from '../../features/restaurant-card/RestaurantCardDetails.vue';
+import RestaurantCardActions from '../../features/restaurant-card/RestaurantCardActions.vue';
 
 interface ContactInfo {
   phone?: string;

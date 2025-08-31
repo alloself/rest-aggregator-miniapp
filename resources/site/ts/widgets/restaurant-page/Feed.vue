@@ -1,5 +1,5 @@
 <template>
-  <section class="categories">
+  <section class="feed">
     <FeedTabs :categories="categories" :active-category="activeCategory" @category-change="onCategoryChange" />
 
     <Component :is="components[activeCategory]" :slug="slug" />
@@ -33,10 +33,3 @@ const components = {
   [ECategory.Offers]: Offers,
 };
 </script>
-
-<style scoped>
-.categories {
-  display: flex;
-  flex-direction: column;
-}
-</style>

@@ -13,20 +13,11 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, useTemplateRef, watch } from 'vue';
 
-/**
- * Компонент-обертка для реализации бесконечной прокрутки
- * Автоматически загружает новые данные при достижении конца списка
- */
 interface Props {
-  /** Состояние загрузки */
   loading: boolean;
-  /** Сообщение об ошибке */
   error: string | null;
-  /** Есть ли еще данные для загрузки */
   hasMore: boolean;
-  /** Состояние загрузки дополнительных данных */
   isLoadingMore: boolean;
-  /** Функция для загрузки дополнительных данных */
   onLoadMore: () => void;
 }
 
@@ -74,26 +65,3 @@ onUnmounted(() => {
   observer = null;
 });
 </script>
-
-<style scoped>
-.infinite-scroll {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.infinite-scroll__content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.infinite-scroll__state {
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 14px;
-}
-
-.infinite-scroll__sentinel {
-  height: 1px;
-}
-</style>

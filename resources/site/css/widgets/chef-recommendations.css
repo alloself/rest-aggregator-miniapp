@@ -1,0 +1,32 @@
+.chef-recommendations__section {
+    @apply mb-6 p-0;
+}
+
+.chef-recommendations__title {
+    @apply text-lg font-semibold text-black mb-4 px-4 font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+    letter-spacing: -0.04em;
+}
+
+.chef-recommendations__items {
+    @apply flex gap-1 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
+}
+
+.chef-recommendations__featured {
+    @apply flex-shrink-0 w-[90px] h-[100px] rounded-r-[30px] p-5 flex items-center justify-center bg-[rgba(255,251,233,0.68)];
+}
+
+.chef-recommendations__featured-image {
+    @apply w-[52px] h-[52px] overflow-hidden;
+}
+
+.chef-recommendations__item {
+    @apply flex-shrink-0 w-[100px] h-[100px] rounded-[20px] overflow-hidden cursor-pointer;
+}
+
+.chef-recommendations__image {
+    @apply max-w-full h-full object-cover block;
+}
+
+.chef-recommendations__image--regular {
+    @apply w-full h-full object-cover block rounded-[20px];
+}

@@ -1,0 +1,76 @@
+.event-card {
+    @apply cursor-pointer transition-all relative overflow-hidden mx-[16px] shadow-[var(--box-shadow-card)];
+}
+
+.event-card__layout {
+    @apply flex items-stretch gap-[18px] p-0 relative min-h-[180px];
+}
+
+.event-card__image-container {
+    @apply relative shrink-0 w-[140px] overflow-hidden rounded-[var(--radius-medium)];
+}
+
+.event-card__image {
+    @apply w-full h-full object-cover;
+}
+
+.event-card__image-placeholder {
+    @apply w-[139px] h-[173px] rounded-[var(--radius-medium)] bg-[var(--color-surface-default)];
+}
+
+.event-card__date-badge {
+    @apply inline-flex items-center gap-[5px] h-[28px] justify-center text-[var(--font-size-caption-default)] font-medium leading-none rounded-[var(--radius-card)] bg-[var(--color-accent-secondary)] text-[var(--color-text-primary)];
+}
+
+.event-card__sold-out-badge {
+    @apply inline-flex items-center justify-center h-[28px] px-[10px] rounded-full font-semibold text-[var(--font-size-caption-default)] leading-[28px] !bg-[var(--color-bg-section)] !text-[var(--color-white-pure)];
+}
+
+.event-card__date-dot {
+    @apply rounded-full w-[var(--size-dot-medium)] h-[var(--size-dot-medium)] bg-[var(--color-accent-warning)];
+}
+
+.event-card__content {
+    @apply flex flex-col gap-[12px] min-w-0 relative items-start flex-1;
+}
+
+.event-card__date-badges {
+    @apply flex gap-[8px];
+}
+
+.event-card__title {
+    @apply m-0 text-[var(--font-size-heading-sm)] font-semibold text-[var(--color-text-primary)] overflow-hidden leading-[var(--line-height-heading-sm)] tracking-[var(--letter-spacing-heading-sm)] line-clamp-2;
+}
+
+.event-card__description {
+    @apply m-0 text-[var(--font-size-body-sm)] text-[var(--color-text-primary)] overflow-hidden leading-[var(--line-height-body-sm)] tracking-[var(--letter-spacing-body-sm)] line-clamp-2;
+}
+
+.event-card__chips {
+    @apply flex items-center mt-auto;
+}
+
+.event-card__chip {
+    @apply h-[30px] rounded-[30px] px-[8px] !bg-transparent !border-0;
+}
+
+.event-card__chip--time .p-chip-text,
+.event-card__chip--price .p-chip-text {
+    @apply inline-flex items-center gap-[7px] justify-center;
+}
+
+.event-card__chip-icon {
+    @apply shrink-0 w-[16px] h-[16px];
+}
+
+.event-card__chip-icon--time {
+    @apply text-[var(--color-text-primary)];
+}
+
+.event-card__chip-icon--price {
+    @apply text-[var(--color-text-primary)] w-[16px] h-[12px];
+}
+
+.event-card__chip-text {
+    @apply text-[var(--font-size-body-sm)] font-normal leading-none text-[var(--color-text-primary)] tracking-[var(--letter-spacing-body-sm)];
+}

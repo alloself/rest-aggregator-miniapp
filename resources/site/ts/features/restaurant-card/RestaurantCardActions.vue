@@ -13,8 +13,8 @@
 </template>
 
 <script setup lang="ts">
-import { AppButton } from '../../../shared/ui';
-import ContactDropdown from '../../../shared/ui/ContactDropdown.vue';
+import { AppButton } from '../../shared/ui';
+import ContactDropdown from '../contact-dropdown/ContactDropdown.vue';
 
 interface ContactInfo {
   phone?: string;
