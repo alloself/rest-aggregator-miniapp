@@ -61,6 +61,14 @@
             :phone="contactInfo.phone"
             :telegram-username="contactInfo.telegram"
           />
+          <AppButton
+            :label="mini.likedByMe ? 'Repeat ✓' : 'Repeat'"
+            variant="primary"
+            size="small"
+            :disabled="mini.isLiking"
+            @click="handleLikeClick"
+            fullWidth
+          />
         </div>
       </div>
     </div>
@@ -133,6 +141,8 @@ import Categories from './Categories.vue';
 import { DishBottomSheet } from '../../entities/dish/ui';
 import { useBottomSheet } from '../../shared';
 import { DishResourceData, RestaurantResourceData } from '@/shared/types/resources';
+import { useMiniAppStore } from '../../shared/stores/miniapp';
+import { client } from '../../shared/api/axios';
 
 interface ContactInfo {
   phone?: string;
@@ -192,4 +202,10 @@ const handleDishClick = (dish: DishResourceData) => {
     dish,
   });
 };
+
+const mini = useMiniAppStore();
+async function handleLikeClick() {
+  if (!mini.me || !props.restaurant) return;
+  await mini.toggleRestaurantLike(props.restaurant.id);
+}
 </script>

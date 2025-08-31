@@ -10,6 +10,8 @@ use App\Http\Controllers\Site\RestaurantController as SiteRestaurantController;
 use App\Http\Controllers\Account\NewsController;
 use App\Http\Controllers\Account\EventController;
 use App\Http\Controllers\Telegram\WebhookController as TelegramWebhookController;
+use App\Http\Controllers\MiniAppAuthController;
+use App\Http\Controllers\LikeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +51,9 @@ Route::prefix('site')->group(function () {
     Route::get('restaurants/{slug}/news', [SiteRestaurantController::class, 'news']);
     Route::get('restaurants/{slug}/events', [SiteRestaurantController::class, 'events']);
     Route::get('restaurants/{slug}/events/{eventSlug}', [SiteRestaurantController::class, 'event']);
+    Route::post('likes', [LikeController::class, 'store']);
+    Route::delete('likes', [LikeController::class, 'destroy']);
+    Route::post('miniapp/restaurants/{slug}/auth', [MiniAppAuthController::class, 'auth']);
 });
 
 Route::post('telegram/webhook/{restaurant}', [TelegramWebhookController::class, 'handle']);

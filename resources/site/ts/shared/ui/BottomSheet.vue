@@ -1,9 +1,10 @@
 <template>
   <Teleport to="body">
-    <transition name="bottom-sheet-backdrop" appear>
+    <transition name="bottom-sheet-backdrop" appear @after-leave="handleAfterLeave">
       <div
         class="bottom-sheet-backdrop"
         :style="{ zIndex: props.zIndex }"
+        v-if="isVisible"
         @click="handleBackdropClick"
         @wheel.prevent.self
         @touchmove.prevent.self
@@ -36,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 interface BottomSheetProps {
   showHandle?: boolean;
@@ -60,6 +61,9 @@ const emit = defineEmits<{
   close: [];
 }>();
 
+// Локальное состояние видимости для корректной анимации закрытия
+const isVisible = ref(true);
+
 // Стили для sheet
 const sheetStyles = computed(() => ({
   maxHeight: `${props.height}vh`,
@@ -79,7 +83,7 @@ const sheetHeight = ref(0);
  */
 function handleBackdropClick() {
   if (props.closableByBackdrop) {
-    emit('close');
+    startClose();
   }
 }
 
@@ -119,7 +123,7 @@ function handleTouchEnd() {
   const threshold = sheetHeight.value * 0.3;
 
   if (deltaY > threshold) {
-    emit('close');
+    startClose();
   } else {
     sheetRef.value.style.transform = 'translateY(0)';
   }
@@ -131,8 +135,23 @@ function handleTouchEnd() {
 
 function handleEscapeKey(event: KeyboardEvent) {
   if (event.key === 'Escape') {
-    emit('close');
+    startClose();
   }
+}
+
+/**
+ * Запуск закрытия с анимацией; событие close эмитится после анимации
+ */
+function startClose() {
+  if (!isVisible.value) return;
+  isVisible.value = false;
+}
+
+/**
+ * Вызывается после завершения leave-анимации
+ */
+function handleAfterLeave() {
+  emit('close');
 }
 
 onMounted(() => {
@@ -219,7 +238,21 @@ onUnmounted(() => {
 
 .bottom-sheet-enter-from,
 .bottom-sheet-leave-to {
-  transform: translateY(100%);
+  transform: translateY(100%) !important;
+}
+
+/* Гарантируем анимацию слайда вниз даже при удалении родителя */
+.bottom-sheet-backdrop-enter-active .bottom-sheet {
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.bottom-sheet-backdrop-leave-active .bottom-sheet {
+  transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.bottom-sheet-backdrop-enter-from .bottom-sheet,
+.bottom-sheet-backdrop-leave-to .bottom-sheet {
+  transform: translateY(100%) !important;
 }
 
 /* Адаптивность */
