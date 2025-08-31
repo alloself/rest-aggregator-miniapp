@@ -32,7 +32,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useMiniAppStore } from '../../../shared/stores/miniapp';
+
+import { useMiniAppStore } from '../../shared/stores/miniapp';
 import type { User } from '../../../../../shared/types/models';
 import { AppButton } from '../../shared/ui';
 import ContactDropdown from '../contact-dropdown/ContactDropdown.vue';
