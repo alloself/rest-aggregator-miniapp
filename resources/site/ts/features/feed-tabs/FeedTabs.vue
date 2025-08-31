@@ -20,12 +20,12 @@ interface Category {
   label: string;
 }
 
-interface CategoryFilterProps {
+interface TabsProps {
   categories: Category[];
   activeCategory: string;
 }
 
-const props = defineProps<CategoryFilterProps>();
+const props = defineProps<TabsProps>();
 
 const emit = defineEmits<{
   categoryChange: [categoryId: ECategory, category: Category];

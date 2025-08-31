@@ -71,7 +71,14 @@ const handleShowMenu = () => {
   open(
     PdfBottomSheet,
     { url: pdf.url, title: 'Меню' },
-    { showHandle: true, height: 90, closableBySwipe: true, closableByBackdrop: true, zIndex: 1200, class: 'restaurant-page__pdf-sheet' },
+    {
+      showHandle: true,
+      height: 90,
+      closableBySwipe: true,
+      closableByBackdrop: true,
+      zIndex: 1200,
+      class: 'restaurant-page__pdf-sheet',
+    },
   );
 };
 
@@ -81,7 +88,14 @@ const handleShowBar = () => {
   open(
     PdfBottomSheet,
     { url: pdf.url, title: 'Барная карта' },
-    { showHandle: true, height: 90, closableBySwipe: true, closableByBackdrop: true, zIndex: 1200, class: 'restaurant-page__pdf-sheet' },
+    {
+      showHandle: true,
+      height: 90,
+      closableBySwipe: true,
+      closableByBackdrop: true,
+      zIndex: 1200,
+      class: 'restaurant-page__pdf-sheet',
+    },
   );
 };
 

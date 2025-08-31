@@ -1,6 +1,6 @@
 <template>
   <section class="categories">
-    <CategoryFilter :categories="categories" :active-category="activeCategory" @category-change="onCategoryChange" />
+    <FeedTabs :categories="categories" :active-category="activeCategory" @category-change="onCategoryChange" />
 
     <Component :is="components[activeCategory]" :slug="slug" />
   </section>
@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import CategoryFilter from '../../features/category-filter/CategoryFilter.vue';
+import FeedTabs from '../../features/feed-tabs/FeedTabs.vue';
 import News from '../../features/restaurant-news/News.vue';
 import Events from '../../features/restaurant-events/Events.vue';
 import Offers from '../../features/restaurant-offers/Offers.vue';
