@@ -159,8 +159,56 @@ class WebhookController extends Controller
             ]);
         }
 
+        // Обработка deep-link приглашения (формат: r{restaurant_uuid}-i{inviter_chat_id})
+        $invitedByText = '';
+        if (!empty($startParam)) {
+            if (preg_match('/^r([0-9a-f\-]+)-i(\d+)$/i', (string)$startParam, $matches) === 1) {
+                $refRestaurantId = (string) ($matches[1] ?? '');
+                $inviterChatId = (string) ($matches[2] ?? '');
+
+                if ($refRestaurantId === (string) $restaurant->id && $user) {
+                    $inviter = User::whereHas('restaurants', function($q) use ($restaurant, $inviterChatId) {
+                        $q->where('restaurant_id', $restaurant->id)
+                          ->where('chat_id', (string)$inviterChatId);
+                    })->first();
+
+                    if ($inviter && $inviter->id !== $user->id) {
+                        // Сохраняем связь (пригласивший -> приглашенный)
+                        $inviter->addFriend($user, [
+                            'invited_via_start_param' => true,
+                            'invited_at' => now()->toISOString(),
+                            'invited_by_chat_id' => (string)$inviterChatId,
+                        ]);
+
+                        $inviterName = trim((string)$inviter->first_name . ($inviter->last_name ? ' ' . (string)$inviter->last_name : ''));
+                        if ($inviterName !== '') {
+                            $invitedByText = "Вас пригласил(а) {$inviterName}.";
+                        }
+
+                        // Пробуем уведомить пригласившего, что друг присоединился
+                        try {
+                            $joinedName = trim((string)$user->first_name . ($user->last_name ? ' ' . (string)$user->last_name : ''));
+                            $service->sendMessage([
+                                'chat_id' => (int)$inviterChatId,
+                                'text' => '✅ ' . ($joinedName !== '' ? $joinedName : 'Ваш друг') . ' присоединился(лась) к боту.',
+                            ]);
+                        } catch (\Throwable $e) {
+                            Log::warning('Не удалось уведомить пригласившего о присоединении друга', [
+                                'error' => $e->getMessage(),
+                                'inviter_chat_id' => $inviterChatId,
+                                'restaurant_id' => $restaurant->id,
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
         // Приветственное сообщение
         $greeting = $this->buildWelcomeMessage($restaurant);
+        if ($invitedByText !== '') {
+            $greeting = $invitedByText . "\n\n" . $greeting;
+        }
 
         // Отправляем приветственное сообщение БЕЗ клавиатуры
         $service->sendMessage([
