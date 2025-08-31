@@ -11,7 +11,7 @@
     >
       <Column selectionMode="multiple"></Column>
       <Column field="name" header="Name"></Column>
-      <Column field="preview" header="Preview">
+      <Column v-if="type === 'image'" field="preview" header="Preview">
         <template #body="{ data }">
           <img :src="data.url" alt="Preview" class="object-contain" />
         </template>

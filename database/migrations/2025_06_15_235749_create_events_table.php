@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('subtitle');
             $table->datetime('start_at');
             $table->decimal('price', 10, 2)->nullable();
-
+            $table->boolean('is_sold_out')->default(false);
             $table->longText('description');
 
             $table->uuid('restaurant_id');

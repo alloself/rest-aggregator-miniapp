@@ -21,7 +21,7 @@
                 {{ formatDate(item.start_at) }}
               </template>
             </Badge>
-            <Badge class="event-card__sold-out-badge" value="Sold out" />
+            <Badge v-if="item.is_sold_out" class="event-card__sold-out-badge" value="Sold out" />
           </div>
 
           <h3 class="event-card__title">{{ item.title }}</h3>

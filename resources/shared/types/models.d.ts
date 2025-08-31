@@ -57,6 +57,7 @@ export interface Event {
   subtitle: string
   start_at: Date
   price?: number | null
+  is_sold_out: boolean
   description: string
   restaurant_id: string
   order: number

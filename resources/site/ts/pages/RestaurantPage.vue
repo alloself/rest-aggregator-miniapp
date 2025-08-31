@@ -33,6 +33,7 @@ import RestaurantCard from '../widgets/restaurant-page/RestaurantCard.vue';
 import { BottomSheetContainer } from '../features/bottom-sheet';
 import PhotoReels from '@/shared/components/PhotoReels.vue';
 import { useBottomSheet } from '../shared';
+import { PdfBottomSheet } from '../shared/ui';
 
 const { slug } = defineProps<{ slug?: string }>();
 
@@ -59,12 +60,29 @@ const galleryImages = computed(() => {
   return images.filter((img) => img?.pivot?.key === 'gallery');
 });
 
+const findPdfByKey = (key: 'menu' | 'bar') => {
+  const files = restaurant.value?.files || [];
+  return files.find((f) => f?.pivot?.key === key && f.extension.toLowerCase() === 'pdf');
+};
+
 const handleShowMenu = () => {
-  console.log('Показать меню');
+  const pdf = findPdfByKey('menu');
+  if (!pdf) return;
+  open(
+    PdfBottomSheet,
+    { url: pdf.url, title: 'Меню' },
+    { showHandle: true, height: 90, closableBySwipe: true, closableByBackdrop: true, zIndex: 1200, class: 'restaurant-page__pdf-sheet' },
+  );
 };
 
 const handleShowBar = () => {
-  console.log('Показать бар');
+  const pdf = findPdfByKey('bar');
+  if (!pdf) return;
+  open(
+    PdfBottomSheet,
+    { url: pdf.url, title: 'Барная карта' },
+    { showHandle: true, height: 90, closableBySwipe: true, closableByBackdrop: true, zIndex: 1200, class: 'restaurant-page__pdf-sheet' },
+  );
 };
 
 const handleShowPhotos = () => {
@@ -134,6 +152,18 @@ onBeforeMount(async () => {
 .restaurant-page__photos-sheet {
   height: 80vh;
   max-height: 80vh;
+
+  .bottom-sheet__content {
+    height: calc(100% - 25px);
+    overflow: hidden;
+    padding: 0;
+  }
+}
+
+/* BottomSheet с PDF: фиксированная высота и viewer занимает всю область */
+.restaurant-page__pdf-sheet {
+  height: 85vh;
+  max-height: 85vh;
 
   .bottom-sheet__content {
     height: calc(100% - 25px);

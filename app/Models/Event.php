@@ -22,12 +22,13 @@ class Event extends BaseModel
         'price',
         'description',
         'restaurant_id',
+        'is_sold_out',
     ];
 
     protected $casts = [
         'start_at' => 'datetime',
         'price' => 'decimal:2',
-        'is_free' => 'boolean',
+        'is_sold_out' => 'boolean',
     ];
 
     public function getSlugOptions(): SlugOptions

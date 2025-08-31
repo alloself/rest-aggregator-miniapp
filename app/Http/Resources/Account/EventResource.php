@@ -26,6 +26,7 @@ class EventResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'restaurant' => $this->whenLoaded('restaurant'),
+            'is_sold_out' => $this->is_sold_out,
             'files' => FileResource::collection($this->whenLoaded('files')),
             'images' => FileResource::collection($this->whenLoaded('images')),
         ];
