@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @csrf
     <title>Eat.Drink.Repeat</title>
+    <script src="https://telegram.org/js/telegram-web-app.js?59"></script>
     @vite(['resources/site/css/app.css', 'resources/site/ts/app/main.ts'])
 </head>
 
