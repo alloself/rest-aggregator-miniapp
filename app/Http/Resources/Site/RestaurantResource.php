@@ -25,6 +25,8 @@ class RestaurantResource extends JsonResource
             'working_hours' => $this->working_hours,
             'address' => $this->address,
             'average_receipt' => $this->average_receipt,
+            'phone' => $this->phone,
+            'bot_username' => $this->bot_username,
             'files' => FileResource::collection($this->whenLoaded('files')),
             'images' => FileResource::collection($this->whenLoaded('images')),
             'categories' => CategoryResource::collection($this->whenLoaded('categories')),

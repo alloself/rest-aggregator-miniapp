@@ -14,7 +14,7 @@ export const useMiniAppStore = defineStore('miniapp', () => {
     tg?.ready?.();
     const initData = tg?.initData ?? '';
     if (!initData) return;
-    const { data } = await client.post<User & { liked_by_me?: boolean }>(`/api/miniapp/restaurants/${slug}/auth`, { init_data: initData });
+    const { data } = await client.post<User & { liked_by_me?: boolean }>(`/api/site/miniapp/restaurants/${slug}/auth`, { init_data: initData });
     me.value = data;
     friends.value = Array.isArray(data.friends) ? data.friends : [];
     likedByMe.value = Boolean(data.liked_by_me);
@@ -29,7 +29,7 @@ export const useMiniAppStore = defineStore('miniapp', () => {
       likedByMe.value = !wasLiked; // optimistic
 
       if (wasLiked) {
-        await client.delete('/api/likes', {
+        await client.delete('/api/site/likes', {
           params: {
             user_id: me.value.id,
             likeable_type: 'App\\\\Models\\\\Restaurant',
@@ -37,7 +37,7 @@ export const useMiniAppStore = defineStore('miniapp', () => {
           },
         });
       } else {
-        await client.post('/api/likes', {
+        await client.post('/api/site/likes', {
           user_id: me.value.id,
           likeable_type: 'App\\\\Models\\\\Restaurant',
           likeable_id: restaurantId,

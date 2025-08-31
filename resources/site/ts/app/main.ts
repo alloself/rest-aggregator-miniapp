@@ -32,6 +32,14 @@ async function initSiteApp() {
 
     await initClient();
 
+    // Mark Telegram WebApp as ready early (works without any API changes)
+    try {
+      const tg = window.Telegram?.WebApp;
+      tg?.ready?.();
+    } catch {
+      // ignore
+    }
+
     const mountPoint = document.getElementById('site-app');
     if (mountPoint) {
       app.mount(mountPoint);

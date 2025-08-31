@@ -9,6 +9,8 @@
     </div>
 
     <div v-else-if="restaurant" class="restaurant-page__wrapper">
+      <pre v-if="me">{{ me }}</pre>
+      <pre v-if="tgInitData">{{ tgInitData }}</pre>
       <RestaurantCard
         :restaurant="restaurant"
         :chef-recommendations="chefRecommendations"
@@ -32,8 +34,6 @@ import RestaurantCard from '../widgets/restaurant-page/RestaurantCard.vue';
 import PhotoReels from '@/shared/components/PhotoReels.vue';
 import { useBottomSheet } from '../shared';
 import { PdfBottomSheet } from '../shared/ui';
-import { client } from '../shared/api/axios';
-import type { User, Restaurant } from '../../../shared/types/models';
 import { useMiniAppStore } from '../shared/stores/miniapp';
 
 const { slug } = defineProps<{ slug?: string }>();
@@ -45,6 +45,9 @@ const { open } = useBottomSheet();
 const store = useRestaurantStore();
 const { restaurant, loading, error } = storeToRefs(store);
 const mini = useMiniAppStore();
+
+const { me } = storeToRefs(mini);
+const tgInitData = computed(() => window.Telegram?.WebApp?.initData || '');
 
 const chefRecommendations = computed(() => {
   const categories = restaurant.value?.categories ?? [];
@@ -126,7 +129,7 @@ onBeforeMount(async () => {
   // Telegram Mini App initialization and auth
   try {
     const tg = window.Telegram?.WebApp;
-    tg?.ready?.();
+    tg?.ready();
     const initData = tg?.initData ?? '';
     if (initData) {
       await mini.authWithInitData(param);

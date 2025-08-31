@@ -224,8 +224,13 @@ class WebhookController extends Controller
             'user_id' => $user?->id,
         ]);
 
-        // Отправляем второе сообщение с предложением поделиться контактами
-        $this->sendContactRequestMessage($chatId, $service, $restaurant);
+        // Отправляем второе сообщение с предложением поделиться контактами только если нет startParam
+        if ($startParam === null) {
+            $this->sendContactRequestMessage($chatId, $service, $restaurant);
+        } else {
+            // Для deep-link сценария не навязываем онбординг
+            $this->setAppKeyboard($chatId, $service, $restaurant, 'Добро пожаловать! Откройте приложение или поделитесь контактами и друзьями.');
+        }
     }
 
     /**
@@ -635,7 +640,26 @@ class WebhookController extends Controller
                 return $user;
             }
 
-            Log::info('🔍 ОТЛАДКА: Пользователь не найден, создаем нового', [
+            // Пробуем найти пользователя по глобальному chat_id (мог быть создан как "друг")
+            $existingByChat = User::where('chat_id', (string)$chatId)->first();
+            if ($existingByChat) {
+                Log::info('🔁 ОТЛАДКА: Найден пользователь по chat_id без привязки к ресторану', [
+                    'user_id' => $existingByChat->id,
+                    'chat_id' => $chatId,
+                    'step' => 'found_user_by_chat_globally'
+                ]);
+
+                $existingByChat->update([
+                    'first_name' => $firstName,
+                    'last_name' => $lastName ?: null,
+                    'username' => $username ?: null,
+                    'avatar_url' => $avatarUrl,
+                ]);
+
+                return $existingByChat;
+            }
+
+            Log::info('🔍 ОТЛАДКА: Пользователь не найден нигде, создаем нового', [
                 'chat_id' => $chatId,
                 'step' => 'creating_new_user'
             ]);
@@ -844,7 +868,7 @@ class WebhookController extends Controller
             ]);
 
             // Показываем обновленную клавиатуру (с контактами и приложением)
-            $this->setAppKeyboard($chatId, $service, $restaurant);
+            $this->setAppKeyboard($chatId, $service, $restaurant, '⌨️ Клавиатура обновлена. Вы можете открыть приложение или поделиться контактами и друзьями.');
 
         } catch (Throwable $e) {
             Log::error('❌ ОТЛАДКА: Ошибка обработки переданных пользователей', [
@@ -858,7 +882,7 @@ class WebhookController extends Controller
             ]);
 
             // Заменяем клавиатуру даже при ошибке
-            $this->setAppKeyboard($chatId, $service, $restaurant);
+            $this->setAppKeyboard($chatId, $service, $restaurant, 'Спасибо! Друзья добавлены. Откройте приложение или поделитесь ещё.');
         }
     }
 
@@ -1308,7 +1332,7 @@ class WebhookController extends Controller
     /**
      * Установить постоянную клавиатуру с приложением и контактами
      */
-    private function setAppKeyboard(int $chatId, TelegramBotService $service, Restaurant $restaurant): void
+    private function setAppKeyboard(int $chatId, TelegramBotService $service, Restaurant $restaurant, ?string $messageText = null): void
     {
         try {
             Log::info('⌨️ ОТЛАДКА: Начало установки клавиатуры приложения', [
@@ -1362,9 +1386,11 @@ class WebhookController extends Controller
                 'step' => 'sending_keyboard_message'
             ]);
 
+            $text = $messageText ?? "🎉 Отлично! Регистрация завершена!\n\n🚀 Откройте приложение для заказов\n📱 Поделитесь контактами для уведомлений\n👥 Найдите друзей через адресную книгу";
+
             $result = $service->sendMessage([
                 'chat_id' => $chatId,
-                'text' => "🎉 Отлично! Регистрация завершена!\n\n🚀 Откройте приложение для заказов\n📱 Поделитесь контактами для уведомлений\n👥 Найдите друзей через адресную книгу",
+                'text' => $text,
                 'reply_markup' => $replyMarkup,
             ]);
 
