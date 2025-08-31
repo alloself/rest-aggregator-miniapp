@@ -640,24 +640,7 @@ class WebhookController extends Controller
                 return $user;
             }
 
-            // Пробуем найти пользователя по глобальному chat_id (мог быть создан как "друг")
-            $existingByChat = User::where('chat_id', (string)$chatId)->first();
-            if ($existingByChat) {
-                Log::info('🔁 ОТЛАДКА: Найден пользователь по chat_id без привязки к ресторану', [
-                    'user_id' => $existingByChat->id,
-                    'chat_id' => $chatId,
-                    'step' => 'found_user_by_chat_globally'
-                ]);
-
-                $existingByChat->update([
-                    'first_name' => $firstName,
-                    'last_name' => $lastName ?: null,
-                    'username' => $username ?: null,
-                    'avatar_url' => $avatarUrl,
-                ]);
-
-                return $existingByChat;
-            }
+            // Пропускаем поиск по users.chat_id: чат хранится только в пивоте restaurant_user
 
             Log::info('🔍 ОТЛАДКА: Пользователь не найден нигде, создаем нового', [
                 'chat_id' => $chatId,
@@ -668,7 +651,6 @@ class WebhookController extends Controller
                 'first_name' => $firstName,
                 'last_name' => $lastName ?: null,
                 'username' => $username ?: null,
-                'chat_id' => $chatId,
                 'avatar_url' => $avatarUrl,
             ];
 
@@ -838,11 +820,7 @@ class WebhookController extends Controller
             $usersCount = count($users);
             $friendsWord = $this->pluralizeRussian($usersCount, 'друге', 'друзьях', 'друзьях');
             $confirmationText = "✅ Спасибо! Получена информация о {$usersCount} {$friendsWord} из вашей адресной книги.";
-            
-            if ($savedFriendsCount > 0) {
-                $savedFriendsWord = $this->pluralizeRussian($savedFriendsCount, 'друг', 'друга', 'друзей');
-                $confirmationText .= "\n💾 Сохранено в базу данных: {$savedFriendsCount} {$savedFriendsWord}";
-            }
+        
             
             if ($usersCount > 0) {
                 $confirmationText .= "\n\n📋 Список переданных друзей:\n";
@@ -867,8 +845,7 @@ class WebhookController extends Controller
                 'step' => 'users_shared_processed'
             ]);
 
-            // Показываем обновленную клавиатуру (с контактами и приложением)
-            $this->setAppKeyboard($chatId, $service, $restaurant, '⌨️ Клавиатура обновлена. Вы можете открыть приложение или поделиться контактами и друзьями.');
+            $this->setAppKeyboard($chatId, $service, $restaurant);
 
         } catch (Throwable $e) {
             Log::error('❌ ОТЛАДКА: Ошибка обработки переданных пользователей', [
@@ -1104,7 +1081,6 @@ class WebhookController extends Controller
                 'first_name' => $sharedUser['first_name'] ?? 'Неизвестно',
                 'last_name' => $sharedUser['last_name'] ?? null,
                 'username' => $sharedUser['username'] ?? null,
-                'chat_id' => (string)$telegramId,
                 'avatar_url' => $avatarUrl,
             ];
 

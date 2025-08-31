@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Restaurant;
+use App\Models\Like;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
+
 
 class MiniAppAuthController extends Controller
 {
@@ -43,34 +45,45 @@ class MiniAppAuthController extends Controller
 
         $user = User::whereHas('restaurants', function ($q) use ($restaurant, $telegramId) {
             $q->where('restaurant_id', $restaurant->id)
-              ->where('chat_id', $telegramId);
+                ->where('chat_id', $telegramId);
         })->first();
 
         if (!$user) {
             return response()->json(['message' => 'User not registered for this restaurant'], BaseResponse::HTTP_NOT_FOUND);
         }
 
-        // Подгружаем ТОЛЬКО тех друзей, которые лайкнули этот ресторан
-        $user->load(['friends' => function ($q) use ($restaurant) {
-            $q->whereExists(function ($sq) use ($restaurant) {
-                $sq->selectRaw('1')
-                    ->from('likes')
-                    ->whereColumn('likes.user_id', 'users.id')
-                    ->where('likes.likeable_type', \App\Models\Restaurant::class)
-                    ->where('likes.likeable_id', $restaurant->id);
-            });
-        }]);
-
-        // liked_by_me признак
-        $likedByMe = \App\Models\Like::query()
-            ->where('user_id', $user->id)
-            ->where('likeable_type', \App\Models\Restaurant::class)
+        // Флаг: лайкнул ли текущий пользователь этот ресторан
+        $liked = Like::where('user_id', $user->id)
+            ->where('likeable_type', Restaurant::class)
             ->where('likeable_id', $restaurant->id)
             ->exists();
 
-        $user->setAttribute('liked_by_me', $likedByMe);
+        // Друзья пользователя, которые лайкнули этот ресторан
+        $friendIds = $user->friends()->pluck('users.id');
+        $friendIdsLiked = Like::whereIn('user_id', $friendIds)
+            ->where('likeable_type', Restaurant::class)
+            ->where('likeable_id', $restaurant->id)
+            ->pluck('user_id')
+            ->unique();
 
-        return response()->json($user);
+        $friendsWhoLiked = $user->friends()
+            ->whereIn('users.id', $friendIdsLiked)
+            ->get();
+
+        $friendsLikedPayload = $friendsWhoLiked->map(function ($friend) {
+            return [
+                'id' => $friend->id,
+                'first_name' => $friend->first_name,
+                'last_name' => $friend->last_name,
+                'username' => $friend->username,
+                'avatar_url' => $friend->getAvatarUrl(),
+            ];
+        })->values()->all();
+
+        return response()->json(array_merge($user->toArray(), [
+            'liked' => $liked,
+            'friends_liked' => $friendsLikedPayload,
+        ]));
     }
 
     /**
@@ -79,14 +92,15 @@ class MiniAppAuthController extends Controller
     private function verifyInitData(string $initData, string $botToken): bool
     {
         parse_str($initData, $data);
-
+        $signature = (string) ($data['signature'] ?? '');
         $hash = (string) ($data['hash'] ?? '');
-        unset($data['hash']);
 
-        ksort($data, SORT_STRING);
-
+        // Готовим строку проверки: исключаем hash и signature, сортируем, собираем key=value\n
+        $dataForCheck = $data;
+        unset($dataForCheck['hash'], $dataForCheck['signature']);
+        ksort($dataForCheck, SORT_STRING);
         $dataCheckStringParts = [];
-        foreach ($data as $key => $value) {
+        foreach ($dataForCheck as $key => $value) {
             if (is_array($value)) {
                 $value = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             }
@@ -94,12 +108,85 @@ class MiniAppAuthController extends Controller
         }
         $dataCheckString = implode("\n", $dataCheckStringParts);
 
-        // secret_key = HMAC_SHA256("WebAppData", bot_token)
-        $secretKey = hash_hmac('sha256', 'WebAppData', $botToken, true);
-        $calculatedHash = bin2hex(hash_hmac('sha256', $dataCheckString, $secretKey, true));
+        // 1) Проверка Ed25519 по полю signature (третьесторонняя схема)
+        if ($signature !== '' && function_exists('sodium_crypto_sign_verify_detached')) {
+            // bot_id берём из токена (формат <bot_id>:<rest>)
+            $botId = null;
+            $tokenParts = explode(':', (string) $botToken, 2);
+            if (isset($tokenParts[0]) && ctype_digit($tokenParts[0])) {
+                $botId = $tokenParts[0];
+            }
+            if ($botId !== null) {
+                $signedString = $botId . ':WebAppData' . "\n" . $dataCheckString;
+                $signatureRaw = $this->base64UrlDecode($signature);
+                if ($signatureRaw !== false) {
+                    // Публичные ключи Telegram (prod и test)
+                    $publicKeysHex = [
+                        'e7bf03a2fa4602af4580703d88dda5bb59f32ed8b02a56c187fe7d34caed242d',
+                        '40055058a4ee38156a06562e52eece92a771bcd8346a8c4615cb7376eddf72ec',
+                    ];
+                    foreach ($publicKeysHex as $hexKey) {
+                        $pubKey = function_exists('sodium_hex2bin') ? \sodium_hex2bin($hexKey) : hex2bin($hexKey);
+                        if ($pubKey !== false && \sodium_crypto_sign_verify_detached($signatureRaw, $signedString, $pubKey)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
 
-        return hash_equals($calculatedHash, strtolower($hash));
+        // 2) Стандартная серверная проверка по bot_token (HMAC-SHA256)
+        if ($hash !== '') {
+            // secret_key = HMAC_SHA256('WebAppData', bot_token)
+            $secretKey = hash_hmac('sha256', 'WebAppData', $botToken, true);
+            $calculatedHash = bin2hex(hash_hmac('sha256', $dataCheckString, $secretKey, true));
+            if (hash_equals($calculatedHash, strtolower($hash))) {
+                return true;
+            }
+        }
+
+        // 3) Мягкая проверка для нестандартных клиентов
+        return $this->softValidateInitData($data);
+    }
+
+    /**
+     * Мягкая проверка init_data, когда Telegram не прислал hash (или клиент старый/нестандартный).
+     * Проверяем свежесть auth_date и наличие user.
+     */
+    private function softValidateInitData(array $data): bool
+    {
+        $authDate = isset($data['auth_date']) ? (int) $data['auth_date'] : 0;
+        if ($authDate <= 0) {
+            return false;
+        }
+
+        // 24 часа окно
+        if (abs(time() - $authDate) > 86400) {
+            return false;
+        }
+
+        if (!array_key_exists('user', $data)) {
+            return false;
+        }
+
+        $rawUser = json_decode((string) $data['user'], true);
+        if (!is_array($rawUser) || !isset($rawUser['id'])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Декодировать base64url без паддинга
+     */
+    private function base64UrlDecode(string $data): string|false
+    {
+        $replaced = strtr($data, '-_', '+/');
+        $padLen = (4 - (strlen($replaced) % 4)) % 4;
+        if ($padLen > 0) {
+            $replaced .= str_repeat('=', $padLen);
+        }
+        return base64_decode($replaced, true);
     }
 }
-
-

@@ -37,7 +37,6 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var list<string>
      */
     protected $fillable = [
-        'chat_id',
         'first_name',
         'last_name',
         'middle_name',
@@ -60,6 +59,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'two_factor_secret',
         'tokens',           // Скрываем Sanctum tokens от ModelTyper
         'notifications',    // Скрываем notifications от ModelTyper
+        'phone',
     ];
 
     /**

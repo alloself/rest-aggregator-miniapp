@@ -7,6 +7,14 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Like extends BaseModel
 {
+
+    protected $fillable = [
+        'id',
+        'user_id',
+        'likeable_id',
+        'likeable_type',
+    ];
+
     /**
      * Пользователь, поставивший лайк.
      */

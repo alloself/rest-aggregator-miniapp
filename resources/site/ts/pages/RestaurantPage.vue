@@ -9,8 +9,6 @@
     </div>
 
     <div v-else-if="restaurant" class="restaurant-page__wrapper">
-      <pre v-if="me">{{ me }}</pre>
-      <pre v-if="tgInitData">{{ tgInitData }}</pre>
       <RestaurantCard
         :restaurant="restaurant"
         :chef-recommendations="chefRecommendations"
@@ -45,9 +43,6 @@ const { open } = useBottomSheet();
 const store = useRestaurantStore();
 const { restaurant, loading, error } = storeToRefs(store);
 const mini = useMiniAppStore();
-
-const { me } = storeToRefs(mini);
-const tgInitData = computed(() => window.Telegram?.WebApp?.initData || '');
 
 const chefRecommendations = computed(() => {
   const categories = restaurant.value?.categories ?? [];
