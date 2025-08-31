@@ -159,8 +159,56 @@ class WebhookController extends Controller
             ]);
         }
 
+        // Обработка deep-link приглашения (формат: r{restaurant_uuid}-i{inviter_chat_id})
+        $invitedByText = '';
+        if (!empty($startParam)) {
+            if (preg_match('/^r([0-9a-f\-]+)-i(\d+)$/i', (string)$startParam, $matches) === 1) {
+                $refRestaurantId = (string) ($matches[1] ?? '');
+                $inviterChatId = (string) ($matches[2] ?? '');
+
+                if ($refRestaurantId === (string) $restaurant->id && $user) {
+                    $inviter = User::whereHas('restaurants', function($q) use ($restaurant, $inviterChatId) {
+                        $q->where('restaurant_id', $restaurant->id)
+                          ->where('chat_id', (string)$inviterChatId);
+                    })->first();
+
+                    if ($inviter && $inviter->id !== $user->id) {
+                        // Сохраняем связь (пригласивший -> приглашенный)
+                        $inviter->addFriend($user, [
+                            'invited_via_start_param' => true,
+                            'invited_at' => now()->toISOString(),
+                            'invited_by_chat_id' => (string)$inviterChatId,
+                        ]);
+
+                        $inviterName = trim((string)$inviter->first_name . ($inviter->last_name ? ' ' . (string)$inviter->last_name : ''));
+                        if ($inviterName !== '') {
+                            $invitedByText = "Вас пригласил(а) {$inviterName}.";
+                        }
+
+                        // Пробуем уведомить пригласившего, что друг присоединился
+                        try {
+                            $joinedName = trim((string)$user->first_name . ($user->last_name ? ' ' . (string)$user->last_name : ''));
+                            $service->sendMessage([
+                                'chat_id' => (int)$inviterChatId,
+                                'text' => '✅ ' . ($joinedName !== '' ? $joinedName : 'Ваш друг') . ' присоединился(лась) к боту.',
+                            ]);
+                        } catch (\Throwable $e) {
+                            Log::warning('Не удалось уведомить пригласившего о присоединении друга', [
+                                'error' => $e->getMessage(),
+                                'inviter_chat_id' => $inviterChatId,
+                                'restaurant_id' => $restaurant->id,
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
         // Приветственное сообщение
         $greeting = $this->buildWelcomeMessage($restaurant);
+        if ($invitedByText !== '') {
+            $greeting = $invitedByText . "\n\n" . $greeting;
+        }
 
         // Отправляем приветственное сообщение БЕЗ клавиатуры
         $service->sendMessage([
@@ -176,8 +224,13 @@ class WebhookController extends Controller
             'user_id' => $user?->id,
         ]);
 
-        // Отправляем второе сообщение с предложением поделиться контактами
-        $this->sendContactRequestMessage($chatId, $service, $restaurant);
+        // Отправляем второе сообщение с предложением поделиться контактами только если нет startParam
+        if ($startParam === null) {
+            $this->sendContactRequestMessage($chatId, $service, $restaurant);
+        } else {
+            // Для deep-link сценария не навязываем онбординг
+            $this->setAppKeyboard($chatId, $service, $restaurant, 'Добро пожаловать! Откройте приложение или поделитесь контактами и друзьями.');
+        }
     }
 
     /**
@@ -587,7 +640,26 @@ class WebhookController extends Controller
                 return $user;
             }
 
-            Log::info('🔍 ОТЛАДКА: Пользователь не найден, создаем нового', [
+            // Пробуем найти пользователя по глобальному chat_id (мог быть создан как "друг")
+            $existingByChat = User::where('chat_id', (string)$chatId)->first();
+            if ($existingByChat) {
+                Log::info('🔁 ОТЛАДКА: Найден пользователь по chat_id без привязки к ресторану', [
+                    'user_id' => $existingByChat->id,
+                    'chat_id' => $chatId,
+                    'step' => 'found_user_by_chat_globally'
+                ]);
+
+                $existingByChat->update([
+                    'first_name' => $firstName,
+                    'last_name' => $lastName ?: null,
+                    'username' => $username ?: null,
+                    'avatar_url' => $avatarUrl,
+                ]);
+
+                return $existingByChat;
+            }
+
+            Log::info('🔍 ОТЛАДКА: Пользователь не найден нигде, создаем нового', [
                 'chat_id' => $chatId,
                 'step' => 'creating_new_user'
             ]);
@@ -740,6 +812,16 @@ class WebhookController extends Controller
                                 'step' => 'friend_successfully_added'
                             ]);
 
+                            // Пытаемся отправить приветственное сообщение приглашенному пользователю
+                            $this->tryGreetInvitedUser(
+                                invitedTelegramId: $userId,
+                                inviterChatId: (int) $chatId,
+                                inviterName: trim(($user->first_name ?? '') . (isset($user->last_name) ? ' ' . $user->last_name : '')),
+                                restaurant: $restaurant,
+                                service: $service,
+                                invitedDisplayName: trim(($sharedUser['first_name'] ?? '') . (isset($sharedUser['last_name']) ? ' ' . $sharedUser['last_name'] : ''))
+                            );
+
                         } catch (Throwable $e) {
                             Log::error('❌ ОТЛАДКА: Ошибка добавления друга', [
                                 'error' => $e->getMessage(),
@@ -786,7 +868,7 @@ class WebhookController extends Controller
             ]);
 
             // Показываем обновленную клавиатуру (с контактами и приложением)
-            $this->setAppKeyboard($chatId, $service, $restaurant);
+            $this->setAppKeyboard($chatId, $service, $restaurant, '⌨️ Клавиатура обновлена. Вы можете открыть приложение или поделиться контактами и друзьями.');
 
         } catch (Throwable $e) {
             Log::error('❌ ОТЛАДКА: Ошибка обработки переданных пользователей', [
@@ -800,7 +882,61 @@ class WebhookController extends Controller
             ]);
 
             // Заменяем клавиатуру даже при ошибке
-            $this->setAppKeyboard($chatId, $service, $restaurant);
+            $this->setAppKeyboard($chatId, $service, $restaurant, 'Спасибо! Друзья добавлены. Откройте приложение или поделитесь ещё.');
+        }
+    }
+
+    /**
+     * Попробовать отправить приветственное сообщение приглашенному пользователю.
+     * Если бот не может инициировать чат, отправляет приглашателю ссылку /start для друга.
+     */
+    private function tryGreetInvitedUser(int $invitedTelegramId, int $inviterChatId, string $inviterName, Restaurant $restaurant, TelegramBotService $service, string $invitedDisplayName = ''): void
+    {
+        try {
+            $greetingText = "Привет" . ($invitedDisplayName ? ", {$invitedDisplayName}" : "") . "! {$inviterName} пригласил(а) вас в {$restaurant->name}. Откройте бота, чтобы посмотреть меню, фото и события, а также чтобы мы могли оставаться на связи.";
+
+            $service->sendMessage([
+                'chat_id' => $invitedTelegramId,
+                'text' => $greetingText,
+            ]);
+
+            Log::info('✅ Отправлено приветственное сообщение приглашенному пользователю', [
+                'restaurant_id' => $restaurant->id,
+                'invited_telegram_id' => $invitedTelegramId,
+                'inviter_chat_id' => $inviterChatId,
+            ]);
+
+            return;
+        } catch (Throwable $e) {
+            Log::warning('⚠️ Не удалось отправить приветствие приглашенному пользователю (возможно, чат не инициализирован)', [
+                'error' => $e->getMessage(),
+                'restaurant_id' => $restaurant->id,
+                'invited_telegram_id' => $invitedTelegramId,
+                'inviter_chat_id' => $inviterChatId,
+            ]);
+        }
+
+        // Пытаемся отправить приглашателю ссылку с deep-link для друга
+        try {
+            $botInfo = $service->getMe();
+            $botUsername = $botInfo['result']['username'] ?? null;
+
+            $payload = 'r' . $restaurant->id . '-i' . $inviterChatId;
+            $startLink = $botUsername ? ("https://t.me/{$botUsername}?start={$payload}") : null;
+
+            $fallbackText = 'Мы не смогли написать приглашенному пользователю. '
+                . 'Попросите его начать чат с ботом' . ($startLink ? ": {$startLink}" : '.') ;
+
+            $service->sendMessage([
+                'chat_id' => $inviterChatId,
+                'text' => $fallbackText,
+            ]);
+        } catch (Throwable $e) {
+            Log::warning('⚠️ Не удалось отправить fallback-сообщение приглашателю', [
+                'error' => $e->getMessage(),
+                'restaurant_id' => $restaurant->id,
+                'inviter_chat_id' => $inviterChatId,
+            ]);
         }
     }
 
@@ -1196,7 +1332,7 @@ class WebhookController extends Controller
     /**
      * Установить постоянную клавиатуру с приложением и контактами
      */
-    private function setAppKeyboard(int $chatId, TelegramBotService $service, Restaurant $restaurant): void
+    private function setAppKeyboard(int $chatId, TelegramBotService $service, Restaurant $restaurant, ?string $messageText = null): void
     {
         try {
             Log::info('⌨️ ОТЛАДКА: Начало установки клавиатуры приложения', [
@@ -1250,9 +1386,11 @@ class WebhookController extends Controller
                 'step' => 'sending_keyboard_message'
             ]);
 
+            $text = $messageText ?? "🎉 Отлично! Регистрация завершена!\n\n🚀 Откройте приложение для заказов\n📱 Поделитесь контактами для уведомлений\n👥 Найдите друзей через адресную книгу";
+
             $result = $service->sendMessage([
                 'chat_id' => $chatId,
-                'text' => "🎉 Отлично! Регистрация завершена!\n\n🚀 Откройте приложение для заказов\n📱 Поделитесь контактами для уведомлений\n👥 Найдите друзей через адресную книгу",
+                'text' => $text,
                 'reply_markup' => $replyMarkup,
             ]);
 

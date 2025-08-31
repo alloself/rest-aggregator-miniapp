@@ -9,6 +9,8 @@
     </div>
 
     <div v-else-if="restaurant" class="restaurant-page__wrapper">
+      <pre v-if="me">{{ me }}</pre>
+      <pre v-if="tgInitData">{{ tgInitData }}</pre>
       <RestaurantCard
         :restaurant="restaurant"
         :chef-recommendations="chefRecommendations"
@@ -21,7 +23,6 @@
 
     <div v-else class="restaurant-page__not-found">Ресторан не найден</div>
   </div>
-  <BottomSheetContainer />
 </template>
 
 <script setup lang="ts">
@@ -30,10 +31,10 @@ import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useRestaurantStore } from '../entities/restaurant';
 import RestaurantCard from '../widgets/restaurant-page/RestaurantCard.vue';
-import { BottomSheetContainer } from '../features/bottom-sheet';
 import PhotoReels from '@/shared/components/PhotoReels.vue';
 import { useBottomSheet } from '../shared';
 import { PdfBottomSheet } from '../shared/ui';
+import { useMiniAppStore } from '../shared/stores/miniapp';
 
 const { slug } = defineProps<{ slug?: string }>();
 
@@ -43,6 +44,10 @@ const { open } = useBottomSheet();
 
 const store = useRestaurantStore();
 const { restaurant, loading, error } = storeToRefs(store);
+const mini = useMiniAppStore();
+
+const { me } = storeToRefs(mini);
+const tgInitData = computed(() => window.Telegram?.WebApp?.initData || '');
 
 const chefRecommendations = computed(() => {
   const categories = restaurant.value?.categories ?? [];
@@ -120,5 +125,17 @@ onBeforeMount(async () => {
   const param = slug || route.params.slug.toString();
 
   store.getRestaurantData(param);
+
+  // Telegram Mini App initialization and auth
+  try {
+    const tg = window.Telegram?.WebApp;
+    tg?.ready();
+    const initData = tg?.initData ?? '';
+    if (initData) {
+      await mini.authWithInitData(param);
+    }
+  } catch (_) {
+    // ignore mini app auth errors silently
+  }
 });
 </script>

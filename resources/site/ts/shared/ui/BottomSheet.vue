@@ -1,9 +1,10 @@
 <template>
   <Teleport to="body">
-    <transition name="bottom-sheet-backdrop" appear>
+    <transition name="bottom-sheet-backdrop" appear @after-leave="handleAfterLeave">
       <div
         class="bottom-sheet-backdrop"
         :style="{ zIndex: props.zIndex }"
+        v-if="isVisible"
         @click="handleBackdropClick"
         @wheel.prevent.self
         @touchmove.prevent.self
@@ -34,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 
 interface BottomSheetProps {
   showHandle?: boolean;
@@ -58,6 +59,8 @@ const emit = defineEmits<{
   close: [];
 }>();
 
+const isVisible = ref(true);
+
 const sheetStyles = computed(() => ({
   maxHeight: `${props.height}vh`,
 }));
@@ -72,7 +75,7 @@ const sheetHeight = ref(0);
 
 const handleBackdropClick = () => {
   if (props.closableByBackdrop) {
-    emit('close');
+    startClose();
   }
 };
 
@@ -106,7 +109,7 @@ const handleTouchEnd = () => {
   const threshold = sheetHeight.value * 0.3;
 
   if (deltaY > threshold) {
-    emit('close');
+    startClose();
   } else {
     sheetRef.value.style.transform = 'translateY(0)';
   }
@@ -118,9 +121,18 @@ const handleTouchEnd = () => {
 
 const handleEscapeKey = (event: KeyboardEvent) => {
   if (event.key === 'Escape') {
-    emit('close');
+    startClose();
   }
-};
+}
+
+const startClose = () => {
+  if (!isVisible.value) return;
+  isVisible.value = false;
+}
+
+const handleAfterLeave = () => {
+  emit('close');
+}
 
 onMounted(() => {
   document.addEventListener('keydown', handleEscapeKey);

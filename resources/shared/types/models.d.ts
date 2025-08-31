@@ -93,6 +93,15 @@ export interface File {
   fileables_exists: boolean
 }
 
+export interface Like {
+  // relations
+  user?: User
+  likeable?: Like
+  // counts
+  // exists
+  user_exists: boolean
+}
+
 export interface Message {
   // columns
   id: number

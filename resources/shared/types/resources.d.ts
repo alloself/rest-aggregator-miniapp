@@ -29,6 +29,8 @@ export interface RestaurantResourceData {
   working_hours?: WorkingHours | null
   address?: string | null
   average_receipt?: number | null
+  phone?: string | null
+  bot_username: string
   files?: FileResourceData[]
   images?: FileResourceData[]
   categories?: CategoryResourceData[]
@@ -101,6 +103,7 @@ export interface EventResourceData {
   created_at?: Date | null
   updated_at?: Date | null
   restaurant?: RestaurantResourceData
+  is_sold_out: boolean
   files?: FileResourceData[]
   images?: FileResourceData[]
 }

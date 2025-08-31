@@ -12,6 +12,7 @@
 
         <RestaurantCardActions
           :contact-info="contactInfo"
+          :restaurant-id="restaurant?.id || undefined"
           @show-menu="showMenu"
           @show-bar="showBar"
           @show-photos="showPhotos"
