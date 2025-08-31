@@ -283,10 +283,6 @@
     width: 100%;
 }
 
-:where(.p-button).p-button-icon-only {
-    width: 60px;
-}
-
 /* Disabled state */
 :where(.p-button)[disabled],
 :where(.p-button).p-disabled,

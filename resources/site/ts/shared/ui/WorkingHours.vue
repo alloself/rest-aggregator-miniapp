@@ -6,7 +6,13 @@
     </div>
   </div>
 
-  <Dialog v-model:visible="isDialogVisible" modal header="Время работы" class="working-hours-dialog">
+  <Dialog
+    v-model:visible="isDialogVisible"
+    :style="{ width: '260px' }"
+    modal
+    header="Время работы"
+    class="working-hours-dialog"
+  >
     <div class="working-hours-dialog__content">
       <div v-for="day in detailedSchedule" :key="day.dayKey" class="working-hours-dialog__item">
         <span class="working-hours-dialog__day">{{ day.dayName }}</span>
