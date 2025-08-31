@@ -31,7 +31,8 @@ class Restaurant extends BaseModel
         'phone',
         'telegram_bot_token',
         'subtitle',
-        'welcome_message'
+        'welcome_message',
+        'bot_username',
     ];
 
 

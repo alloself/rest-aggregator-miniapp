@@ -4,6 +4,7 @@
         :baseUrl="RESTAURANT_BASE_URL"
         :client="client"
         entity="restaurant"
+        :showActions="false"
     />
 </template>
 

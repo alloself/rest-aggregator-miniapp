@@ -21,7 +21,7 @@
             ></Column>
         </slot>
         <template #paginatorend>
-            <Button type="button" icon="pi pi-plus" text @click="toCreate" />
+            <Button v-if="showActions" type="button" icon="pi pi-plus" text @click="toCreate" />
         </template>
     </DataTable>
 </template>
@@ -39,6 +39,7 @@ const {
     baseUrl = "",
     client,
     entity,
+    showActions = true,
     relations = [],
 } = defineProps<{
     columns: { field: string; header: string }[];
@@ -46,6 +47,7 @@ const {
     client: AxiosInstance;
     entity: string;
     relations?: string[];
+    showActions?: boolean;
 }>();
 
 const listData = reactive<{
