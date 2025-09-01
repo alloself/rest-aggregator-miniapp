@@ -16,10 +16,6 @@
         :paginationBottom="'12px'"
       />
 
-      <button class="event-page__back-button" @click="handleBackClick">
-        <Icon name="arrow" :size="18" class="event-page__back-icon" />
-      </button>
-
       <div class="event-page__overlay-content">
         <div class="event-page__title-card">
           <h1 class="event-page__title">{{ event.title }}</h1>
@@ -70,12 +66,15 @@ import { useEventStore } from '../entities/event';
 import Icon from '@shared/ui/Icon.vue';
 import HeroCarousel from '@shared/ui/HeroCarousel.vue';
 import { dayjs } from '../shared/lib/dayjs';
+import type { Event } from '@/shared/types/models';
 
-const route = useRoute();
+type Props = {
+  slug: string;
+  eventSlug: Event['slug'];
+};
+const { slug, eventSlug } = defineProps<Props>();
+
 const router = useRouter();
-
-const slug = computed(() => (typeof route.params.slug === 'string' ? route.params.slug : ''));
-const eventSlug = computed(() => (typeof route.params.eventSlug === 'string' ? route.params.eventSlug : ''));
 
 const store = useEventStore();
 const { event, loading, error } = storeToRefs(store);
@@ -98,10 +97,6 @@ const formatPrice = (price: number): string => {
   return `${price.toLocaleString('ru-RU')} ₽`;
 };
 
-const handleBackClick = () => {
-  router.back();
-};
-
 const handleBooking = () => {
   // TODO: Реализовать логику бронирования
   console.log('Бронирование события:', event.value?.title);
@@ -113,8 +108,8 @@ const handleTelegramShare = () => {
 };
 
 onBeforeMount(async () => {
-  if (slug.value && eventSlug.value) {
-    await store.getEventData(slug.value, eventSlug.value);
+  if (slug && eventSlug) {
+    await store.getEventData(slug, eventSlug);
   }
 });
 </script>

@@ -14,27 +14,22 @@
 import { useEventsStore } from '../../entities/event';
 import { storeToRefs } from 'pinia';
 import { onBeforeMount } from 'vue';
-import { useRouter } from 'vue-router';
 import type { Event } from '@/shared';
 import EventCard from './EventCard.vue';
 import InfiniteScroll from '../../shared/ui/InfiniteScroll.vue';
+import { useBottomSheet } from '../../shared/lib/composables/useBottomSheet';
+import EventPage from '../../pages/EventPage.vue';
 
 const { slug } = defineProps<{ slug: string }>();
 
-const router = useRouter();
+const { open } = useBottomSheet();
 
 const store = useEventsStore();
 const { events, loading, error, hasMore, isLoadingMore } = storeToRefs(store);
 const { getEventsData, loadMore } = store;
 
 const handleEventClick = (event: Event) => {
-  router.push({
-    name: 'event',
-    params: {
-      slug: slug,
-      eventSlug: event.slug,
-    },
-  });
+  open(EventPage, { eventSlug: event.slug, slug }, { height: 90 });
 };
 
 onBeforeMount(async () => {
