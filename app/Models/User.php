@@ -11,7 +11,9 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Traits\HasImages;
+use App\Models\Like;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -295,5 +297,13 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getFullAvatarUrlAttribute(): ?string
     {
         return $this->getAvatarUrl();
+    }
+
+    /**
+     * Лайки пользователя
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
     }
 }

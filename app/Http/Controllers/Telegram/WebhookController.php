@@ -640,7 +640,39 @@ class WebhookController extends Controller
                 return $user;
             }
 
-            // Пропускаем поиск по users.chat_id: чат хранится только в пивоте restaurant_user
+            // Пропускаем глобальный поиск по users.chat_id — колонка удалена; чат хранится в restaurant_user
+
+            // Попытка сопоставить с существующим пользователем по username или по имени/фамилии,
+            // чтобы не создавать дубль, если пользователь был создан ранее через приглашение
+            $matched = null;
+            if ($username !== '') {
+                $matched = User::where('username', $username)->first();
+            }
+            if (!$matched && $firstName !== '') {
+                $q = User::query()->where('first_name', $firstName);
+                if ($lastName !== '') {
+                    $q->where('last_name', $lastName);
+                }
+                $matched = $q->first();
+            }
+
+            if ($matched) {
+                $matched->update([
+                    'first_name' => $firstName,
+                    'last_name' => $lastName ?: $matched->last_name,
+                    'username' => $username !== '' ? $username : $matched->username,
+                    'avatar_url' => $avatarUrl ?: $matched->avatar_url,
+                ]);
+
+                Log::info('🔁 ОТЛАДКА: Сопоставлен существующий пользователь по профилю', [
+                    'user_id' => $matched->id,
+                    'chat_id' => $chatId,
+                    'matched_by' => $username !== '' ? 'username' : 'name',
+                    'step' => 'matched_existing_by_profile'
+                ]);
+
+                return $matched;
+            }
 
             Log::info('🔍 ОТЛАДКА: Пользователь не найден нигде, создаем нового', [
                 'chat_id' => $chatId,
@@ -769,10 +801,33 @@ class WebhookController extends Controller
                         ]);
                     }
 
-                    // Пытаемся найти или создать друга в базе данных
-                    $friendUser = $this->findOrCreateFriendUser($userId, $sharedUser, $userInfo, $avatarUrl, $restaurant);
-                    
+                    // Если этот друг уже есть у пользователя (по username/имени), не создаём дубликат
+                    $existingFriend = null;
+                    if (!empty($sharedUser['username'])) {
+                        $existingFriend = $user->friends()->where('users.username', (string)$sharedUser['username'])->first();
+                    }
+                    if (!$existingFriend && !empty($sharedUser['first_name'])) {
+                        $existingFriend = $user->friends()
+                            ->where('users.first_name', (string)$sharedUser['first_name'])
+                            ->when(isset($sharedUser['last_name']) && $sharedUser['last_name'] !== '', function ($q) use ($sharedUser) {
+                                $q->where('users.last_name', (string)$sharedUser['last_name']);
+                            })
+                            ->first();
+                    }
+
+                    $friendUser = $existingFriend ?: $this->findOrCreateFriendUser($userId, $sharedUser, $userInfo, $avatarUrl, $restaurant);
+
                     if ($friendUser) {
+                        // Если уже есть связь user->friend, не создаём дубликат
+                        if ($user->friends()->where('friend_id', $friendUser->id)->exists()) {
+                            Log::info('ℹ️ ОТЛАДКА: Друг уже привязан к пользователю, пропускаем attach', [
+                                'user_id' => $user->id,
+                                'friend_user_id' => $friendUser->id,
+                                'friend_telegram_id' => $userId,
+                                'step' => 'friend_already_attached'
+                            ]);
+                            continue;
+                        }
                         // Добавляем друга к текущему пользователю
                         try {
                             // Дополнительные данные для сохранения в pivot таблице
@@ -781,6 +836,7 @@ class WebhookController extends Controller
                                 'shared_at' => now()->toISOString(),
                                 'telegram_photo_data' => $sharedUser['photo'] ?? null,
                                 'additional_telegram_info' => $userInfo,
+                                'friend_telegram_id' => $userId,
                             ];
 
                             $user->addFriend($friendUser, $telegramData);
@@ -869,6 +925,7 @@ class WebhookController extends Controller
      */
     private function tryGreetInvitedUser(int $invitedTelegramId, int $inviterChatId, string $inviterName, Restaurant $restaurant, TelegramBotService $service, string $invitedDisplayName = ''): void
     {
+        $directSent = false;
         try {
             $greetingText = "Привет" . ($invitedDisplayName ? ", {$invitedDisplayName}" : "") . "! {$inviterName} пригласил(а) вас в {$restaurant->name}. Откройте бота, чтобы посмотреть меню, фото и события, а также чтобы мы могли оставаться на связи.";
 
@@ -882,8 +939,7 @@ class WebhookController extends Controller
                 'invited_telegram_id' => $invitedTelegramId,
                 'inviter_chat_id' => $inviterChatId,
             ]);
-
-            return;
+            $directSent = true;
         } catch (Throwable $e) {
             Log::warning('⚠️ Не удалось отправить приветствие приглашенному пользователю (возможно, чат не инициализирован)', [
                 'error' => $e->getMessage(),
@@ -894,16 +950,33 @@ class WebhookController extends Controller
         }
 
         // Пытаемся отправить приглашателю ссылку с deep-link для друга
+        $botUsername = null;
         try {
             $botInfo = $service->getMe();
             $botUsername = $botInfo['result']['username'] ?? null;
+        } catch (Throwable $e) {
+            Log::warning('⚠️ Не удалось получить username бота через getMe', [
+                'error' => $e->getMessage(),
+                'restaurant_id' => $restaurant->id,
+            ]);
+        }
 
-            $payload = 'r' . $restaurant->id . '-i' . $inviterChatId;
-            $startLink = $botUsername ? ("https://t.me/{$botUsername}?start={$payload}") : null;
+        // Фолбэк: если API не вернул username, используем сохранённый в ресторане bot_username
+        if (!$botUsername && !empty($restaurant->bot_username)) {
+            $botUsername = (string) $restaurant->bot_username;
+            Log::info('Использован restaurant.bot_username для инвайт-ссылки', [
+                'restaurant_id' => $restaurant->id,
+                'bot_username' => $botUsername,
+            ]);
+        }
 
-            $fallbackText = 'Мы не смогли написать приглашенному пользователю. '
-                . 'Попросите его начать чат с ботом' . ($startLink ? ": {$startLink}" : '.') ;
+        $payload = 'r' . $restaurant->id . '-i' . $inviterChatId;
+        $startLink = $botUsername ? ("https://t.me/{$botUsername}?start={$payload}") : null;
+        $fallbackText = $directSent
+            ? ('На всякий случай — вот ссылка для друга: ' . ($startLink ?? ''))
+            : ('Мы не смогли написать приглашенному пользователю. Попросите его начать чат с ботом' . ($startLink ? ": {$startLink}" : '.'));
 
+        try {
             $service->sendMessage([
                 'chat_id' => $inviterChatId,
                 'text' => $fallbackText,
@@ -1026,11 +1099,20 @@ class WebhookController extends Controller
                 'step' => 'start_find_friend_user'
             ]);
 
-            // Сначала пытаемся найти существующего пользователя по chat_id
-            $friendUser = User::whereHas('restaurants', function($q) use ($restaurant, $telegramId) {
-                $q->where('restaurant_id', $restaurant->id)
-                  ->where('chat_id', (string)$telegramId);
-            })->first();
+            // 1) Пытаемся найти по username (самый надёжный признак для Telegram)
+            $friendUser = null;
+            if (!empty($sharedUser['username'])) {
+                $friendUser = User::where('username', (string)$sharedUser['username'])->first();
+            }
+
+            // 2) Если username отсутствует — пробуем найти по имени/фамилии (менее надёжно)
+            if (!$friendUser && !empty($sharedUser['first_name'])) {
+                $query = User::query()->where('first_name', (string)$sharedUser['first_name']);
+                if (!empty($sharedUser['last_name'])) {
+                    $query->where('last_name', (string)$sharedUser['last_name']);
+                }
+                $friendUser = $query->first();
+            }
 
             if ($friendUser) {
                 Log::info('✅ ОТЛАДКА: Пользователь-друг найден в базе', [

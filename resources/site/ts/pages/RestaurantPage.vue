@@ -76,6 +76,7 @@ const handleShowMenu = () => {
       height: 90,
       closableBySwipe: true,
       closableByBackdrop: true,
+      bottomGap: false,
       zIndex: 1200,
       class: 'restaurant-page__pdf-sheet',
     },
@@ -93,6 +94,7 @@ const handleShowBar = () => {
       height: 90,
       closableBySwipe: true,
       closableByBackdrop: true,
+      bottomGap: false,
       zIndex: 1200,
       class: 'restaurant-page__pdf-sheet',
     },
@@ -107,6 +109,7 @@ const handleShowPhotos = () => {
     { images: galleryImages.value, showPagination: true },
     {
       showHandle: true,
+      bottomGap: false,
       closableByBackdrop: true,
       closableBySwipe: true,
       height: 90,

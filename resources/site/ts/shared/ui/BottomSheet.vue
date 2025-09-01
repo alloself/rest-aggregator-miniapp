@@ -44,6 +44,7 @@ interface BottomSheetProps {
   height?: number;
   customClass?: string;
   zIndex?: number;
+  bottomGap?: boolean;
 }
 
 const props = withDefaults(defineProps<BottomSheetProps>(), {
@@ -53,6 +54,7 @@ const props = withDefaults(defineProps<BottomSheetProps>(), {
   height: 60,
   customClass: '',
   zIndex: 1000,
+  bottomGap: false,
 });
 
 const emit = defineEmits<{
@@ -65,7 +67,7 @@ const sheetStyles = computed(() => ({
   maxHeight: `${props.height}vh`,
 }));
 
-const sheetClasses = computed(() => ['bottom-sheet--default']);
+const sheetClasses = computed(() => ['bottom-sheet--default', { 'pb-4': props.bottomGap }]);
 
 const sheetRef = ref<HTMLElement>();
 const isDragging = ref(false);
@@ -149,7 +151,7 @@ onUnmounted(() => {
 
 <style scoped>
 .bottom-sheet__content {
-  padding-bottom: constant(safe-area-inset-bottom);
-  padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  justify-content: center;
 }
 </style>

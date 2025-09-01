@@ -32,14 +32,14 @@ export const useMiniAppStore = defineStore('miniapp', () => {
         await client.delete('/api/site/likes', {
           params: {
             user_id: me.value.id,
-            likeable_type: 'App\\\\Models\\\\Restaurant',
+            likeable_type: 'restaurant',
             likeable_id: restaurantId,
           },
         });
       } else {
         await client.post('/api/site/likes', {
           user_id: me.value.id,
-          likeable_type: 'App\\\\Models\\\\Restaurant',
+          likeable_type: 'restaurant',
           likeable_id: restaurantId,
         });
       }
