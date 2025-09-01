@@ -23,6 +23,10 @@ export interface BottomSheetOptions {
    * Z-index для overlay
    */
   zIndex?: number
+  /**
+   * Добавить ли отступ внизу
+   */
+  bottomGap?: boolean
 }
 export interface BottomSheetItem {
   id: string

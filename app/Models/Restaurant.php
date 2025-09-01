@@ -11,10 +11,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Models\Pivot\Categorizable;
 use App\Models\Category;
 use App\Services\TelegramBotService;
 use App\Models\User;
+use App\Models\Like;
 
 class Restaurant extends BaseModel
 {
@@ -118,5 +120,13 @@ class Restaurant extends BaseModel
     public function bot(): TelegramBotService
     {
         return new TelegramBotService($this->telegram_bot_token);
+    }
+
+    /**
+     * Лайки ресторана (полиморфное отношение)
+     */
+    public function likes(): MorphMany
+    {
+        return $this->morphMany(Like::class, 'likeable');
     }
 }

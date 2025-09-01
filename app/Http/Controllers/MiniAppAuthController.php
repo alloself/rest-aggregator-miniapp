@@ -7,7 +7,7 @@ use App\Models\Like;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
-
+use Illuminate\Support\Facades\Log;
 
 class MiniAppAuthController extends Controller
 {
@@ -52,37 +52,32 @@ class MiniAppAuthController extends Controller
             return response()->json(['message' => 'User not registered for this restaurant'], BaseResponse::HTTP_NOT_FOUND);
         }
 
-        // Флаг: лайкнул ли текущий пользователь этот ресторан
-        $liked = Like::where('user_id', $user->id)
-            ->where('likeable_type', Restaurant::class)
-            ->where('likeable_id', $restaurant->id)
+        // Проверяем лайкнул ли текущий пользователь этот ресторан
+        $liked = $restaurant->likes()
+            ->where('user_id', $user->id)
             ->exists();
 
-        // Друзья пользователя, которые лайкнули этот ресторан
-        $friendIds = $user->friends()->pluck('users.id');
-        $friendIdsLiked = Like::whereIn('user_id', $friendIds)
-            ->where('likeable_type', Restaurant::class)
-            ->where('likeable_id', $restaurant->id)
-            ->pluck('user_id')
-            ->unique();
-
-        $friendsWhoLiked = $user->friends()
-            ->whereIn('users.id', $friendIdsLiked)
+        // Находим всех друзей пользователя, которые лайкнули этот ресторан
+        $friendsLiked = $user->friends()
+            ->whereHas('likes', function ($query) use ($restaurant) {
+                $query->where('likeable_id', $restaurant->id)
+                      ->where('likeable_type', Restaurant::class);
+            })
             ->get();
 
-        $friendsLikedPayload = $friendsWhoLiked->map(function ($friend) {
+        // Формируем данные о друзьях для ответа
+        $friendsLikedPayload = $friendsLiked->map(function ($friend) {
             return [
                 'id' => $friend->id,
-                'first_name' => $friend->first_name,
-                'last_name' => $friend->last_name,
+                'name' => trim($friend->first_name . ' ' . $friend->last_name) ?: $friend->username,
                 'username' => $friend->username,
-                'avatar_url' => $friend->getAvatarUrl(),
+                'profile_photo_url' => $friend->getProfilePhotoUrl(),
             ];
-        })->values()->all();
+        });
 
         return response()->json(array_merge($user->toArray(), [
-            'liked' => $liked,
-            'friends_liked' => $friendsLikedPayload,
+            'liked_by_me' => $liked,
+            'friends' => $friendsLikedPayload,
         ]));
     }
 
