@@ -73,6 +73,7 @@ const formatTime = (date: Date): string => {
 };
 
 const formatPrice = (price: number): string => {
-  return `${price.toLocaleString('ru-RU')} ₽`;
+  const whole = Math.floor(price);
+  return `${whole.toLocaleString('ru-RU', { maximumFractionDigits: 0 })} ₽`;
 };
 </script>

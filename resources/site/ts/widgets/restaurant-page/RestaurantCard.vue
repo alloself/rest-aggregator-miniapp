@@ -1,7 +1,7 @@
 <template>
   <div class="restaurant-card">
     <div class="restaurant-card__hero-carousel">
-      <HeroCarousel :images="images" :autoplay="4000" height="300px" />
+      <HeroCarousel :images="images" :autoplay="4000" height="300px" :show-pagination="false" />
       <LikeButton class="restaurant-card__like-button" :is-liked="mini.likedByMe" :friends-count="friends.length"
         :disabled="isLiking" @click="handleToggleLike" />
     </div>

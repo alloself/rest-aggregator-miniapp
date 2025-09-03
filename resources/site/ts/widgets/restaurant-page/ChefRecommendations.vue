@@ -47,6 +47,6 @@ const { chefRecommendations } = toRefs(props);
 const { open } = useBottomSheet();
 
 const handleDishClick = (dish: DishResourceData) => {
-  open(DishBottomSheet, { dish });
+  open(DishBottomSheet, { dish }, { bottomGap: true });
 };
 </script>

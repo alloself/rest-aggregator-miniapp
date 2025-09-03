@@ -7,7 +7,7 @@
 }
 
 .event-card__image-container {
-    @apply relative shrink-0 w-[140px] overflow-hidden rounded-[var(--radius-medium)];
+    @apply relative shrink-0 w-[128px] overflow-hidden rounded-[var(--radius-medium)];
 }
 
 .event-card__image {

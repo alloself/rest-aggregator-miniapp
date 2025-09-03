@@ -70,11 +70,12 @@ const sanitizedHtml = computed(() => {
     'h6',
     'span',
   ];
-  return DOMPurify.sanitize(props.text, {
+  const sanitized = DOMPurify.sanitize(props.text, {
     ALLOWED_TAGS: allowedTags,
     ALLOWED_ATTR: [],
     USE_PROFILES: { html: true },
-  }) as string;
+  });
+  return sanitized.replace(/&nbsp;|&#160;/g, ' ').replace(/\u00A0/g, ' ');
 });
 
 const truncatedHtml = computed(() => {
@@ -149,3 +150,12 @@ const collapse = async () => {
   }, props.animationDuration);
 };
 </script>
+
+<style scoped>
+.collapsible-text__text {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+  hyphens: auto;
+}
+</style>

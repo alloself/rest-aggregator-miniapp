@@ -37,6 +37,7 @@
     /* Текстовые цвета */
     --color-text-primary: #000000;
     --color-text-secondary: rgba(0, 0, 0, 0.35);
+    --color-text-tertiary: #9F9E9E;
     --color-text-accent: #1c1c1e;
     --color-text-muted: rgba(0, 0, 0, 0.4);
     --color-text-dark: #050505;

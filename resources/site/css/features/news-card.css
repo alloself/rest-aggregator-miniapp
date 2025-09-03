@@ -11,7 +11,7 @@
 }
 
 .news-card__title {
-    @apply m-0 mb-[8px] text-[var(--font-size-heading-md)] font-semibold leading-[var(--line-height-heading-lg)] text-[var(--color-text-primary)];
+    @apply m-0 mb-[8px] text-base font-medium leading-[0.95em] tracking-[-0.01em] text-[var(--color-text-primary)];
 }
 
 .news-card__description {
@@ -19,5 +19,5 @@
 }
 
 .news-card__date {
-    @apply mt-[4px] text-left text-[var(--font-size-body-tiny)] text-[var(--color-text-secondary)];
+    @apply mt-1 text-left text-xs leading-[1.3em] tracking-[-0.04em] font-normal text-[var(--color-text-tertiary)];
 }

@@ -8,6 +8,7 @@
     :height="sheet.options?.height"
     :custom-class="sheet.options?.class"
     :z-index="sheet.options?.zIndex"
+    :bottom-gap="sheet.options?.bottomGap"
     @close="close(sheet.id)"
   >
     <component :is="sheet.component" v-bind="sheet.props" @close="close(sheet.id)" />
