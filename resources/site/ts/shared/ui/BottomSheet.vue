@@ -72,9 +72,17 @@ const emit = defineEmits<{
 
 const isVisible = ref(true);
 
-const sheetStyles = computed<CSSProperties>(() => ({
-  maxHeight: `${props.height}dvh`,
-}));
+// overlay height не нужен: backdrop всегда фиксирован и растянут на весь экран
+
+const sheetStyles = computed<CSSProperties>(() => {
+  const tg = window.Telegram?.WebApp;
+  const vh = tg?.viewportHeight;
+  const maxH = vh ? Math.min(vh, (props.height ?? 60) * (window.innerHeight / 100)) : undefined;
+  // При наличии tg.viewportHeight ограничиваем шит высотой видимой области, иначе оставляем dvh
+  return vh
+    ? { maxHeight: `${Math.floor(maxH ?? vh)}px` }
+    : { maxHeight: `${props.height}dvh` };
+});
 
 const sheetClasses = computed(() => ['bottom-sheet--default', { 'bottom-sheet--gap': props.bottomGap }]);
 
@@ -89,7 +97,6 @@ const contentAtTopOnStart = ref(false);
 const lastMoveY = ref(0);
 const lastMoveTime = ref(0);
 const velocityY = ref(0);
-// CSS-only позиционирование через dvh: JS не нужен
 const rafId = ref(0);
 const hasScheduledFrame = ref(false);
 const pendingTranslateY = ref(0);
@@ -297,8 +304,28 @@ const handleAfterLeave = () => {
   emit('close');
 };
 
+// Типы Telegram доступны глобально из resources/site/ts/shared/types/telegram-webapp.d.ts
+
+const handleViewportChange = () => {
+  // триггерим обновление вычисляемых стилей
+  // Vue сам пересчитает computed, т.к. обращение идёт к window.Telegram.WebApp внутри них
+  // Ничего не делаем здесь – важно просто подписаться/отписаться корректно
+};
+
 onMounted(() => {
   document.addEventListener('keydown', handleEscapeKey);
+
+  const tg = window.Telegram?.WebApp;
+  try {
+    tg?.expand?.();
+    // Пока открыт шит, выключаем вертикальный свайп (чтобы не уезжало вниз)
+    tg?.setupSwipeBehavior?.({ allow_vertical_swipe: false });
+    tg?.onEvent?.('viewportChanged', handleViewportChange);
+    tg?.onEvent?.('safeAreaChanged', handleViewportChange);
+    tg?.onEvent?.('contentSafeAreaChanged', handleViewportChange);
+  } catch {
+    // ignore
+  }
 });
 
 onUnmounted(() => {
@@ -306,6 +333,16 @@ onUnmounted(() => {
 
   if (sheetRef.value) {
     sheetRef.value.style.transform = '';
+  }
+
+  const tg = window.Telegram?.WebApp;
+  try {
+    tg?.setupSwipeBehavior?.({ allow_vertical_swipe: true });
+    tg?.offEvent?.('viewportChanged', handleViewportChange);
+    tg?.offEvent?.('safeAreaChanged', handleViewportChange);
+    tg?.offEvent?.('contentSafeAreaChanged', handleViewportChange);
+  } catch {
+    // ignore
   }
 });
 </script>

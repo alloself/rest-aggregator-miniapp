@@ -1,6 +1,6 @@
 .bottom-sheet-backdrop {
     @apply fixed left-0 right-0 bottom-0 flex items-end bg-black/50 [backdrop-filter:var(--shadow-backdrop)];
-    height: 100dvh;
+    height: 100vh;
 }
 
 .bottom-sheet {
