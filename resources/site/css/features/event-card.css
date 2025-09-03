@@ -72,5 +72,5 @@
 }
 
 .event-card__chip-text {
-    @apply text-[var(--font-size-body-sm)] font-normal leading-none text-[var(--color-text-primary)] tracking-[var(--letter-spacing-body-sm)];
+    @apply text-[var(--font-size-body-sm)] font-normal leading-none text-[var(--color-text-primary)] tracking-[var(--letter-spacing-body-sm)] whitespace-nowrap overflow-hidden text-ellipsis;
 }

@@ -20,7 +20,7 @@ export const lockBodyScroll = (): void => {
   body.style.right = '0';
   body.style.width = '100%';
   body.style.overflow = 'hidden';
-}
+};
 
 export const unlockBodyScroll = (): void => {
   const body = document.body;
@@ -41,15 +41,18 @@ export const unlockBodyScroll = (): void => {
 
   body.removeAttribute('data-scroll-lock-y');
   window.scrollTo(0, y);
-}
+};
 
 export const useBottomSheet = () => {
   const generateId = (): string => {
     return `sheet-${++idCounter}`;
   };
 
-
-  const open = (component: Component, props: Record<string, unknown> = {}, options: BottomSheetOptions = {}): string => {
+  const open = (
+    component: Component,
+    props: Record<string, unknown> = {},
+    options: BottomSheetOptions = {},
+  ): string => {
     const id = generateId();
 
     const defaultOptions: BottomSheetOptions = {
@@ -109,4 +112,4 @@ export const useBottomSheet = () => {
     closeLast,
     closeAll,
   };
-}
+};

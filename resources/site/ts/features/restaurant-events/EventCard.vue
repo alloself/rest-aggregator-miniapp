@@ -72,8 +72,11 @@ const formatTime = (date: Date): string => {
   return dayjs(date).format('HH:mm');
 };
 
-const formatPrice = (price: number): string => {
-  const whole = Math.floor(price);
-  return `${whole.toLocaleString('ru-RU', { maximumFractionDigits: 0 })} ₽`;
+const formatPrice = (price: number | string): string => {
+  const raw = typeof price === 'string' ? price : String(price);
+  const beforeDot = raw.split('.')[0];
+  const cleaned = beforeDot.replace(/[^\d-]/g, '');
+  const numeric = Number(cleaned);
+  return `${Number.isFinite(numeric) ? numeric.toLocaleString('ru-RU') : beforeDot} ₽`;
 };
 </script>
