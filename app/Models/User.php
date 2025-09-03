@@ -233,12 +233,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getAvatarUrl(): ?string
     {
-        // Если есть прямой avatar_url - используем его
-        if ($this->avatar_url) {
-            return $this->avatar_url;
-        }
-
-        // Если это друг и у него есть telegram_photo_data в pivot таблице
+        // 1) Если это друг и у него есть telegram_photo_data в pivot таблице — строим динамически через file_id
         if ($this->pivot && isset($this->pivot->telegram_data)) {
             $telegramData = json_decode($this->pivot->telegram_data, true);
             
@@ -252,6 +247,17 @@ class User extends Authenticatable implements MustVerifyEmail
                     return $this->buildTelegramAvatarUrl($highestResPhoto['file_id']);
                 }
             }
+        }
+
+        // 2) Пытаемся получить актуальный аватар для самого пользователя через связанные рестораны
+        $selfAvatar = $this->buildSelfTelegramAvatarUrl();
+        if ($selfAvatar) {
+            return $selfAvatar;
+        }
+
+        // 3) Фолбэк на сохранённый avatar_url (может быть устаревшим)
+        if ($this->avatar_url) {
+            return $this->avatar_url;
         }
 
         return null;
@@ -280,6 +286,60 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Попробовать построить URL аватара для самого пользователя через привязанные рестораны.
+     * Берём chat_id из pivot restaurant_user и используем текущий токен бота ресторана.
+     */
+    private function buildSelfTelegramAvatarUrl(): ?string
+    {
+        try {
+            // Получаем связанные рестораны вместе с chat_id из pivot
+            $restaurants = $this->relationLoaded('restaurants')
+                ? $this->getRelation('restaurants')
+                : $this->restaurants()->withPivot(['chat_id'])->get();
+
+            foreach ($restaurants as $restaurant) {
+                $chatId = isset($restaurant->pivot) ? (string) ($restaurant->pivot->chat_id ?? '') : '';
+                $botToken = (string) ($restaurant->telegram_bot_token ?? '');
+
+                if ($chatId === '' || $botToken === '') {
+                    continue;
+                }
+
+                $service = new \App\Services\TelegramBotService($botToken);
+
+                // Получаем последнее фото профиля
+                $photosResponse = $service->getUserProfilePhotos([
+                    'user_id' => (int) $chatId,
+                    'limit' => 1,
+                ]);
+
+                if (!isset($photosResponse['result']['photos'][0])) {
+                    continue;
+                }
+
+                $firstPhoto = $photosResponse['result']['photos'][0];
+                $largestPhoto = is_array($firstPhoto) ? end($firstPhoto) : null;
+                if (!is_array($largestPhoto) || !isset($largestPhoto['file_id'])) {
+                    continue;
+                }
+
+                // Получаем file_path и строим ссылку
+                $fileResponse = $service->getFile(['file_id' => (string) $largestPhoto['file_id']]);
+                if (isset($fileResponse['result']['file_path'])) {
+                    return $service->getFileUrl((string) $fileResponse['result']['file_path']);
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Ошибка получения Telegram аватара пользователя (self)', [
+                'user_id' => $this->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return null;
+    }
+
+    /**
      * Получить данные Telegram для друга (из pivot таблицы)
      */
     public function getTelegramData(): ?array
@@ -297,6 +357,85 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getFullAvatarUrlAttribute(): ?string
     {
         return $this->getAvatarUrl();
+    }
+
+    /**
+     * Получить URL аватара пользователя в контексте конкретного ресторана (учитывает токен бота ресторана).
+     * Сначала используем данные pivot->telegram_data (для друзей), затем пробуем по chat_id из связи с рестораном.
+     */
+    public function getAvatarUrlForRestaurant(Restaurant $restaurant): ?string
+    {
+        // 1) Если в текущей выборке это друг и есть telegram_data — используем file_id
+        if ($this->pivot && isset($this->pivot->telegram_data)) {
+            try {
+                $telegramData = json_decode((string) $this->pivot->telegram_data, true);
+                if (is_array($telegramData) && isset($telegramData['telegram_photo_data']) && is_array($telegramData['telegram_photo_data'])) {
+                    $photos = $telegramData['telegram_photo_data'];
+                    $highestResPhoto = end($photos);
+                    if (is_array($highestResPhoto) && isset($highestResPhoto['file_id'])) {
+                        $service = $restaurant->bot();
+                        $file = $service->getFile(['file_id' => (string) $highestResPhoto['file_id']]);
+                        if (isset($file['result']['file_path'])) {
+                            return $service->getFileUrl((string) $file['result']['file_path']);
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Ошибка получения аватара друга через pivot', [
+                    'user_id' => $this->id,
+                    'restaurant_id' => $restaurant->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // 2) Если в avatar_url сохранён file_id — строим ссылку через токен ресторана
+        if ($this->avatar_url && !str_starts_with((string) $this->avatar_url, 'http')) {
+            try {
+                $service = $restaurant->bot();
+                $file = $service->getFile(['file_id' => (string) $this->avatar_url]);
+                if (isset($file['result']['file_path'])) {
+                    return $service->getFileUrl((string) $file['result']['file_path']);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Ошибка получения аватара по file_id из avatar_url (per restaurant)', [
+                    'user_id' => $this->id,
+                    'restaurant_id' => $restaurant->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // 3) Пробуем по chat_id пользователя в этом ресторане
+        try {
+            $related = $this->relationLoaded('restaurants')
+                ? $this->getRelation('restaurants')->firstWhere('id', $restaurant->id)
+                : $this->restaurants()->where('restaurant_id', $restaurant->id)->first();
+
+            $chatId = $related && isset($related->pivot) ? (string) ($related->pivot->chat_id ?? '') : '';
+            if ($chatId !== '') {
+                $service = $restaurant->bot();
+                $photos = $service->getUserProfilePhotos(['user_id' => (int) $chatId, 'limit' => 1]);
+                if (isset($photos['result']['photos'][0])) {
+                    $largest = end($photos['result']['photos'][0]);
+                    if (is_array($largest) && isset($largest['file_id'])) {
+                        $file = $service->getFile(['file_id' => (string) $largest['file_id']]);
+                        if (isset($file['result']['file_path'])) {
+                            return $service->getFileUrl((string) $file['result']['file_path']);
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Ошибка получения аватара пользователя через restaurant chat_id', [
+                'user_id' => $this->id,
+                'restaurant_id' => $restaurant->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // 4) Фолбэк
+        return $this->avatar_url ?: null;
     }
 
     /**

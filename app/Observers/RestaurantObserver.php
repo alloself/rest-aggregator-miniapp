@@ -26,7 +26,7 @@ class RestaurantObserver
             return;
         }
         
-        $tokenChanged = $restaurant->wasChanged('telegram_bot_token');
+        $tokenChanged = true;//$restaurant->wasChanged('telegram_bot_token');
         $wasRecentlyCreated = $restaurant->wasRecentlyCreated;
 
         Log::info('RestaurantObserver: Начинаем настройку бота', [
@@ -134,7 +134,7 @@ class RestaurantObserver
         // 2. Настраиваем Mini App
         $this->setupMiniApp($service, $restaurant);
 
-        // 3. Настраиваем Menu Button
+        // 3. Настраиваем Menu Button (web_app)
         $this->setupMenuButton($service, $restaurant);
 
         // 4. Настраиваем Webhook
@@ -221,25 +221,20 @@ class RestaurantObserver
      */
     private function prepareShortDescription(Restaurant $restaurant): ?string
     {
-        // Приоритет: subtitle -> обрезанное welcome_message -> обрезанное description
-        $sources = [
-            (string) ($restaurant->subtitle ?? ''),
-            (string) ($restaurant->welcome_message ?? ''),
-            (string) ($restaurant->description ?? ''),
-        ];
-
-        foreach ($sources as $source) {
-            $cleaned = $this->cleanTextForTelegram($source);
-            if ($cleaned !== '') {
-                // Telegram ограничивает короткое описание 120 символами
-                if (mb_strlen($cleaned) > 120) {
-                    $cleaned = mb_substr($cleaned, 0, 117) . '...';
-                }
-                return $cleaned;
-            }
+        $name = trim((string) $restaurant->name);
+        if ($name === '') {
+            $name = 'нашем ресторане';
         }
 
-        return "Добро пожаловать в {$restaurant->name}!";
+        // Короткая версия фиксированного описания
+        $short = "Все о {$name}: меню, фото, адрес, новости и бронирование.";
+
+        // Telegram ограничивает короткое описание 120 символами
+        if (mb_strlen($short) > 120) {
+            $short = mb_substr($short, 0, 117) . '...';
+        }
+
+        return $short;
     }
 
     /**
@@ -247,45 +242,23 @@ class RestaurantObserver
      */
     private function prepareLongDescription(Restaurant $restaurant): ?string
     {
-        // Приоритет: welcome_message -> description -> subtitle
-        $sources = [
-            (string) ($restaurant->welcome_message ?? ''),
-            (string) ($restaurant->description ?? ''),
-            (string) ($restaurant->subtitle ?? ''),
-        ];
-
-        foreach ($sources as $source) {
-            $cleaned = $this->cleanTextForTelegram($source);
-            if ($cleaned !== '') {
-                // Telegram ограничивает описание 512 символами
-                if (mb_strlen($cleaned) > 512) {
-                    $cleaned = mb_substr($cleaned, 0, 509) . '...';
-                }
-                return $cleaned;
-            }
+        $name = trim((string) $restaurant->name);
+        if ($name === '') {
+            $name = 'нашем ресторане';
         }
 
-        return null;
-    }
+        // Полная версия фиксированного описания с переносами строк
+        $text = "Привет! В этом приложении — все самое важное о {$name}: меню, фото, адрес, актуальные новости, анонсы событий и бронирование.\n\n" .
+            "Откройте приложение, чтобы увидеть, сколько друзей поставили Repeat.\n\n" .
+            "🖇️ Repeat — это отметка о том, что заведение понравилось и сюда хочется вернуться.\n" .
+            "Её видят ваши контакты — удобный способ поделиться своим выбором и узнать, куда ходят друзья.";
 
-    /**
-     * Очистка текста для Telegram API
-     */
-    private function cleanTextForTelegram(string $text): string
-    {
-        // Удаляем HTML теги
-        $text = strip_tags($text);
-        
-        // Декодируем HTML сущности
-        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        
-        // Заменяем неразрывные пробелы на обычные
-        $text = str_replace(["\xC2\xA0", "&nbsp;"], ' ', $text);
-        
-        // Нормализуем пробелы
-        $text = (string) preg_replace('/\s+/u', ' ', $text);
-        
-        return trim($text);
+        // Ограничение Telegram на 512 символов
+        if (mb_strlen($text) > 512) {
+            $text = mb_substr($text, 0, 509) . '...';
+        }
+
+        return $text;
     }
 
     /**
@@ -329,59 +302,47 @@ class RestaurantObserver
     }
 
     /**
-     * Подготовка короткого имени для Mini App
-     */
-    private function prepareMiniAppShortName(Restaurant $restaurant): string
-    {
-        $name = $restaurant->slug ?: (string) $restaurant->id;
-        
-        // Короткое имя должно содержать только буквы, цифры и подчеркивания
-        $name = preg_replace('/[^a-zA-Z0-9_]/', '_', $name);
-        $name = trim($name, '_');
-        
-        // Ограничиваем длину
-        if (mb_strlen($name) > 30) {
-            $name = mb_substr($name, 0, 30);
-        }
-
-        return $name ?: 'restaurant_' . $restaurant->id;
-    }
-
-    /**
-     * Настройка Menu Button
+     * Настройка кнопки меню чата (web_app) с текстом "Открыть приложение"
      */
     private function setupMenuButton(TelegramBotService $service, Restaurant $restaurant): void
     {
         try {
             $miniAppUrl = $this->buildMiniAppUrl($restaurant);
-            
+
             if (!$miniAppUrl) {
-                Log::warning('RestaurantObserver: Не удалось настроить Menu Button - нет URL');
+                Log::warning('RestaurantObserver: Не удалось построить URL для Menu Button');
                 return;
             }
 
-            // Сначала сбрасываем на default для обновления кеша
-            $service->setChatMenuButton([
-                'menu_button' => ['type' => 'default']
-            ]);
+            // Требование Telegram: URL должен быть HTTPS
+            if (!str_starts_with($miniAppUrl, 'https://')) {
+                Log::warning('RestaurantObserver: Mini App URL для Menu Button должен быть HTTPS', [
+                    'url' => $miniAppUrl,
+                ]);
+                return;
+            }
 
-            // Устанавливаем web_app menu button
             $service->setChatMenuButton([
                 'menu_button' => [
                     'type' => 'web_app',
                     'text' => 'Открыть приложение',
-                    'web_app' => ['url' => $miniAppUrl]
-                ]
+                    'web_app' => [
+                        'url' => $miniAppUrl,
+                    ],
+                ],
             ]);
 
-            Log::info('RestaurantObserver: Menu Button настроен', ['url' => $miniAppUrl]);
-
+            Log::info('RestaurantObserver: Установлена web_app кнопка меню', [
+                'url' => $miniAppUrl,
+            ]);
         } catch (Throwable $e) {
-            Log::warning('RestaurantObserver: Ошибка настройки Menu Button', [
+            Log::warning('RestaurantObserver: Ошибка установки web_app кнопки меню', [
                 'error' => $e->getMessage(),
             ]);
         }
     }
+
+    
 
     /**
      * Настройка Webhook

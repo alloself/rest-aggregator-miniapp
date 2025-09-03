@@ -18,7 +18,7 @@ import type { Event } from '@/shared';
 import EventCard from './EventCard.vue';
 import InfiniteScroll from '../../shared/ui/InfiniteScroll.vue';
 import { useBottomSheet } from '../../shared/lib/composables/useBottomSheet';
-import EventPage from '../../pages/EventPage.vue';
+import { EventBottomSheet } from '../event-bottom-sheet';
 
 const { slug } = defineProps<{ slug: string }>();
 
@@ -29,7 +29,7 @@ const { events, loading, error, hasMore, isLoadingMore } = storeToRefs(store);
 const { getEventsData, loadMore } = store;
 
 const handleEventClick = (event: Event) => {
-  open(EventPage, { eventSlug: event.slug, slug }, { height: 90 });
+  open(EventBottomSheet, { eventSlug: event.slug, slug }, { height: 90 });
 };
 
 onBeforeMount(async () => {

@@ -11,10 +11,10 @@
 @import './widgets/restaurant-card.css';
 @import './widgets/chef-recommendations.css';
 
-@import './pages/event-page.css';
 @import './pages/restaurant-page.css';
 
 @import './features/event-card.css';
+@import './features/event-bottom-sheet.css';
 @import './features/feed-tabs.css';
 @import './features/news-card.css';
 @import './features/working-hours.css';

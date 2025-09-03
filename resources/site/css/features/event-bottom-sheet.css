@@ -1,0 +1,119 @@
+.event-bottom-sheet {
+    @apply w-full overflow-x-hidden p-0 relative bg-[var(--color-bg-primary)];
+}
+
+.event-bottom-sheet__loading,
+.event-bottom-sheet__error,
+.event-bottom-sheet__not-found {
+    @apply flex items-center justify-center min-h-[200px] text-center py-10 px-5 text-[length:var(--font-size-body-md)] text-[var(--text-secondary)];
+}
+
+.loading-spinner {
+    @apply text-[length:var(--font-size-body-md)] text-[var(--text-secondary)];
+}
+
+.event-bottom-sheet__content {
+    @apply w-full p-0;
+}
+
+
+
+.event-bottom-sheet__info {
+    @apply mx-5 flex flex-col gap-[12px] pt-4;
+}
+
+.event-bottom-sheet__title-card {
+    @apply rounded-[20px] p-5 bg-[var(--color-surface-cool)] backdrop-blur-[10px];
+}
+
+.event-bottom-sheet__title {
+    @apply font-medium text-[18px] leading-[1.1] m-0 tracking-[-0.01em] text-[var(--text-primary)];
+}
+
+.event-bottom-sheet__info-cards {
+    @apply flex items-center gap-[10px];
+}
+
+.event-bottom-sheet__info-card {
+    @apply flex items-center justify-center rounded-[20px] py-5 px-5 relative gap-[25px] flex-1 bg-[var(--color-surface-cool)] backdrop-blur-[10px];
+}
+
+.event-bottom-sheet__info-row {
+    @apply flex items-center gap-2 mb-[2px];
+}
+
+.event-bottom-sheet__info-row:last-child {
+    @apply mb-0;
+}
+
+.event-bottom-sheet__info-icon {
+    @apply w-4 h-4 shrink-0 text-[var(--text-primary)];
+}
+
+.event-bottom-sheet__info-text {
+    @apply font-medium text-[14px] leading-[1] text-[var(--text-primary)];
+}
+
+.event-bottom-sheet__price-card {
+    @apply rounded-[20px] p-5 flex items-center justify-center gap-2 w-fit h-[56px] bg-[var(--color-surface-cool)] backdrop-blur-[10px];
+}
+
+.event-bottom-sheet__price-icon {
+    @apply w-4 h-4 text-[var(--text-primary)];
+}
+
+.event-bottom-sheet__price-text {
+    @apply font-medium text-[14px] leading-[1];
+}
+
+.event-bottom-sheet__description-card {
+    @apply rounded-[20px] py-[22px] px-[30px] bg-[var(--color-surface-cool)] backdrop-blur-[10px];
+}
+
+.event-bottom-sheet__description-title {
+    @apply font-medium text-[16px] leading-[1.1] mb-4;
+}
+
+.event-bottom-sheet__description-text {
+    @apply text-[16px] leading-[1.3] m-0 overflow-y-auto;
+}
+
+.event-bottom-sheet__actions {
+    @apply h-[120px] flex items-center py-[31px] px-[25px] gap-[7px] bg-[var(--bg-card)] mt-4 shadow-[var(--shadow-bottom)] sticky bottom-0;
+}
+
+.event-bottom-sheet__book-button {
+    @apply flex-1 h-[60px] border-0 rounded-[30px] font-medium text-[16px] leading-[1.21] cursor-pointer transition flex items-center justify-center ease-in-out bg-[var(--color-accent-success)] text-[var(--text-primary)] tracking-[-0.01em] hover:-translate-y-px;
+}
+
+.event-bottom-sheet__book-button:active {
+    @apply translate-y-0;
+}
+
+.event-bottom-sheet__telegram-button {
+    @apply w-[60px] h-[60px] border-0 rounded-[30px] cursor-pointer transition flex items-center justify-center ease-in-out bg-[var(--color-surface-cool)] backdrop-blur-[10px] hover:-translate-y-px hover:bg-[rgba(238,238,238,0.8)];
+}
+
+.event-bottom-sheet__telegram-button:active {
+    @apply translate-y-0;
+}
+
+.event-bottom-sheet__telegram-icon {
+    @apply w-[22px] h-[20px] text-[var(--text-primary)];
+}
+
+@media (max-width: 480px) {
+    .event-bottom-sheet__info-cards {
+        @apply gap-2;
+    }
+
+
+
+    .event-bottom-sheet__actions {
+        @apply py-5 px-4 h-auto;
+    }
+
+    .event-bottom-sheet__info {
+        @apply mx-4;
+    }
+}

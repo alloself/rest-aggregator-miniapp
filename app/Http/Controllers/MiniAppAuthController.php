@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Illuminate\Support\Facades\Log;
+use App\Services\TelegramBotService;
 
 class MiniAppAuthController extends Controller
 {
@@ -57,25 +58,48 @@ class MiniAppAuthController extends Controller
             ->where('user_id', $user->id)
             ->exists();
 
-        // Находим всех друзей пользователя, которые лайкнули этот ресторан
-        $friendsLiked = $user->friends()
+        // Находим всех друзей пользователя, которые лайкнули этот ресторан (двунаправленно)
+        // 1) те, кого пользователь добавил как друзей
+        $friendsLikedDirect = $user->friends()
             ->whereHas('likes', function ($query) use ($restaurant) {
                 $query->where('likeable_id', $restaurant->id)
                       ->where('likeable_type', Restaurant::class);
             })
             ->get();
 
-        // Формируем данные о друзьях для ответа
-        $friendsLikedPayload = $friendsLiked->map(function ($friend) {
+        // 2) те, кто добавил текущего пользователя (обратная связь)
+        $friendsLikedReverse = $user->friendOf()
+            ->whereHas('likes', function ($query) use ($restaurant) {
+                $query->where('likeable_id', $restaurant->id)
+                      ->where('likeable_type', Restaurant::class);
+            })
+            ->get();
+
+        // Убираем pivot у обратных связей, чтобы не путать telegram_data (оно описывает текущего пользователя, а не друга)
+        $friendsLikedReverse->each(function ($friend) {
+            if (method_exists($friend, 'unsetRelation')) {
+                $friend->unsetRelation('pivot');
+            }
+        });
+
+        // Объединяем и удаляем дубликаты по id
+        $friendsLiked = $friendsLikedDirect
+            ->merge($friendsLikedReverse)
+            ->unique('id')
+            ->values();
+
+        // Формируем данные о друзьях для ответа — перекладываем логику в модель
+        $friendsLikedPayload = $friendsLiked->map(function ($friend) use ($restaurant) {
             return [
                 'id' => $friend->id,
-                'name' => trim($friend->first_name . ' ' . $friend->last_name) ?: $friend->username,
+                'name' => trim((string) $friend->first_name . ' ' . (string) $friend->last_name) ?: $friend->username,
                 'username' => $friend->username,
-                'profile_photo_url' => $friend->getProfilePhotoUrl(),
+                'profile_photo_url' => $friend->getAvatarUrlForRestaurant($restaurant),
             ];
         });
 
         return response()->json(array_merge($user->toArray(), [
+            'full_avatar_url' => $user->full_avatar_url,
             'liked_by_me' => $liked,
             'friends' => $friendsLikedPayload,
         ]));

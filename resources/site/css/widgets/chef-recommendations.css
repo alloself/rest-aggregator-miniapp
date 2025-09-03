@@ -11,16 +11,12 @@
     @apply flex gap-1 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
 }
 
-.chef-recommendations__featured {
-    @apply flex-shrink-0 w-[90px] h-[100px] rounded-r-[30px] p-5 flex items-center justify-center bg-[rgba(255,251,233,0.68)];
-}
-
-.chef-recommendations__featured-image {
-    @apply w-[52px] h-[52px] overflow-hidden;
-}
-
 .chef-recommendations__item {
     @apply flex-shrink-0 w-[100px] h-[100px] rounded-[20px] overflow-hidden cursor-pointer;
+}
+
+.chef-recommendations__items .chef-recommendations__item:first-child {
+    @apply rounded-l-none;
 }
 
 .chef-recommendations__image {
@@ -29,4 +25,8 @@
 
 .chef-recommendations__image--regular {
     @apply w-full h-full object-cover block rounded-[20px];
+}
+
+.chef-recommendations__items .chef-recommendations__item:first-child .chef-recommendations__image--regular {
+    @apply rounded-l-none;
 }

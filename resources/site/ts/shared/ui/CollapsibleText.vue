@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue';
-import DOMPurify from 'dompurify';
+import { sanitizeHtml } from '../lib/html';
 
 interface Props {
   text: string;
@@ -49,34 +49,7 @@ const shouldShowToggle = computed(() => {
   return props.text.length > props.characterLimit;
 });
 
-const sanitizedHtml = computed(() => {
-  const allowedTags = [
-    'b',
-    'strong',
-    'i',
-    'em',
-    'u',
-    's',
-    'p',
-    'br',
-    'ul',
-    'ol',
-    'li',
-    'h1',
-    'h2',
-    'h3',
-    'h4',
-    'h5',
-    'h6',
-    'span',
-  ];
-  const sanitized = DOMPurify.sanitize(props.text, {
-    ALLOWED_TAGS: allowedTags,
-    ALLOWED_ATTR: [],
-    USE_PROFILES: { html: true },
-  });
-  return sanitized.replace(/&nbsp;|&#160;/g, ' ').replace(/\u00A0/g, ' ');
-});
+const sanitizedHtml = computed(() => sanitizeHtml(props.text));
 
 const truncatedHtml = computed(() => {
   const text = sanitizedHtml.value;

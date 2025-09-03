@@ -248,32 +248,44 @@ class WebhookController extends Controller
         ]);
 
         // Сразу показываем reply-клавиатуру под полем ввода
-        $contactKeyboard = $service->createReplyKeyboard([
-            [
+        $contactKeyboardButtons = [];
+
+        // Кнопка поделиться контактами показывается только если у пользователя ещё нет телефона
+        $userForContact = User::whereHas('restaurants', function($q) use ($restaurant, $chatId) {
+            $q->where('restaurant_id', $restaurant->id)
+              ->where('chat_id', (string)$chatId);
+        })->first();
+
+        if (!$userForContact || empty($userForContact->phone)) {
+            $contactKeyboardButtons[] = [
                 [
                     'text' => '📞 Поделиться контактом',
                     'request_contact' => true,
                 ],
-            ],
+            ];
+        }
+
+        $contactKeyboardButtons[] = [
             [
-                [
-                    'text' => '👥 Поделиться друзьями',
-                    'request_users' => [
-                        'request_id' => 1,
-                        'user_is_bot' => false,
-                        'max_quantity' => 10,
-                        'request_name' => true,
-                        'request_username' => true,
-                        'request_photo' => true,
-                    ],
+                'text' => '👥 Поделиться друзьями',
+                'request_users' => [
+                    'request_id' => 1,
+                    'user_is_bot' => false,
+                    'max_quantity' => 10,
+                    'request_name' => true,
+                    'request_username' => true,
+                    'request_photo' => true,
                 ],
             ],
+        ];
+
+        $contactKeyboardButtons[] = [
             [
-                [
-                    'text' => '⏭️ Пропустить',
-                ],
-            ]
-        ], true, false);
+                'text' => '⏭️ Пропустить',
+            ],
+        ];
+
+        $contactKeyboard = $service->createReplyKeyboard($contactKeyboardButtons, true, false);
 
         $service->sendMessage([
             'chat_id' => $chatId,
@@ -1136,7 +1148,18 @@ class WebhookController extends Controller
                     $updateData['username'] = $sharedUser['username'];
                 }
                 
-                if (!empty($avatarUrl) && $avatarUrl !== $friendUser->avatar_url) {
+                // Если удалось получить фото из sharedUser->photo — вместо CDN URL сохраняем file_id
+                if (!empty($sharedUser['photo']) && is_array($sharedUser['photo'])) {
+                    $photos = $sharedUser['photo'];
+                    $highest = end($photos);
+                    if (is_array($highest) && !empty($highest['file_id'])) {
+                        $fileId = (string) $highest['file_id'];
+                        if ($fileId !== $friendUser->avatar_url) {
+                            $updateData['avatar_url'] = $fileId;
+                        }
+                    }
+                } elseif (!empty($avatarUrl) && $avatarUrl !== $friendUser->avatar_url) {
+                    // Фолбэк: если нет photo массива, сохраняем как раньше (CDN URL)
                     $updateData['avatar_url'] = $avatarUrl;
                 }
 
@@ -1163,7 +1186,17 @@ class WebhookController extends Controller
                 'first_name' => $sharedUser['first_name'] ?? 'Неизвестно',
                 'last_name' => $sharedUser['last_name'] ?? null,
                 'username' => $sharedUser['username'] ?? null,
-                'avatar_url' => $avatarUrl,
+                // Если есть photo — сохраняем file_id вместо CDN URL
+                'avatar_url' => (function () use ($sharedUser, $avatarUrl) {
+                    if (isset($sharedUser['photo']) && is_array($sharedUser['photo'])) {
+                        $photos = $sharedUser['photo'];
+                        $highest = end($photos);
+                        if (is_array($highest) && !empty($highest['file_id'])) {
+                            return (string) $highest['file_id'];
+                        }
+                    }
+                    return $avatarUrl;
+                })(),
             ];
 
             $friendUser = User::create($userData);
@@ -1407,15 +1440,18 @@ class WebhookController extends Controller
                 'step' => 'web_app_url_built'
             ]);
 
-            // Создаем клавиатуру с кнопкой для открытия Mini App и контактами
-            $replyMarkup = $service->createReplyKeyboard([
-                [
-                    [
-                        'text' => '🚀 Открыть приложение',
-                        'web_app' => ['url' => $webAppUrl],
-                    ],
-                ],
-                [
+            // Создаем постоянную клавиатуру БЕЗ кнопки открытия приложения
+            // и с кнопкой поделиться контактом только если телефона ещё нет
+
+            $buttons = [];
+
+            $user = User::whereHas('restaurants', function($q) use ($restaurant, $chatId) {
+                $q->where('restaurant_id', $restaurant->id)
+                  ->where('chat_id', (string)$chatId);
+            })->first();
+
+            if (!$user || empty($user->phone)) {
+                $buttons[] = [
                     [
                         'text' => '📞 Поделиться контактом',
                         'request_contact' => true,
@@ -1431,8 +1467,24 @@ class WebhookController extends Controller
                             'request_photo' => true,
                         ],
                     ],
-                ]
-            ], true, false);
+                ];
+            } else {
+                $buttons[] = [
+                    [
+                        'text' => '👥 Поделиться друзьями',
+                        'request_users' => [
+                            'request_id' => 1,
+                            'user_is_bot' => false,
+                            'max_quantity' => 10,
+                            'request_name' => true,
+                            'request_username' => true,
+                            'request_photo' => true,
+                        ],
+                    ],
+                ];
+            }
+
+            $replyMarkup = $service->createReplyKeyboard($buttons, true, false);
 
             Log::info('⌨️ ОТЛАДКА: Клавиатура создана', [
                 'reply_markup' => $replyMarkup,
@@ -1444,7 +1496,7 @@ class WebhookController extends Controller
                 'step' => 'sending_keyboard_message'
             ]);
 
-            $text = $messageText ?? "🎉 Отлично! Регистрация завершена!\n\n🚀 Откройте приложение для заказов\n📱 Поделитесь контактами для уведомлений\n👥 Найдите друзей через адресную книгу";
+            $text = $messageText ?? "🎉 Отлично! Регистрация завершена!\n\n📱 Поделитесь контактами для уведомлений\n👥 Найдите друзей через адресную книгу";
 
             $result = $service->sendMessage([
                 'chat_id' => $chatId,

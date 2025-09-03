@@ -157,7 +157,7 @@ class PublishNewsToTelegramJob implements ShouldQueue
         $title = trim((string) $news->title);
         $description = $this->cleanForTelegram((string) $news->description);
 
-        $header = $title !== '' ? '📰 ' . $title : '📰 Новость';
+        $header = $title !== '' ? $title : 'Новость';
         $body = $description !== '' ? "\n\n{$description}" : '';
 
         return $header . $body;

@@ -3,11 +3,6 @@
     <h2 class="chef-recommendations__title">Шеф рекомендует</h2>
 
     <div class="chef-recommendations__items">
-      <div v-if="chefRecommendations" class="chef-recommendations__featured">
-        <div class="chef-recommendations__featured-image">
-          <Icon name="chief" class="chef-recommendations__image" />
-        </div>
-      </div>
 
       <div
         v-for="dish in chefRecommendations"
@@ -31,7 +26,6 @@
 
 <script setup lang="ts">
 import { toRefs } from 'vue';
-import { Icon } from '@/shared';
 import { AppImage } from '../../shared/ui';
 import { useBottomSheet } from '../../shared';
 import DishBottomSheet from '../../features/dish-bottom-sheet/DishBottomSheet.vue';
