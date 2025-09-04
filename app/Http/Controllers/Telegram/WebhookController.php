@@ -121,6 +121,12 @@ class WebhookController extends Controller
             return;
         }
 
+        // Обработка запроса на создание ссылки-приглашения
+        if ($text === '🔗 Создать ссылку-приглашение') {
+            $this->handleCreateInviteLink($chatId, $service, $restaurant);
+            return;
+        }
+
         // Обработка текстовых сообщений
         if ($text === '⏭️ Пропустить') {
             $this->handleSkipMessage($chatId, $service, $restaurant);
@@ -173,11 +179,9 @@ class WebhookController extends Controller
                     })->first();
 
                     if ($inviter && $inviter->id !== $user->id) {
-                        // Сохраняем связь (пригласивший -> приглашенный)
+                        // Сохраняем только friend_telegram_id в pivot
                         $inviter->addFriend($user, [
-                            'invited_via_start_param' => true,
-                            'invited_at' => now()->toISOString(),
-                            'invited_by_chat_id' => (string)$inviterChatId,
+                            'friend_telegram_id' => (int) $chatId,
                         ]);
 
                         $inviterName = trim((string)$inviter->first_name . ($inviter->last_name ? ' ' . (string)$inviter->last_name : ''));
@@ -276,6 +280,13 @@ class WebhookController extends Controller
                     'request_username' => true,
                     'request_photo' => true,
                 ],
+            ],
+        ];
+
+        // Кнопка создания ссылки-приглашения
+        $contactKeyboardButtons[] = [
+            [
+                'text' => '🔗 Создать ссылку-приглашение',
             ],
         ];
 
@@ -793,25 +804,7 @@ class WebhookController extends Controller
                 if (isset($sharedUser['user_id'])) {
                     $userId = (int) $sharedUser['user_id'];
                     
-                    // Получаем информацию о пользователе через getChat
-                    $userInfo = $this->getUserInfo($userId, $service);
-                    if ($userInfo) {
-                        Log::info('👤 ОТЛАДКА: Дополнительная информация о переданном пользователе', [
-                            'user_id' => $userId,
-                            'user_info' => $userInfo,
-                            'step' => 'shared_user_additional_info'
-                        ]);
-                    }
-
-                    // Получаем аватар пользователя из photo данных или через API
-                    $avatarUrl = $this->extractAvatarFromSharedUser($sharedUser, $userId, $service);
-                    if ($avatarUrl) {
-                        Log::info('👤 ОТЛАДКА: Аватар переданного пользователя', [
-                            'user_id' => $userId,
-                            'avatar_url' => $avatarUrl,
-                            'step' => 'shared_user_avatar'
-                        ]);
-                    }
+                    // Больше не сохраняем лишние данные, используем только friend_telegram_id
 
                     // Если этот друг уже есть у пользователя (по username/имени), не создаём дубликат
                     $existingFriend = null;
@@ -842,16 +835,10 @@ class WebhookController extends Controller
                         }
                         // Добавляем друга к текущему пользователю
                         try {
-                            // Дополнительные данные для сохранения в pivot таблице
-                            $telegramData = [
-                                'shared_from_telegram' => true,
-                                'shared_at' => now()->toISOString(),
-                                'telegram_photo_data' => $sharedUser['photo'] ?? null,
-                                'additional_telegram_info' => $userInfo,
+                            // Сохраняем только friend_telegram_id в pivot
+                            $user->addFriend($friendUser, [
                                 'friend_telegram_id' => $userId,
-                            ];
-
-                            $user->addFriend($friendUser, $telegramData);
+                            ]);
                             $savedFriendsCount++;
 
                             Log::info('✅ ОТЛАДКА: Друг успешно добавлен', [
@@ -1484,6 +1471,13 @@ class WebhookController extends Controller
                 ];
             }
 
+            // Всегда добавляем кнопку для создания пригласительной ссылки
+            $buttons[] = [
+                [
+                    'text' => '🔗 Создать ссылку-приглашение',
+                ],
+            ];
+
             $replyMarkup = $service->createReplyKeyboard($buttons, true, false);
 
             Log::info('⌨️ ОТЛАДКА: Клавиатура создана', [
@@ -1523,6 +1517,63 @@ class WebhookController extends Controller
                 'chat_id' => $chatId,
                 'restaurant_id' => $restaurant->id,
                 'step' => 'error_in_set_app_keyboard'
+            ]);
+        }
+    }
+
+    /**
+     * Сформировать и отправить пользователю персональную ссылку-приглашение
+     */
+    private function handleCreateInviteLink(int $chatId, TelegramBotService $service, Restaurant $restaurant): void
+    {
+        try {
+            // Получаем username бота
+            $botUsername = null;
+            try {
+                $botInfo = $service->getMe();
+                $botUsername = $botInfo['result']['username'] ?? null;
+            } catch (Throwable $e) {
+                Log::warning('Не удалось получить username бота через getMe', [
+                    'error' => $e->getMessage(),
+                    'restaurant_id' => $restaurant->id,
+                ]);
+            }
+
+            if (!$botUsername && !empty($restaurant->bot_username)) {
+                $botUsername = (string) $restaurant->bot_username;
+            }
+
+            if (!$botUsername) {
+                $service->sendMessage([
+                    'chat_id' => $chatId,
+                    'text' => '❌ Не удалось сформировать ссылку. Попробуйте позже.',
+                ]);
+                return;
+            }
+
+            $payload = 'r' . $restaurant->id . '-i' . $chatId;
+            $inviteLink = 'https://t.me/' . $botUsername . '?start=' . $payload;
+
+            $service->sendMessage([
+                'chat_id' => $chatId,
+                'text' => "🔗 Ваша персональная ссылка-приглашение:\n" . $inviteLink . "\n\nОтправьте её другу. Как только он запустит бота по ссылке, он будет добавлен в ваши друзья.",
+            ]);
+
+            Log::info('Сформирована ссылка-приглашение', [
+                'restaurant_id' => $restaurant->id,
+                'chat_id' => $chatId,
+                'invite_link' => $inviteLink,
+            ]);
+        } catch (Throwable $e) {
+            Log::error('Ошибка создания ссылки-приглашения', [
+                'error' => $e->getMessage(),
+                'restaurant_id' => $restaurant->id,
+                'chat_id' => $chatId,
+            ]);
+
+            $service->sendMessage([
+                'chat_id' => $chatId,
+                'text' => '❌ Произошла ошибка при создании ссылки. Попробуйте позже.',
             ]);
         }
     }

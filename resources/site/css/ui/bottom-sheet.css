@@ -27,7 +27,7 @@
 }
 
 .bottom-sheet__content {
-    @apply flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch];
+    @apply flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] [touch-action:pan-y];
 }
 
 .bottom-sheet-backdrop-enter-active,

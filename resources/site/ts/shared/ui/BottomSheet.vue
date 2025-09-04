@@ -29,7 +29,7 @@
             <div
               ref="contentRef"
               class="bottom-sheet__content"
-              @touchstart="handleContentTouchStart"
+              @touchstart.passive="handleContentTouchStart"
               @touchmove="handleContentTouchMove"
               @touchend="handleContentTouchEnd"
               @touchcancel="handleContentTouchEnd"
@@ -50,6 +50,7 @@ interface BottomSheetProps {
   showHandle?: boolean;
   closableByBackdrop?: boolean;
   closableBySwipe?: boolean;
+  contentSwipeToClose?: boolean;
   height?: number;
   customClass?: string;
   zIndex?: number;
@@ -60,6 +61,7 @@ const props = withDefaults(defineProps<BottomSheetProps>(), {
   showHandle: true,
   closableByBackdrop: true,
   closableBySwipe: true,
+  contentSwipeToClose: false,
   height: 60,
   customClass: '',
   zIndex: 1000,
@@ -175,7 +177,7 @@ const handleTouchEnd = () => {
  * Начало жеста на контенте: если контент вверху и жест вниз — начинаем тянуть шит
  */
 const handleContentTouchStart = (event: TouchEvent) => {
-  if (!props.closableBySwipe) return;
+  if (!props.closableBySwipe || !props.contentSwipeToClose) return;
 
   if (!contentRef.value) return;
   contentAtTopOnStart.value = contentRef.value.scrollTop <= 0;
@@ -191,23 +193,38 @@ const handleContentTouchStart = (event: TouchEvent) => {
 };
 
 /**
- * Движение по контенту: если вверху и тянут вниз — тянем шит, иначе даём скроллиться
+ * Движение по контенту: начинаем тянуть шит ТОЛЬКО если контент у верхней границы и жест вниз.
+ * В остальных случаях — позволяем нативный скролл контента.
  */
 const handleContentTouchMove = (event: TouchEvent) => {
-  if (!props.closableBySwipe || !sheetRef.value) return;
+  if (!props.closableBySwipe || !props.contentSwipeToClose || !sheetRef.value || !contentRef.value) return;
 
   currentY.value = event.touches[0].clientY;
   const deltaY = currentY.value - startY.value;
 
-  // Если ещё не начали тянуть шит с контента
+  // Текущие позиции скролла
+  const contentEl = contentRef.value;
+  const atTop = contentEl.scrollTop <= 0;
+  const atBottom = contentEl.scrollTop + contentEl.clientHeight >= contentEl.scrollHeight - 1;
+
+  // Если ещё не начали тянуть шит с контента — решаем, нужно ли начать
   if (!isDraggingFromContent.value) {
-    // Начать перетаскивание только когда контент был вверху и жест вниз
-    if (contentAtTopOnStart.value && deltaY > 0) {
+    // Тянем шит только когда контент у верха и жест вниз (deltaY > 0)
+    if (deltaY > 0 && atTop) {
       isDraggingFromContent.value = true;
       isDragging.value = true;
     } else {
-      return; // Обычный скролл контента
+      // В остальных случаях — обычный скролл контента
+      return;
     }
+  }
+
+  // Если уже тянем шит, но пользователь повёл вверх — отпускаем шит и возвращаем скролл
+  if (isDraggingFromContent.value && deltaY <= 0) {
+    isDraggingFromContent.value = false;
+    isDragging.value = false;
+    scheduleTransform(0);
+    return;
   }
 
   // Когда тянем шит — блокируем дефолт и всплытие, обновляем трансформ
@@ -234,6 +251,7 @@ const handleContentTouchMove = (event: TouchEvent) => {
  * Завершение жеста на контенте: если тянули шит — финализируем, иначе ничего
  */
 const handleContentTouchEnd = () => {
+  if (!props.contentSwipeToClose) return;
   if (!isDraggingFromContent.value) return;
   handleTouchEnd();
 };

@@ -15,6 +15,9 @@
     @apply flex-shrink-0 w-[100px] h-[100px] rounded-[20px] overflow-hidden cursor-pointer;
 }
 
+.chef-recommendations__items {
+    @apply px-4;
+}
 .chef-recommendations__items .chef-recommendations__item:first-child {
     @apply rounded-l-none;
 }
@@ -27,6 +30,3 @@
     @apply w-full h-full object-cover block rounded-[20px];
 }
 
-.chef-recommendations__items .chef-recommendations__item:first-child .chef-recommendations__image--regular {
-    @apply rounded-l-none;
-}

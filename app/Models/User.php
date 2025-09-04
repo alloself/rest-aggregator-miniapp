@@ -177,7 +177,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function friends(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_friends', 'user_id', 'friend_id')
-            ->withPivot(['telegram_data'])
+            ->withPivot(['friend_telegram_id', 'last_photo_file_id', 'last_photo_file_path', 'last_photo_url', 'last_checked_at'])
             ->withTimestamps();
     }
 
@@ -187,7 +187,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function friendOf(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_friends', 'friend_id', 'user_id')
-            ->withPivot(['telegram_data'])
+            ->withPivot(['friend_telegram_id', 'last_photo_file_id', 'last_photo_file_path', 'last_photo_url', 'last_checked_at'])
             ->withTimestamps();
     }
 
@@ -204,9 +204,15 @@ class User extends Authenticatable implements MustVerifyEmail
             return; // Друг уже добавлен
         }
 
+        // Поддержка старого вызова (telegramData), но пишем только новые поля
+        $friendTelegramId = null;
+        if (isset($telegramData['friend_telegram_id']) && is_int($telegramData['friend_telegram_id'])) {
+            $friendTelegramId = $telegramData['friend_telegram_id'];
+        }
+
         $this->friends()->attach($friend->id, [
             'id' => \Illuminate\Support\Str::uuid(),
-            'telegram_data' => !empty($telegramData) ? json_encode($telegramData) : null,
+            'friend_telegram_id' => $friendTelegramId,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -344,10 +350,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getTelegramData(): ?array
     {
-        if ($this->pivot && isset($this->pivot->telegram_data)) {
-            return json_decode($this->pivot->telegram_data, true);
-        }
-
+        // Упразднено: оставлено для обратной совместимости, всегда null
         return null;
     }
 
@@ -365,18 +368,85 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getAvatarUrlForRestaurant(Restaurant $restaurant): ?string
     {
+        // Единая точка получения аватара с кэшированием
+        try {
+            $avatarService = app(\App\Services\AvatarService::class);
+            $url = $avatarService->getFriendAvatarUrlForRestaurant($this, $restaurant);
+            if ($url) {
+                return $url;
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('AvatarService недоступен, используем старые фолбэки', [
+                'user_id' => $this->id,
+                'restaurant_id' => $restaurant->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         // 1) Если в текущей выборке это друг и есть telegram_data — используем file_id
         if ($this->pivot && isset($this->pivot->telegram_data)) {
             try {
                 $telegramData = json_decode((string) $this->pivot->telegram_data, true);
-                if (is_array($telegramData) && isset($telegramData['telegram_photo_data']) && is_array($telegramData['telegram_photo_data'])) {
-                    $photos = $telegramData['telegram_photo_data'];
-                    $highestResPhoto = end($photos);
-                    if (is_array($highestResPhoto) && isset($highestResPhoto['file_id'])) {
-                        $service = $restaurant->bot();
-                        $file = $service->getFile(['file_id' => (string) $highestResPhoto['file_id']]);
-                        if (isset($file['result']['file_path'])) {
-                            return $service->getFileUrl((string) $file['result']['file_path']);
+                if (is_array($telegramData)) {
+                    // 1.1) Прямо из массива размеров фото
+                    if (isset($telegramData['telegram_photo_data']) && is_array($telegramData['telegram_photo_data'])) {
+                        $photos = $telegramData['telegram_photo_data'];
+                        $highestResPhoto = end($photos);
+                        if (is_array($highestResPhoto) && isset($highestResPhoto['file_id'])) {
+                            $service = $restaurant->bot();
+                            $file = $service->getFile(['file_id' => (string) $highestResPhoto['file_id']]);
+                            if (isset($file['result']['file_path'])) {
+                                return $service->getFileUrl((string) $file['result']['file_path']);
+                            }
+                        }
+                    }
+
+                    // 1.2) Фолбэк на big_file_id/small_file_id из additional_telegram_info.photo
+                    if (isset($telegramData['additional_telegram_info']['photo'])) {
+                        $photoMeta = $telegramData['additional_telegram_info']['photo'];
+                        $candidateIds = [];
+                        if (is_array($photoMeta)) {
+                            if (isset($photoMeta['big_file_id']) && is_string($photoMeta['big_file_id'])) {
+                                $candidateIds[] = $photoMeta['big_file_id'];
+                            }
+                            if (isset($photoMeta['small_file_id']) && is_string($photoMeta['small_file_id'])) {
+                                $candidateIds[] = $photoMeta['small_file_id'];
+                            }
+                        }
+
+                        foreach ($candidateIds as $candidateId) {
+                            try {
+                                $service = $restaurant->bot();
+                                $file = $service->getFile(['file_id' => $candidateId]);
+                                if (isset($file['result']['file_path'])) {
+                                    return $service->getFileUrl((string) $file['result']['file_path']);
+                                }
+                            } catch (\Throwable $eInner) {
+                                // Продолжаем к следующему id
+                            }
+                        }
+                    }
+
+                    // 1.3) Если знаем friend_telegram_id — попробуем запросить актуальные фото этим ботом
+                    if (isset($telegramData['friend_telegram_id']) && is_int($telegramData['friend_telegram_id'])) {
+                        try {
+                            $service = $restaurant->bot();
+                            $photosResponse = $service->getUserProfilePhotos([
+                                'user_id' => $telegramData['friend_telegram_id'],
+                                'limit' => 1,
+                            ]);
+                            if (isset($photosResponse['result']['photos'][0])) {
+                                $first = $photosResponse['result']['photos'][0];
+                                $largest = is_array($first) ? end($first) : null;
+                                if (is_array($largest) && isset($largest['file_id'])) {
+                                    $file = $service->getFile(['file_id' => (string) $largest['file_id']]);
+                                    if (isset($file['result']['file_path'])) {
+                                        return $service->getFileUrl((string) $file['result']['file_path']);
+                                    }
+                                }
+                            }
+                        } catch (\Throwable $eInner) {
+                            // Игнорируем и продолжаем к следующим шагам
                         }
                     }
                 }
