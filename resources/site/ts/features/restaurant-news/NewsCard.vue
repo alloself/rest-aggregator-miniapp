@@ -17,11 +17,12 @@
         @click.stop="handleShareToStory"
         :title="shareButtonTitle"
       >
-        <img 
-          src="/storage/icons/share-story-icon.svg" 
-          alt="Поделиться в сторис"
-          width="20" 
-          height="18"
+        <Icon 
+          name="mdi:send" 
+          :size="20" 
+          class="shrink-0 text-white"
+          color="#fff"
+          aria-label="Поделиться в сторис"
         />
       </button>
     </div>
@@ -51,6 +52,7 @@ import HeroCarousel from '@shared/ui/HeroCarousel.vue';
 import CollapsibleText from '../../shared/ui/CollapsibleText.vue';
 import { useTelegramStoryShare } from '../../shared/composables/useTelegramStoryShare';
 import type { News } from '@/shared';
+import Icon from '@shared/ui/Icon.vue';
 
 interface Props {
   item: News;

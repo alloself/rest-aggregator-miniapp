@@ -26,7 +26,7 @@ export const useRestaurantMedia = () => {
         showFileInfo: false,
       },
       {
-        height: 95,
+        height: 85,
         showHandle: true,
         closableByBackdrop: true,
         closableBySwipe: true,
@@ -52,7 +52,7 @@ export const useRestaurantMedia = () => {
         showFileInfo: true,
       },
       {
-        height: 95,
+        height: 85,
         showHandle: true,
         closableByBackdrop: true,
         closableBySwipe: true,
@@ -78,7 +78,7 @@ export const useRestaurantMedia = () => {
         showFileInfo: true,
       },
       {
-        height: 95,
+        height: 85,
         showHandle: true,
         closableByBackdrop: true,
         closableBySwipe: true,
@@ -106,7 +106,7 @@ export const useRestaurantMedia = () => {
         showFileInfo,
       },
       {
-        height: 95,
+        height: 85,
         showHandle: true,
         closableByBackdrop: true,
         closableBySwipe: true,

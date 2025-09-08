@@ -1,7 +1,7 @@
 <template>
   <div class="media-viewer">
     <!-- Основной контейнер с медиа файлом -->
-    <div class="media-viewer__main">
+    <div class="media-viewer__main" ref="mainRef" :style="mainStyles">
       <!-- Изображение -->
       <div v-if="currentMedia && isImage(currentMedia)" class="media-viewer__image-container">
         <img :src="currentMedia.url" :alt="currentMedia.name" class="media-viewer__image" loading="lazy" />
@@ -9,7 +9,7 @@
 
       <!-- Файлы, совместимые с iframe (PDF, HTML, TXT и др.) -->
       <div v-else-if="currentMedia && isIframeCompatible(currentMedia)" class="media-viewer__iframe-container">
-        <iframe :src="currentMedia.url" class="media-viewer__iframe" :title="currentMedia.name" loading="lazy" />
+        <iframe :src="getIframeUrl(currentMedia)" class="media-viewer__iframe" :title="currentMedia.name" loading="lazy" :style="{ height: iframeHeight + 'px' }" />
       </div>
 
       <!-- Другие файлы (не совместимые с iframe) -->
@@ -75,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import Icon from './Icon.vue';
 import type { File } from '@/shared';
 import { isImage, isPdf, isIframeCompatible, getFileIcon } from '@shared/utils/media';
@@ -99,6 +99,13 @@ const emit = defineEmits<{
 
 // Состояние
 const currentIndex = ref(props.initialIndex);
+const mainRef = ref<HTMLElement | null>(null);
+const iframeHeight = ref<number>(600);
+const isIframeMode = computed(() => !!currentMedia.value && isIframeCompatible(currentMedia.value));
+const mainStyles = computed(() => ({
+  // Для iframe убираем минимальную высоту, чтобы поместился рассчитанный iframe
+  minHeight: isIframeMode.value ? '0px' : '300px',
+}));
 
 // Вычисляемые свойства
 const currentMedia = computed(() => {
@@ -119,6 +126,72 @@ const setCurrentIndex = (index: number) => {
     currentIndex.value = index;
   }
 };
+// Рассчёт высоты iframe из ФАКТИЧЕСКОЙ доступной области в bottom sheet
+const recalcIframeHeight = () => {
+  if (!mainRef.value) return;
+
+  // 1) Находим реальный контейнер контента шита, чтобы не гадать проценты
+  const sheetEl = mainRef.value.closest('.bottom-sheet') as HTMLElement | null;
+  const sheetContentEl = sheetEl?.querySelector('.bottom-sheet__content') as HTMLElement | null;
+
+  // 2) Внутри него лежит наш контейнер с паддингами
+  const viewerWrap = sheetContentEl?.querySelector('.restaurant-media-bottom-sheet__content') as HTMLElement | null;
+
+  // Если не нашли — выходим
+  if (!sheetEl || !sheetContentEl || !viewerWrap) return;
+
+  // Максимальная высота шита (учитывает 85% экрана)
+  const sheetComputed = window.getComputedStyle(sheetEl);
+  const sheetMaxPx = parseFloat(sheetComputed.maxHeight) || window.innerHeight * 0.85;
+
+  // Высота хэндла (если показывается)
+  const handleEl = sheetEl.querySelector('.bottom-sheet__handle') as HTMLElement | null;
+  const handleHeight = handleEl ? handleEl.offsetHeight : 0;
+
+  // Высота шапки медиавьюера
+  const headerEl = viewerWrap.parentElement?.querySelector('.restaurant-media-bottom-sheet__header') as HTMLElement | null;
+  const headerHeight = headerEl ? headerEl.offsetHeight : 0;
+
+  // Паддинги внутреннего контейнера для MediaViewer
+  const styles = window.getComputedStyle(viewerWrap);
+  const paddingTop = parseFloat(styles.paddingTop) || 0;
+  const paddingBottom = parseFloat(styles.paddingBottom) || 0;
+
+  // Доступная высота под сам MediaViewer (без шапки, хэндла и паддингов)
+  const availableViewerArea = sheetMaxPx - handleHeight - headerHeight - paddingTop - paddingBottom;
+
+  // Высота миниатюр + зазор между main и thumbnails (см. .media-viewer { gap: 16px; })
+  const thumbnails = viewerWrap.querySelector('.media-viewer__thumbnails') as HTMLElement | null;
+  const thumbnailsHeight = thumbnails ? thumbnails.offsetHeight : 0;
+  const thumbnailsGap = thumbnails ? 16 : 0;
+
+  // Доступная высота под основной контейнер (media-viewer__main)
+  const mainAvailable = Math.max(0, availableViewerArea - thumbnailsHeight - thumbnailsGap);
+
+  // Iframe во всю высоту main. Добавляем нижний небольшой зазор под тени/скругления
+  const navBtnsSpace = 0; // кнопки наложены absolute, не вычитаем
+  const computedIframe = Math.max(320, mainAvailable - navBtnsSpace);
+  iframeHeight.value = computedIframe;
+};
+
+const handleResize = () => {
+  recalcIframeHeight();
+};
+
+onMounted(async () => {
+  await nextTick();
+  recalcIframeHeight();
+  window.addEventListener('resize', handleResize);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
+});
+
+watch([currentIndex, () => props.mediaFiles.length], async () => {
+  await nextTick();
+  recalcIframeHeight();
+});
 
 // Вспомогательные функции
 const getFileTypeDescription = (file: File): string => {
@@ -150,6 +223,23 @@ const getFileTypeDescription = (file: File): string => {
     default:
       return `${ext.toUpperCase()} файл`;
   }
+};
+
+/**
+ * Получает URL для iframe с необходимыми параметрами
+ * @param file - файл для отображения
+ */
+const getIframeUrl = (file: File): string => {
+  const baseUrl = file.url;
+  
+  // Для PDF файлов добавляем параметры масштабирования
+  if (isPdf(file)) {
+    const separator = baseUrl.includes('?') ? '&' : '#';
+    return `${baseUrl}${separator}view=FitH&toolbar=1&navpanes=0&scrollbar=1&page=1&zoom=page-width`;
+  }
+  
+  // Для других типов файлов возвращаем оригинальный URL
+  return baseUrl;
 };
 
 const goToPrevious = () => {
@@ -217,7 +307,7 @@ defineExpose({
   position: relative;
   width: 100%;
   flex: 1;
-  min-height: 300px;
+  min-height: 500px;
   border-radius: 15px;
   overflow: hidden;
   background-color: var(--color-secondary);
@@ -227,9 +317,10 @@ defineExpose({
 }
 
 .media-viewer__image-container {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  position: relative;
 }
 
 .media-viewer__image {
@@ -250,11 +341,18 @@ defineExpose({
 
 .media-viewer__iframe {
   width: 100%;
-  flex: 1;
+  height: 600px;
   border: none;
   border-radius: 8px;
   background: var(--color-white-pure);
-  min-height: 400px;
+  overflow: hidden;
+  pointer-events: auto;
+  touch-action: auto;
+  /* Обеспечиваем возможность зума и взаимодействия с содержимым */
+  user-select: auto;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
 }
 
 .media-viewer__file-controls {
@@ -494,13 +592,23 @@ defineExpose({
 }
 
 /* Responsive */
+@media (max-width: 768px) {
+  .media-viewer__iframe {
+    height: 500px;
+  }
+}
+
 @media (max-width: 480px) {
   .media-viewer {
     gap: 16px;
   }
 
   .media-viewer__main {
-    min-height: 250px;
+    min-height: 400px;
+  }
+
+  .media-viewer__iframe {
+    height: 450px;
   }
 
   .media-viewer__nav-btn {

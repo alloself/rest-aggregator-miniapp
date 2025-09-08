@@ -19,11 +19,12 @@
             @click.stop="handleShareToStory"
             :title="shareButtonTitle"
           >
-            <img 
-              src="/storage/icons/share-story-icon.svg" 
-              alt="Поделиться в сторис"
-              width="20" 
-              height="18"
+            <Icon 
+              name="mdi:send" 
+              :size="20" 
+              class="shrink-0 text-white"
+              color="#fff"
+              aria-label="Поделиться в сторис"
             />
           </button>
         </div>

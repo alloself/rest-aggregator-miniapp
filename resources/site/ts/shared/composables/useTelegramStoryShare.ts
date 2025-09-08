@@ -73,7 +73,7 @@ export function useTelegramStoryShare() {
     const widgetUrl = `${baseUrl}/${restaurantSlug}?news=${newsId}`;
     
     return shareToStory(imageUrl, {
-      text: `📰 ${title}`,
+      text: `${title}`,
       widgetLink: {
         url: widgetUrl,
         name: 'Читать новость',
@@ -92,7 +92,7 @@ export function useTelegramStoryShare() {
     const widgetUrl = `${baseUrl}/${restaurantSlug}?event=${eventId}`;
     
     return shareToStory(imageUrl, {
-      text: `🎉 ${title}`,
+      text: `${title}`,
       widgetLink: {
         url: widgetUrl,
         name: 'Подробнее',
