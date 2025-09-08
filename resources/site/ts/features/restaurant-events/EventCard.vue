@@ -126,7 +126,7 @@ const handleShareToStory = () => {
     imageUrl,
     item.title,
     slug,
-    item.id
+    item.slug
   );
   
   if (!success) {

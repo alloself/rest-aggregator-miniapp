@@ -49,6 +49,7 @@ Route::prefix('account')->middleware(['auth:sanctum', 'restaurant.team', 'accoun
 Route::prefix('site')->group(function () {
     Route::get('restaurants/{slug}', [SiteRestaurantController::class, 'show']);
     Route::get('restaurants/{slug}/news', [SiteRestaurantController::class, 'news']);
+    Route::get('restaurants/{slug}/news/{newsSlug}', [SiteRestaurantController::class, 'newsItem']);
     Route::get('restaurants/{slug}/events', [SiteRestaurantController::class, 'events']);
     Route::get('restaurants/{slug}/events/{eventSlug}', [SiteRestaurantController::class, 'event']);
     Route::post('likes', [LikeController::class, 'store']);

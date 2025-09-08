@@ -31,6 +31,9 @@ import { useRestaurantStore } from '../entities/restaurant';
 import RestaurantCard from '../widgets/restaurant-page/RestaurantCard.vue';
 import { useRestaurantMedia } from '../features/restaurant-media-bottom-sheet';
 import { useMiniAppStore } from '../shared/stores/miniapp';
+import { useBottomSheet } from '../shared/lib/composables/useBottomSheet';
+import { EventBottomSheet } from '../features/event-bottom-sheet';
+import { NewsBottomSheet } from '../features/news-bottom-sheet/index';
 
 const { slug } = defineProps<{ slug?: string }>();
 
@@ -115,6 +118,23 @@ onBeforeMount(async () => {
     const initData = tg?.initData ?? '';
     if (initData) {
       await mini.authWithInitData(param);
+    }
+
+    // Авто-открытие BottomSheet по deep-link start_param
+    const startParam = tg?.initDataUnsafe?.start_param;
+    if (typeof startParam === 'string' && startParam.length > 0) {
+      // Компактная схема: e_<eventSlug> | n_<newsSlug>
+      const kind = startParam.slice(0, 2);
+      const slugPart = startParam.slice(2);
+      const targetSlug = slugPart.replace(/^[_-]/, '');
+
+      const { open } = useBottomSheet();
+      if (kind === 'e_' && targetSlug) {
+        open(EventBottomSheet, { slug: param, eventSlug: targetSlug }, { height: 90 });
+      }
+      if (kind === 'n_' && targetSlug) {
+        open(NewsBottomSheet, { slug: param, newsSlug: targetSlug }, { height: 90 });
+      }
     }
   } catch (_) {
     // ignore mini app auth errors silently

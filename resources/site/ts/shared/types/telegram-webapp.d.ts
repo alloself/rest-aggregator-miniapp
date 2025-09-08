@@ -16,6 +16,15 @@ declare global {
   interface TelegramWebApp {
     ready: () => void;
     initData: string;
+    // В реальном SDK ещё есть initDataUnsafe со start_param
+    initDataUnsafe?: {
+      query_id?: string;
+      user?: unknown;
+      receiver?: unknown;
+      start_param?: string;
+      auth_date?: string;
+      hash?: string;
+    };
     // Viewport & safe areas
     viewportHeight?: number;
     safeAreaInset?: TelegramInsets;

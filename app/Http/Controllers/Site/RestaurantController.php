@@ -63,6 +63,30 @@ class RestaurantController extends Controller
         ]);
     }
 
+    public function newsItem(string $slug, string $newsSlug)
+    {
+        try {
+            $restaurant = Restaurant::where('slug', $slug)->firstOrFail();
+
+            $news = $restaurant->news()
+                ->with(['images', 'files'])
+                ->where('slug', $newsSlug)
+                ->firstOrFail();
+
+            return new NewsResource($news);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Новость не найдена',
+                'error' => 'News not found'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Произошла ошибка при загрузке новости',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function event(string $slug, string $eventSlug)
     {
         try {

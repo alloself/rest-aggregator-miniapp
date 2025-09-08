@@ -4,6 +4,8 @@
  */
 
 import { computed } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useRestaurantStore } from '@site/ts/entities/restaurant';
 
 interface ShareToStoryOptions {
   /** Текст, который будет добавлен в сторис */
@@ -67,11 +69,20 @@ export function useTelegramStoryShare() {
     imageUrl: string,
     title: string,
     restaurantSlug: string,
-    newsId: string
+    newsSlug: string
   ): boolean => {
-    const baseUrl = window.location.origin;
-    const widgetUrl = `${baseUrl}/${restaurantSlug}?news=${newsId}`;
-    
+    const restaurantStore = useRestaurantStore();
+    const { restaurant } = storeToRefs(restaurantStore);
+    const botUsername = restaurant.value?.bot_username;
+
+    // Формируем deep link Mini App через startapp payload
+    // стартовый параметр должен содержать только [A-Za-z0-9_-], максимум 64 символа
+    // используем компактную схему: n_<newsSlug>
+    const payload = `n_${newsSlug}`;
+    const widgetUrl = botUsername
+      ? `https://t.me/${botUsername}?startapp=${payload}`
+      : `${window.location.origin}/restaurant/${restaurantSlug}`;
+
     return shareToStory(imageUrl, {
       text: `${title}`,
       widgetLink: {
@@ -86,11 +97,18 @@ export function useTelegramStoryShare() {
     imageUrl: string,
     title: string,
     restaurantSlug: string,
-    eventId: string
+    eventSlug: string
   ): boolean => {
-    const baseUrl = window.location.origin;
-    const widgetUrl = `${baseUrl}/${restaurantSlug}?event=${eventId}`;
-    
+    const restaurantStore = useRestaurantStore();
+    const { restaurant } = storeToRefs(restaurantStore);
+    const botUsername = restaurant.value?.bot_username;
+
+    // компактная схема: e_<eventSlug>
+    const payload = `e_${eventSlug}`;
+    const widgetUrl = botUsername
+      ? `https://t.me/${botUsername}?startapp=${payload}`
+      : `${window.location.origin}/restaurant/${restaurantSlug}`;
+
     return shareToStory(imageUrl, {
       text: `${title}`,
       widgetLink: {

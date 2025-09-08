@@ -22,6 +22,7 @@
               @touchmove.stop.prevent="handleTouchMove"
               @touchend.stop.prevent="handleTouchEnd"
               @touchcancel.stop.prevent="handleTouchEnd"
+              @mousedown.stop.prevent="handleMouseDown"
             >
               <div class="bottom-sheet__handle-line"></div>
             </div>
@@ -33,6 +34,7 @@
               @touchmove="handleContentTouchMove"
               @touchend="handleContentTouchEnd"
               @touchcancel="handleContentTouchEnd"
+              @mousedown="handleContentMouseDown"
             >
               <slot />
             </div>
@@ -61,7 +63,7 @@ const props = withDefaults(defineProps<BottomSheetProps>(), {
   showHandle: true,
   closableByBackdrop: true,
   closableBySwipe: true,
-  contentSwipeToClose: false,
+  contentSwipeToClose: true,
   height: 60,
   customClass: '',
   zIndex: 1000,
@@ -102,6 +104,8 @@ const velocityY = ref(0);
 const rafId = ref(0);
 const hasScheduledFrame = ref(false);
 const pendingTranslateY = ref(0);
+const dragOrigin = ref<null | 'handle' | 'content'>(null);
+const prevUserSelect = ref('');
 
 const handleBackdropClick = () => {
   if (props.closableByBackdrop) {
@@ -171,6 +175,7 @@ const handleTouchEnd = () => {
   startY.value = 0;
   currentY.value = 0;
   velocityY.value = 0;
+  dragOrigin.value = null;
 };
 
 /**
@@ -254,6 +259,137 @@ const handleContentTouchEnd = () => {
   if (!props.contentSwipeToClose) return;
   if (!isDraggingFromContent.value) return;
   handleTouchEnd();
+};
+
+/**
+ * Мышь: начать перетаскивание за хэндл
+ */
+const handleMouseDown = (event: MouseEvent) => {
+  if (!props.closableBySwipe) return;
+  if (event.button !== 0) return; // только ЛКМ
+
+  isDragging.value = true;
+  dragOrigin.value = 'handle';
+  startY.value = event.clientY;
+  lastMoveY.value = startY.value;
+  lastMoveTime.value = performance.now();
+  velocityY.value = 0;
+  if (sheetRef.value) sheetHeight.value = sheetRef.value.offsetHeight;
+
+  // выключаем выделение текста во время перетаскивания
+  prevUserSelect.value = document.body.style.userSelect;
+  document.body.style.userSelect = 'none';
+  document.body.style.cursor = 'grabbing';
+
+  window.addEventListener('mousemove', handleMouseMove);
+  window.addEventListener('mouseup', handleMouseUp, { once: true });
+};
+
+/**
+ * Мышь: начало потенциального перетаскивания за контент
+ */
+const handleContentMouseDown = (event: MouseEvent) => {
+  if (!props.closableBySwipe || !props.contentSwipeToClose) return;
+  if (event.button !== 0) return; // только ЛКМ
+  if (!contentRef.value) return;
+
+  contentAtTopOnStart.value = contentRef.value.scrollTop <= 0;
+  isDraggingFromContent.value = false;
+  isDragging.value = false;
+  dragOrigin.value = 'content';
+
+  startY.value = event.clientY;
+  lastMoveY.value = startY.value;
+  lastMoveTime.value = performance.now();
+  velocityY.value = 0;
+  if (sheetRef.value) sheetHeight.value = sheetRef.value.offsetHeight;
+
+  window.addEventListener('mousemove', handleMouseMove);
+  window.addEventListener('mouseup', handleMouseUp, { once: true });
+};
+
+/**
+ * Мышь: движение
+ */
+const handleMouseMove = (event: MouseEvent) => {
+  if (!props.closableBySwipe || !sheetRef.value) return;
+
+  currentY.value = event.clientY;
+  const deltaY = currentY.value - startY.value;
+
+  // скорость
+  const now = performance.now();
+  const dy = currentY.value - lastMoveY.value;
+  const dt = Math.max(1, now - lastMoveTime.value);
+  velocityY.value = dy / dt;
+  lastMoveY.value = currentY.value;
+  lastMoveTime.value = now;
+
+  if (dragOrigin.value === 'handle') {
+    if (!isDragging.value) return;
+    if (deltaY > 0) {
+      const translateY = applyDragFriction(deltaY, sheetHeight.value);
+      scheduleTransform(translateY);
+    }
+    return;
+  }
+
+  if (dragOrigin.value === 'content') {
+    if (!contentRef.value) return;
+    const contentEl = contentRef.value;
+    const atTop = contentEl.scrollTop <= 0;
+
+    if (!isDraggingFromContent.value) {
+      if (deltaY > 0 && (contentAtTopOnStart.value || atTop)) {
+        isDraggingFromContent.value = true;
+        isDragging.value = true;
+        // как только начинаем тянуть шит — блокируем выделение/скролл
+        prevUserSelect.value = document.body.style.userSelect;
+        document.body.style.userSelect = 'none';
+        document.body.style.cursor = 'grabbing';
+        event.preventDefault();
+      } else {
+        return; // обычное поведение контента
+      }
+    }
+
+    if (isDraggingFromContent.value && deltaY <= 0) {
+      isDraggingFromContent.value = false;
+      isDragging.value = false;
+      scheduleTransform(0);
+      document.body.style.userSelect = prevUserSelect.value;
+      document.body.style.cursor = '';
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (deltaY > 0) {
+      const translateY = applyDragFriction(deltaY, sheetHeight.value);
+      scheduleTransform(translateY);
+    } else {
+      scheduleTransform(0);
+    }
+  }
+};
+
+/**
+ * Мышь: завершение
+ */
+const handleMouseUp = () => {
+  if (!isDragging.value) {
+    cleanupMouseHandlers();
+    return;
+  }
+  handleTouchEnd();
+  cleanupMouseHandlers();
+};
+
+const cleanupMouseHandlers = () => {
+  window.removeEventListener('mousemove', handleMouseMove);
+  document.body.style.userSelect = prevUserSelect.value;
+  document.body.style.cursor = '';
 };
 
 /**
@@ -362,6 +498,7 @@ onUnmounted(() => {
   } catch {
     // ignore
   }
+  cleanupMouseHandlers();
 });
 </script>
 
@@ -369,5 +506,13 @@ onUnmounted(() => {
 .bottom-sheet__content {
   display: flex;
   justify-content: center;
+  /* предотвращает «протекание» скролла к вебвью Telegram и случайное сворачивание */
+  overscroll-behavior-y: contain;
+}
+
+/* Скруглённые верхние углы контейнера шита */
+:deep(.bottom-sheet) {
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
 }
 </style>
