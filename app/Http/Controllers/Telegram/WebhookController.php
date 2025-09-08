@@ -173,9 +173,9 @@ class WebhookController extends Controller
                 $inviterChatId = (string) ($matches[2] ?? '');
 
                 if ($refRestaurantId === (string) $restaurant->id && $user) {
-                    $inviter = User::whereHas('restaurants', function($q) use ($restaurant, $inviterChatId) {
+                    $inviter = User::whereHas('restaurants', function ($q) use ($restaurant, $inviterChatId) {
                         $q->where('restaurant_id', $restaurant->id)
-                          ->where('chat_id', (string)$inviterChatId);
+                            ->where('chat_id', (string)$inviterChatId);
                     })->first();
 
                     if ($inviter && $inviter->id !== $user->id) {
@@ -194,7 +194,7 @@ class WebhookController extends Controller
                             $joinedName = trim((string)$user->first_name . ($user->last_name ? ' ' . (string)$user->last_name : ''));
                             $service->sendMessage([
                                 'chat_id' => (int)$inviterChatId,
-                                'text' => '✅ ' . ($joinedName !== '' ? $joinedName : 'Ваш друг') . ' присоединился(лась) к боту.',
+                                'text' => '✅ ' . ($joinedName !== '' ? $joinedName : 'Ваш друг') . ' присоединился(лась).',
                             ]);
                         } catch (\Throwable $e) {
                             Log::warning('Не удалось уведомить пригласившего о присоединении друга', [
@@ -242,7 +242,7 @@ class WebhookController extends Controller
      */
     private function sendContactRequestMessage(int $chatId, TelegramBotService $service, Restaurant $restaurant): void
     {
-        $contactMessage = "Поделитесь своими контактами и друзьями, чтобы:\n📱 Мы могли связаться с вами для подтверждения брони\n🔔 Отправлять уведомления о специальных предложениях\n👥 Помочь вам найти друзей в приложении!";
+        $contactMessage = "Поделитесь своими контактами и друзьями, чтобы:\n📱 Мы могли связаться с вами для подтверждения брони\n🔔 Отправлять уведомления о специальных предложениях\n👥 Помочь вам найти друзей в приложении!\n\n\Это необходимо сделать один раз — и отметки Repeat ваших друзей будут видны во всех приложениях Eat.Drink.Repeat.";
 
         // Отправляем сообщение БЕЗ кнопок
         $service->sendMessage([
@@ -255,9 +255,9 @@ class WebhookController extends Controller
         $contactKeyboardButtons = [];
 
         // Кнопка поделиться контактами показывается только если у пользователя ещё нет телефона
-        $userForContact = User::whereHas('restaurants', function($q) use ($restaurant, $chatId) {
+        $userForContact = User::whereHas('restaurants', function ($q) use ($restaurant, $chatId) {
             $q->where('restaurant_id', $restaurant->id)
-              ->where('chat_id', (string)$chatId);
+                ->where('chat_id', (string)$chatId);
         })->first();
 
         if (!$userForContact || empty($userForContact->phone)) {
@@ -398,10 +398,10 @@ class WebhookController extends Controller
     private function buildWelcomeMessage(Restaurant $restaurant): string
     {
         // Используем фиксированный текст приветствия вместо поля welcome_message
-        return "Привет! В этом приложении — всё самое важное о {$restaurant->name}: меню, фото, адрес, актуальные новости, анонсы событий и бронирование.\n\n"
-            . "Внутри приложения нажмите кнопку Repeat — это знак, что вы к нам вернетесь. И ваши друзья в Telegram увидят, что вам в {$restaurant->name} действительно понравилось.\n"
-            . "А ещё, скоро здесь можно будет оставить комментарий — и вы сможете прочитать отзывы только от ваших знакомых близких людей.\n\n"
-            . "🤩 Неужели теперь можно узнать, куда ходят друзья — даже не спрашивая их лично?!";
+        return "Привет! В этом приложении — все самое важное о {$restaurant->name}: меню, фото, адрес, актуальные новости, анонсы событий и бронирование.\n
+        <strong>Откройте приложение</strong>, чтобы увидеть, сколько друзей поставили Repeat.\n
+        🖇️ <strong>Repeat</strong> — это отметка о том, что заведение понравилось и сюда хочется вернуться.\n
+        Её видят ваши контакты — удобный способ поделиться своим выбором и узнать, куда ходят друзья.\n";
     }
 
     /**
@@ -509,7 +509,7 @@ class WebhookController extends Controller
 
             // Берем первую (последнюю загруженную) фотографию
             $firstPhoto = $response['result']['photos'][0];
-            
+
             if (empty($firstPhoto)) {
                 Log::info('🖼️ ОТЛАДКА: Первая фотография пустая', [
                     'user_id' => $userId,
@@ -520,7 +520,7 @@ class WebhookController extends Controller
 
             // Берем наибольшее разрешение (последний элемент в массиве)
             $largestPhoto = end($firstPhoto);
-            
+
             if (!isset($largestPhoto['file_id'])) {
                 Log::warning('🖼️ ОТЛАДКА: Отсутствует file_id в фотографии', [
                     'largest_photo' => $largestPhoto,
@@ -594,11 +594,11 @@ class WebhookController extends Controller
             $firstName = (string) ($telegramUser['first_name'] ?? '');
             $lastName = (string) ($telegramUser['last_name'] ?? '');
             $username = (string) ($telegramUser['username'] ?? '');
-            
+
             // Получаем дополнительную информацию о пользователе
             $userInfo = $this->getUserInfo($userId, $service);
             $avatarUrl = $this->getUserAvatarUrl($userId, $service);
-            
+
             // Обновляем данные из дополнительной информации если доступно
             if ($userInfo) {
                 // Используем bio из getChat как дополнительную информацию
@@ -633,9 +633,9 @@ class WebhookController extends Controller
             ]);
 
             // Ищем пользователя по chat_id в pivot для текущего ресторана
-            $user = User::whereHas('restaurants', function($q) use ($chatId, $restaurant) {
+            $user = User::whereHas('restaurants', function ($q) use ($chatId, $restaurant) {
                 $q->where('restaurant_id', $restaurant->id)
-                  ->where('chat_id', (string)$chatId);
+                    ->where('chat_id', (string)$chatId);
             })->first();
 
             if ($user) {
@@ -764,9 +764,9 @@ class WebhookController extends Controller
             ]);
 
             // Находим пользователя по chat_id
-            $user = User::whereHas('restaurants', function($q) use ($chatId, $restaurant) {
+            $user = User::whereHas('restaurants', function ($q) use ($chatId, $restaurant) {
                 $q->where('restaurant_id', $restaurant->id)
-                  ->where('chat_id', (string)$chatId);
+                    ->where('chat_id', (string)$chatId);
             })->first();
 
             if (!$user) {
@@ -800,10 +800,10 @@ class WebhookController extends Controller
                 $userId = null;
                 $userInfo = null;
                 $avatarUrl = null;
-                
+
                 if (isset($sharedUser['user_id'])) {
                     $userId = (int) $sharedUser['user_id'];
-                    
+
                     // Больше не сохраняем лишние данные, используем только friend_telegram_id
 
                     // Если этот друг уже есть у пользователя (по username/имени), не создаём дубликат
@@ -858,7 +858,6 @@ class WebhookController extends Controller
                                 service: $service,
                                 invitedDisplayName: trim(($sharedUser['first_name'] ?? '') . (isset($sharedUser['last_name']) ? ' ' . $sharedUser['last_name'] : ''))
                             );
-
                         } catch (Throwable $e) {
                             Log::error('❌ ОТЛАДКА: Ошибка добавления друга', [
                                 'error' => $e->getMessage(),
@@ -875,13 +874,13 @@ class WebhookController extends Controller
             $usersCount = count($users);
             $friendsWord = $this->pluralizeRussian($usersCount, 'друге', 'друзьях', 'друзьях');
             $confirmationText = "✅ Спасибо! Получена информация о {$usersCount} {$friendsWord} из вашей адресной книги.";
-        
-            
+
+
             if ($usersCount > 0) {
                 $confirmationText .= "\n\n📋 Список переданных друзей:\n";
                 foreach ($users as $index => $sharedUser) {
-                    $name = ($sharedUser['first_name'] ?? '') . 
-                           (isset($sharedUser['last_name']) ? ' ' . $sharedUser['last_name'] : '');
+                    $name = ($sharedUser['first_name'] ?? '') .
+                        (isset($sharedUser['last_name']) ? ' ' . $sharedUser['last_name'] : '');
                     $username = isset($sharedUser['username']) ? ' (@' . $sharedUser['username'] . ')' : '';
                     $confirmationText .= ($index + 1) . ". {$name}{$username}\n";
                 }
@@ -901,7 +900,6 @@ class WebhookController extends Controller
             ]);
 
             $this->setAppKeyboard($chatId, $service, $restaurant);
-
         } catch (Throwable $e) {
             Log::error('❌ ОТЛАДКА: Ошибка обработки переданных пользователей', [
                 'error' => $e->getMessage(),
@@ -926,7 +924,7 @@ class WebhookController extends Controller
     {
         $directSent = false;
         try {
-            $greetingText = "Привет" . ($invitedDisplayName ? ", {$invitedDisplayName}" : "") . "! {$inviterName} пригласил(а) вас в {$restaurant->name}. Откройте бота, чтобы посмотреть меню, фото и события, а также чтобы мы могли оставаться на связи.";
+            $greetingText = "Привет" . ($invitedDisplayName ? ", {$invitedDisplayName}" : "") . "! {$inviterName} пригласил(а) вас в {$restaurant->name}. Откройте приложение, чтобы посмотреть меню, фото, новости и события, а также узнать, кто из друзей поставил Repeat.";
 
             $service->sendMessage([
                 'chat_id' => $invitedTelegramId,
@@ -995,11 +993,11 @@ class WebhookController extends Controller
     private function pluralizeRussian(int $number, string $one, string $few, string $many): string
     {
         $number = abs($number);
-        
+
         if ($number % 100 >= 11 && $number % 100 <= 19) {
             return $many;
         }
-        
+
         switch ($number % 10) {
             case 1:
                 return $one;
@@ -1027,7 +1025,7 @@ class WebhookController extends Controller
             // Проверяем, есть ли фото в данных пошаренного пользователя
             if (isset($sharedUser['photo']) && is_array($sharedUser['photo'])) {
                 $photos = $sharedUser['photo'];
-                
+
                 Log::info('🖼️ ОТЛАДКА: Найдены фотографии в пошаренных данных', [
                     'user_id' => $userId,
                     'photos_count' => count($photos),
@@ -1037,7 +1035,7 @@ class WebhookController extends Controller
 
                 // Берем фото с самым высоким разрешением (последнее в массиве)
                 $highestResPhoto = end($photos);
-                
+
                 if (isset($highestResPhoto['file_id'])) {
                     Log::info('🖼️ ОТЛАДКА: Выбрано фото высокого разрешения', [
                         'user_id' => $userId,
@@ -1054,7 +1052,7 @@ class WebhookController extends Controller
 
                     if (isset($fileResponse['result']['file_path'])) {
                         $avatarUrl = $service->getFileUrl($fileResponse['result']['file_path']);
-                        
+
                         Log::info('✅ ОТЛАДКА: Получен URL аватара из пошаренных данных', [
                             'user_id' => $userId,
                             'avatar_url' => $avatarUrl,
@@ -1074,7 +1072,6 @@ class WebhookController extends Controller
             ]);
 
             return $this->getUserAvatarUrl($userId, $service);
-
         } catch (Throwable $e) {
             Log::error('❌ ОТЛАДКА: Ошибка извлечения аватара из пошаренных данных', [
                 'error' => $e->getMessage(),
@@ -1122,19 +1119,19 @@ class WebhookController extends Controller
 
                 // Обновляем информацию, если есть новые данные
                 $updateData = [];
-                
+
                 if (!empty($sharedUser['first_name']) && $sharedUser['first_name'] !== $friendUser->first_name) {
                     $updateData['first_name'] = $sharedUser['first_name'];
                 }
-                
+
                 if (!empty($sharedUser['last_name']) && $sharedUser['last_name'] !== $friendUser->last_name) {
                     $updateData['last_name'] = $sharedUser['last_name'];
                 }
-                
+
                 if (!empty($sharedUser['username']) && $sharedUser['username'] !== $friendUser->username) {
                     $updateData['username'] = $sharedUser['username'];
                 }
-                
+
                 // Если удалось получить фото из sharedUser->photo — вместо CDN URL сохраняем file_id
                 if (!empty($sharedUser['photo']) && is_array($sharedUser['photo'])) {
                     $photos = $sharedUser['photo'];
@@ -1196,7 +1193,6 @@ class WebhookController extends Controller
             ]);
 
             return $friendUser;
-
         } catch (Throwable $e) {
             Log::error('❌ ОТЛАДКА: Ошибка поиска/создания пользователя-друга', [
                 'error' => $e->getMessage(),
@@ -1263,9 +1259,9 @@ class WebhookController extends Controller
                 'step' => 'searching_user_for_contact'
             ]);
 
-            $user = User::whereHas('restaurants', function($q) use ($restaurant, $chatId) {
+            $user = User::whereHas('restaurants', function ($q) use ($restaurant, $chatId) {
                 $q->where('restaurant_id', $restaurant->id)
-                  ->where('chat_id', (string)$chatId);
+                    ->where('chat_id', (string)$chatId);
             })->first();
 
             if (!$user) {
@@ -1432,9 +1428,9 @@ class WebhookController extends Controller
 
             $buttons = [];
 
-            $user = User::whereHas('restaurants', function($q) use ($restaurant, $chatId) {
+            $user = User::whereHas('restaurants', function ($q) use ($restaurant, $chatId) {
                 $q->where('restaurant_id', $restaurant->id)
-                  ->where('chat_id', (string)$chatId);
+                    ->where('chat_id', (string)$chatId);
             })->first();
 
             if (!$user || empty($user->phone)) {
@@ -1556,7 +1552,7 @@ class WebhookController extends Controller
 
             $service->sendMessage([
                 'chat_id' => $chatId,
-                'text' => "🔗 Ваша персональная ссылка-приглашение:\n" . $inviteLink . "\n\nОтправьте её другу. Как только он запустит бота по ссылке, он будет добавлен в ваши друзья.",
+                'text' => "🔗 Ваша персональная ссылка-приглашение:\n" . $inviteLink . "\n\nОтправьте её другу. Как только он запустит бота, он появится у вас в друзьях, и вы увидите его отметки Repeat во всех приложениях by Eat.Drink.Repeat.",
             ]);
 
             Log::info('Сформирована ссылка-приглашение', [
@@ -1583,7 +1579,7 @@ class WebhookController extends Controller
      */
     private function findByChatId(string $chatId): ?User
     {
-        return User::whereHas('restaurants', function($q) use ($chatId) {
+        return User::whereHas('restaurants', function ($q) use ($chatId) {
             $q->where('chat_id', $chatId);
         })->first();
     }
@@ -1593,7 +1589,7 @@ class WebhookController extends Controller
      */
     private function existsByChatId(string $chatId): bool
     {
-        return User::whereHas('restaurants', function($q) use ($chatId) {
+        return User::whereHas('restaurants', function ($q) use ($chatId) {
             $q->where('chat_id', $chatId);
         })->exists();
     }
