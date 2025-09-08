@@ -94,6 +94,13 @@ export interface File {
 }
 
 export interface Like {
+  // columns
+  id: string
+  user_id: string
+  likeable_id: string
+  likeable_type: string
+  created_at?: Date | null
+  updated_at?: Date | null
   // relations
   user?: User
   likeable?: Like
@@ -205,6 +212,7 @@ export interface Restaurant {
   subtitle?: string | null
   average_receipt?: string | null
   phone?: string | null
+  bot_username?: string | null
   telegram_bot_token?: string | null
   address?: string | null
   description?: string | null
@@ -219,6 +227,7 @@ export interface Restaurant {
   events?: Event[]
   categories?: Category[]
   users?: User[]
+  likes?: Like[]
   images?: File[]
   files?: File[]
   // counts
@@ -226,6 +235,7 @@ export interface Restaurant {
   events_count: number
   categories_count: number
   users_count: number
+  likes_count: number
   images_count: number
   files_count: number
   // exists
@@ -233,6 +243,7 @@ export interface Restaurant {
   events_exists: boolean
   categories_exists: boolean
   users_exists: boolean
+  likes_exists: boolean
   images_exists: boolean
   files_exists: boolean
 }
@@ -263,7 +274,6 @@ export interface User {
   last_name?: string | null
   middle_name?: string | null
   email?: string | null
-  phone?: string | null
   username?: string | null
   avatar_url?: string | null
   email_verified_at?: Date | null
@@ -279,6 +289,7 @@ export interface User {
   restaurants?: Restaurant[]
   friends?: User[]
   friend_of?: User[]
+  likes?: Like[]
   roles?: Role[]
   permissions?: Permission[]
   images?: File[]
@@ -287,6 +298,7 @@ export interface User {
   restaurants_count: number
   friends_count: number
   friend_of_count: number
+  likes_count: number
   roles_count: number
   permissions_count: number
   images_count: number
@@ -295,6 +307,7 @@ export interface User {
   restaurants_exists: boolean
   friends_exists: boolean
   friend_of_exists: boolean
+  likes_exists: boolean
   roles_exists: boolean
   permissions_exists: boolean
   images_exists: boolean

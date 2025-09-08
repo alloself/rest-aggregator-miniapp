@@ -6,7 +6,7 @@
     :is-loading-more="isLoadingMore"
     :on-load-more="newsStore.loadMore"
   >
-    <NewsCard v-for="item in news" :key="item.id" :item="item" />
+    <NewsCard v-for="item in news" :key="item.id" :item="item" :slug="slug" />
   </InfiniteScroll>
 </template>
 

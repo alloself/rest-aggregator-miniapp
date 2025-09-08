@@ -20,6 +20,7 @@
 @import './features/working-hours.css';
 @import './features/contact-dropdown.css';
 @import './features/dish-bottom-sheet.css';
+@import './features/restaurant-media-bottom-sheet.css';
 
 /* CSS Variables для Design Tokens */
 @theme {

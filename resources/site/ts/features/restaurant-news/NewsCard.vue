@@ -9,6 +9,21 @@
         border-radius="20px"
         pagination-bottom="24px"
       />
+      
+      <!-- Кнопка репоста в сторис -->
+      <button
+        v-if="canShareToStory"
+        class="news-card__share-story-btn"
+        @click.stop="handleShareToStory"
+        :title="shareButtonTitle"
+      >
+        <img 
+          src="/storage/icons/share-story-icon.svg" 
+          alt="Поделиться в сторис"
+          width="20" 
+          height="18"
+        />
+      </button>
     </div>
 
     <div class="news-card__body">
@@ -34,13 +49,15 @@ import { computed } from 'vue';
 import { dayjs } from '@site/ts/shared/lib/dayjs';
 import HeroCarousel from '@shared/ui/HeroCarousel.vue';
 import CollapsibleText from '../../shared/ui/CollapsibleText.vue';
+import { useTelegramStoryShare } from '../../shared/composables/useTelegramStoryShare';
 import type { News } from '@/shared';
 
 interface Props {
   item: News;
+  slug: string;
 }
 
-const { item } = defineProps<Props>();
+const { item, slug } = defineProps<Props>();
 
 const title = computed(() => item.title);
 const description = computed(() => item.description);
@@ -60,4 +77,38 @@ const formattedDate = computed(() => {
   if (!createdAt.value) return '';
   return dayjs(createdAt.value).fromNow();
 });
+
+// Логика для репоста в сторис
+const { isAvailable, isVersionSupported, shareNewsToStory } = useTelegramStoryShare();
+
+const canShareToStory = computed(() => {
+  return (
+    isAvailable.value && 
+    isVersionSupported.value && 
+    imageItems.value.length > 0
+  );
+});
+
+const shareButtonTitle = computed(() => {
+  if (!isAvailable.value) return 'Функция недоступна в этом браузере';
+  if (!isVersionSupported.value) return 'Требуется обновление Telegram';
+  if (imageItems.value.length === 0) return 'Нет изображений для публикации';
+  return 'Поделиться в сторис Telegram';
+});
+
+const handleShareToStory = () => {
+  if (!canShareToStory.value || imageItems.value.length === 0) return;
+  
+  const firstImage = imageItems.value[0];
+  const success = shareNewsToStory(
+    firstImage.url,
+    title.value,
+    slug,
+    item.id
+  );
+  
+  if (!success) {
+    console.warn('Не удалось поделиться в сторис');
+  }
+};
 </script>

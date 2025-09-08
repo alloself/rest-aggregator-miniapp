@@ -45,6 +45,17 @@ export const useRestaurantDetailFormFields = (props: { id?: string }) => {
     },
     {
       component: BaseInput,
+      key: 'bot_username',
+      props: {
+        type: 'bot_username',
+        fluid: true,
+        autocomplete: 'restaurant_bot_username',
+        label: 'Имя бота',
+        name: 'bot_username',
+      },
+    },
+    {
+      component: BaseInput,
       key: 'phone',
       props: {
         type: 'phone',

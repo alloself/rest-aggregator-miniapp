@@ -5,6 +5,14 @@ export {};
 declare global {
   type TelegramInsets = { top: number; bottom: number; left: number; right: number };
 
+  interface StoryShareParams {
+    text?: string;
+    widget_link?: {
+      url: string;
+      name?: string;
+    };
+  }
+
   interface TelegramWebApp {
     ready: () => void;
     initData: string;
@@ -18,6 +26,8 @@ declare global {
     // Expanding and gestures
     expand?: () => void;
     setupSwipeBehavior?: (opts: { allow_vertical_swipe: boolean }) => void;
+    // Story sharing
+    shareToStory?: (media_url: string, params?: StoryShareParams) => void;
     // Events
     onEvent?: (
       event: 'viewportChanged' | 'safeAreaChanged' | 'contentSafeAreaChanged' | 'fullscreenChanged',

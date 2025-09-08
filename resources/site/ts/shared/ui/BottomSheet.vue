@@ -79,7 +79,7 @@ const isVisible = ref(true);
 const sheetStyles = computed<CSSProperties>(() => {
   const tg = window.Telegram?.WebApp;
   const vh = tg?.viewportHeight;
-  const maxH = vh ? Math.min(vh, (props.height ?? 60) * (window.innerHeight / 100)) : undefined;
+  const maxH = vh ? Math.min(vh, (props.height ?? 60) * window.innerHeight / 100) : undefined;
   // При наличии tg.viewportHeight ограничиваем шит высотой видимой области, иначе оставляем dvh
   return vh
     ? { maxHeight: `${Math.floor(maxH ?? vh)}px` }

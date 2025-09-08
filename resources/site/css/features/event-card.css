@@ -74,3 +74,17 @@
 .event-card__chip-text {
     @apply text-[var(--font-size-body-sm)] font-normal leading-none text-[var(--color-text-primary)] tracking-[var(--letter-spacing-body-sm)] whitespace-nowrap overflow-hidden text-ellipsis;
 }
+
+.event-card__share-story-btn {
+    @apply absolute bottom-[16px] right-[16px] 
+           w-[40px] h-[38px] 
+           rounded-[30px] 
+           bg-black/20 
+           backdrop-blur-[4px]
+           border-0 
+           flex items-center justify-center 
+           cursor-pointer 
+           transition-all duration-200 
+           hover:bg-black/30 
+           active:scale-95 z-10;
+}

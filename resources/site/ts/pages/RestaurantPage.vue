@@ -29,16 +29,14 @@ import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useRestaurantStore } from '../entities/restaurant';
 import RestaurantCard from '../widgets/restaurant-page/RestaurantCard.vue';
-import PhotoReels from '@/shared/components/PhotoReels.vue';
-import { useBottomSheet } from '../shared';
-import { PdfBottomSheet } from '../shared/ui';
+import { useRestaurantMedia } from '../features/restaurant-media-bottom-sheet';
 import { useMiniAppStore } from '../shared/stores/miniapp';
 
 const { slug } = defineProps<{ slug?: string }>();
 
 const route = useRoute();
 
-const { open } = useBottomSheet();
+const { openMenu, openBar, openPhotos } = useRestaurantMedia();
 
 const store = useRestaurantStore();
 const { restaurant, loading, error } = storeToRefs(store);
@@ -57,66 +55,52 @@ const contactInfo = computed(() => ({
 
 const galleryImages = computed(() => {
   const images = restaurant.value?.images ?? [];
-  return images.filter((img) => img?.pivot?.key === 'gallery');
+  return images
+    .filter((img) => img?.pivot?.key === 'gallery')
+    .map((img) => ({
+      ...img,
+      fileables_count: 0,
+      fileables_exists: false,
+    }));
 });
 
-const findPdfByKey = (key: 'menu' | 'bar') => {
+const menuFiles = computed(() => {
   const files = restaurant.value?.files || [];
-  return files.find((f) => f?.pivot?.key === key && f.extension.toLowerCase() === 'pdf');
-};
+  return files
+    .filter((f) => f?.pivot?.key === 'menu')
+    .map((f) => ({
+      ...f,
+      fileables_count: 0,
+      fileables_exists: false,
+    }));
+});
+
+const barFiles = computed(() => {
+  const files = restaurant.value?.files || [];
+  return files
+    .filter((f) => f?.pivot?.key === 'bar')
+    .map((f) => ({
+      ...f,
+      fileables_count: 0,
+      fileables_exists: false,
+    }));
+});
+
+const restaurantName = computed(() => restaurant.value?.name || 'Ресторан');
 
 const handleShowMenu = () => {
-  const pdf = findPdfByKey('menu');
-  if (!pdf) return;
-  open(
-    PdfBottomSheet,
-    { url: pdf.url, title: 'Меню' },
-    {
-      showHandle: true,
-      height: 90,
-      closableBySwipe: true,
-      closableByBackdrop: true,
-      bottomGap: false,
-      zIndex: 1200,
-      class: 'restaurant-page__pdf-sheet',
-    },
-  );
+  if (menuFiles.value.length === 0) return;
+  openMenu(restaurantName.value, menuFiles.value, 0);
 };
 
 const handleShowBar = () => {
-  const pdf = findPdfByKey('bar');
-  if (!pdf) return;
-  open(
-    PdfBottomSheet,
-    { url: pdf.url, title: 'Барная карта' },
-    {
-      showHandle: true,
-      height: 90,
-      closableBySwipe: true,
-      closableByBackdrop: true,
-      bottomGap: false,
-      zIndex: 1200,
-      class: 'restaurant-page__pdf-sheet',
-    },
-  );
+  if (barFiles.value.length === 0) return;
+  openBar(restaurantName.value, barFiles.value, 0);
 };
 
 const handleShowPhotos = () => {
   if (galleryImages.value.length === 0) return;
-
-  open(
-    PhotoReels,
-    { images: galleryImages.value, showPagination: true },
-    {
-      showHandle: true,
-      bottomGap: false,
-      closableByBackdrop: true,
-      closableBySwipe: true,
-      height: 90,
-      zIndex: 1200,
-      class: 'restaurant-page__photos-sheet',
-    },
-  );
+  openPhotos(restaurantName.value, galleryImages.value, 0);
 };
 
 onBeforeMount(async () => {

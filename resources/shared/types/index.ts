@@ -59,6 +59,15 @@ export interface ISmartFormField {
 
 export type { AuthUser, LoginRequest, LoginResponse, AuthState } from './auth';
 
+export type {
+  MediaViewerProps,
+  MediaViewerEvents,
+  MediaViewerMethods,
+  MediaType,
+  FileIconConfig,
+  MediaUtils
+} from './ui';
+
 export function isApiError(obj: any): obj is ApiError {
   return obj && typeof obj === 'object' && 'message' in obj;
 }

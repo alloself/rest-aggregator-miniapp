@@ -6,7 +6,7 @@
     :is-loading-more="isLoadingMore"
     :on-load-more="loadMore"
   >
-    <EventCard v-for="item in events" :key="item.id" :item="item" @click="handleEventClick" />
+    <EventCard v-for="item in events" :key="item.id" :item="item" :slug="slug" @click="handleEventClick" />
   </InfiniteScroll>
 </template>
 
