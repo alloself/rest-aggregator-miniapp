@@ -179,6 +179,9 @@ class WebhookController extends Controller
                     })->first();
 
                     if ($inviter && $inviter->id !== $user->id) {
+                        // Проверяем, был ли этот пользователь уже в друзьях у приглашавшего
+                        $alreadyFriend = $inviter->isFriend($user);
+
                         // Сохраняем только friend_telegram_id в pivot
                         $inviter->addFriend($user, [
                             'friend_telegram_id' => (int) $chatId,
@@ -189,19 +192,21 @@ class WebhookController extends Controller
                             $invitedByText = "Вас пригласил(а) {$inviterName}.";
                         }
 
-                        // Пробуем уведомить пригласившего, что друг присоединился
-                        try {
-                            $joinedName = trim((string)$user->first_name . ($user->last_name ? ' ' . (string)$user->last_name : ''));
-                            $service->sendMessage([
-                                'chat_id' => (int)$inviterChatId,
-                                'text' => '✅ ' . ($joinedName !== '' ? $joinedName : 'Ваш друг') . ' присоединился(лась).',
-                            ]);
-                        } catch (\Throwable $e) {
-                            Log::warning('Не удалось уведомить пригласившего о присоединении друга', [
-                                'error' => $e->getMessage(),
-                                'inviter_chat_id' => $inviterChatId,
-                                'restaurant_id' => $restaurant->id,
-                            ]);
+                        // Уведомляем приглашавшего только один раз — при первом присоединении друга по инвайту
+                        if (!$alreadyFriend) {
+                            try {
+                                $joinedName = trim((string)$user->first_name . ($user->last_name ? ' ' . (string)$user->last_name : ''));
+                                $service->sendMessage([
+                                    'chat_id' => (int)$inviterChatId,
+                                    'text' => '✅ ' . ($joinedName !== '' ? $joinedName : 'Ваш друг') . ' присоединился(лась).',
+                                ]);
+                            } catch (\Throwable $e) {
+                                Log::warning('Не удалось уведомить пригласившего о присоединении друга', [
+                                    'error' => $e->getMessage(),
+                                    'inviter_chat_id' => $inviterChatId,
+                                    'restaurant_id' => $restaurant->id,
+                                ]);
+                            }
                         }
                     }
                 }
