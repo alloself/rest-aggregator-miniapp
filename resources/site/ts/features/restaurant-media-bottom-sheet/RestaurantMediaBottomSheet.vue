@@ -33,7 +33,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { MediaViewer, Icon } from '@shared/ui';
-import { getMediaType, isPdf } from '@shared/utils/media';
 import type { File } from '@/shared';
 
 export interface RestaurantMediaType {
