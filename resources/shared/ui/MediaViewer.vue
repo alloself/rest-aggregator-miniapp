@@ -7,7 +7,6 @@
         <img :src="currentMedia.url" :alt="currentMedia.name" class="media-viewer__image" loading="lazy" />
       </div>
 
-      <!-- Файлы, совместимые с iframe (PDF, HTML, TXT и др.) -->
       <div v-else-if="currentMedia && isIframeCompatible(currentMedia)" class="media-viewer__iframe-container">
         <iframe
           :src="getIframeUrl(currentMedia)"
@@ -17,26 +16,6 @@
           :style="{ height: iframeHeight + 'px' }"
         />
       </div>
-
-      <!-- Другие файлы (не совместимые с iframe) -->
-      <div v-else-if="currentMedia" class="media-viewer__file-container">
-        <div class="media-viewer__file-preview">
-          <div class="media-viewer__file-icon">
-            <Icon :name="getFileIcon(currentMedia)" size="48" />
-          </div>
-          <div class="media-viewer__file-info">
-            <span class="media-viewer__file-name">{{ currentMedia.name }}</span>
-            <span class="media-viewer__file-type">{{ getFileTypeDescription(currentMedia) }}</span>
-          </div>
-        </div>
-
-        <a :href="currentMedia.url" target="_blank" class="media-viewer__file-download">
-          <Icon name="mdi:download" size="20" />
-          Открыть
-        </a>
-      </div>
-
-      <!-- Кнопки навигации -->
       <button
         v-if="hasPrevious"
         class="media-viewer__nav-btn media-viewer__nav-btn--prev"
@@ -55,33 +34,11 @@
         <Icon name="mdi:chevron-right" size="16" />
       </button>
     </div>
-
-    <!-- Миниатюры -->
-    <div v-if="mediaFiles.length > 1" class="media-viewer__thumbnails">
-      <button
-        v-for="(media, index) in mediaFiles"
-        :key="media.id"
-        class="media-viewer__thumbnail"
-        :class="{ 'media-viewer__thumbnail--active': index === currentIndex }"
-        @click="setCurrentIndex(index)"
-      >
-        <img
-          v-if="isImage(media)"
-          :src="media.url"
-          :alt="media.name"
-          class="media-viewer__thumbnail-image"
-          loading="lazy"
-        />
-        <div v-else class="media-viewer__thumbnail-file">
-          <Icon :name="getFileIcon(media)" size="24" class="media-viewer__thumbnail-icon" />
-        </div>
-      </button>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Icon from './Icon.vue';
 import type { File } from '@/shared';
 import { isImage, isPdf, isIframeCompatible, getFileIcon } from '@shared/utils/media';
@@ -107,7 +64,7 @@ const emit = defineEmits<{
 const currentIndex = ref(props.initialIndex);
 const mainRef = ref<HTMLElement | null>(null);
 const iframeHeight = ref<number>(600);
-const isIframeMode = computed(() => !!currentMedia.value && isIframeCompatible(currentMedia.value));
+
 
 // Вычисляемые свойства
 const currentMedia = computed(() => {
@@ -126,38 +83,6 @@ const hasNext = computed(() => {
 const setCurrentIndex = (index: number) => {
   if (index >= 0 && index < props.mediaFiles.length) {
     currentIndex.value = index;
-  }
-};
-
-// Вспомогательные функции
-const getFileTypeDescription = (file: File): string => {
-  const ext = file.extension.toLowerCase();
-
-  switch (ext) {
-    case 'pdf':
-      return 'PDF документ';
-    case 'html':
-    case 'htm':
-      return 'HTML документ';
-    case 'txt':
-      return 'Текстовый файл';
-    case 'md':
-      return 'Markdown файл';
-    case 'xml':
-      return 'XML документ';
-    case 'json':
-      return 'JSON файл';
-    case 'doc':
-    case 'docx':
-      return 'Word документ';
-    case 'xls':
-    case 'xlsx':
-      return 'Excel таблица';
-    case 'ppt':
-    case 'pptx':
-      return 'PowerPoint презентация';
-    default:
-      return `${ext.toUpperCase()} файл`;
   }
 };
 
@@ -204,20 +129,6 @@ watch(
     setCurrentIndex(newIndex);
   },
 );
-
-// Клавиатурная навигация
-const handleKeydown = (event: KeyboardEvent) => {
-  switch (event.key) {
-    case 'ArrowLeft':
-      event.preventDefault();
-      goToPrevious();
-      break;
-    case 'ArrowRight':
-      event.preventDefault();
-      goToNext();
-      break;
-  }
-};
 
 defineExpose({
   setCurrentIndex,

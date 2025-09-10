@@ -26,10 +26,12 @@ export const useRestaurantMedia = () => {
         showFileInfo: false,
       },
       {
-        height: 85,
+        height: 90,
+        class: 'restaurant-media-sheet',
         showHandle: true,
         closableByBackdrop: true,
         closableBySwipe: true,
+        bottomGap: true,
       }
     );
   };
@@ -53,6 +55,7 @@ export const useRestaurantMedia = () => {
       },
       {
         height: 85,
+        class: 'restaurant-media-sheet',
         showHandle: true,
         closableByBackdrop: true,
         closableBySwipe: true,
@@ -79,6 +82,7 @@ export const useRestaurantMedia = () => {
       },
       {
         height: 85,
+        class: 'restaurant-media-sheet',
         showHandle: true,
         closableByBackdrop: true,
         closableBySwipe: true,
@@ -107,6 +111,7 @@ export const useRestaurantMedia = () => {
       },
       {
         height: 85,
+        class: 'restaurant-media-sheet',
         showHandle: true,
         closableByBackdrop: true,
         closableBySwipe: true,
