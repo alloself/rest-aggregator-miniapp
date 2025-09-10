@@ -54,7 +54,7 @@ export const useRestaurantMedia = () => {
         showFileInfo: true,
       },
       {
-        height: 85,
+        height: 90,
         class: 'restaurant-media-sheet',
         showHandle: true,
         closableByBackdrop: true,
@@ -81,7 +81,7 @@ export const useRestaurantMedia = () => {
         showFileInfo: true,
       },
       {
-        height: 85,
+        height: 90,
         class: 'restaurant-media-sheet',
         showHandle: true,
         closableByBackdrop: true,
@@ -110,7 +110,7 @@ export const useRestaurantMedia = () => {
         showFileInfo,
       },
       {
-        height: 85,
+        height: 90,
         class: 'restaurant-media-sheet',
         showHandle: true,
         closableByBackdrop: true,
