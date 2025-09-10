@@ -1,6 +1,6 @@
 <template>
   <div class="contact-dropdown" ref="dropdownRef">
-    <AppButton @click="toggleDropdown" variant="help" size="small" class="contact-dropdown__trigger">
+    <AppButton @click="toggleDropdown" variant="help" size="medium" class="contact-dropdown__trigger">
       <template #icon>
         <Icon name="phone" size="12" class="contact-dropdown__icon" />
       </template>
@@ -79,7 +79,11 @@ const handleTelegramMessage = () => {
 };
 
 const handleBooking = () => {
-  // TODO: Integrate with booking system
+  // При клике на "Забронировать" звоним в ресторан
+  if (props.phone) {
+    const cleanPhone = props.phone.replace(/[^\d+]/g, '');
+    window.location.href = `tel:${cleanPhone}`;
+  }
   closeDropdown();
 };
 

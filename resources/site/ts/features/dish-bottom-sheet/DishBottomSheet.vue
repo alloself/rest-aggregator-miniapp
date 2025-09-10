@@ -36,6 +36,6 @@ interface DishBottomSheetProps {
 const props = defineProps<DishBottomSheetProps>();
 
 function formatPrice(price: number): string {
-  return price.toLocaleString('ru-RU');
+  return Math.round(price).toLocaleString('ru-RU');
 }
 </script>

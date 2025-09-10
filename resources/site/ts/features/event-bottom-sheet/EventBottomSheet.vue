@@ -63,8 +63,10 @@
 import { onBeforeMount, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useEventStore } from '../../entities/event';
+import { useBottomSheet } from '../../shared/lib/composables/useBottomSheet';
 import Icon from '@shared/ui/Icon.vue';
 import HeroCarousel from '@shared/ui/HeroCarousel.vue';
+import ShareBottomSheet from '../share-bottom-sheet/ShareBottomSheet.vue';
 import { dayjs, sanitizeHtml, formatPrice } from '../../shared/lib';
 import type { Event } from '@/shared/types/models';
 
@@ -76,6 +78,8 @@ const { slug, eventSlug } = defineProps<Props>();
 
 const store = useEventStore();
 const { event, loading, error } = storeToRefs(store);
+
+const { open } = useBottomSheet();
 
 type CarouselImage = { url: string; alt?: string };
 const carousel_images = computed<CarouselImage[]>(() => {
@@ -95,16 +99,31 @@ const formatTime = (date: Date): string => {
   return dayjs(date).format('HH:mm');
 };
 
-// Используем общий хелпер formatPrice из shared/lib
-
 const handleBooking = () => {
-  // TODO: Реализовать логику бронирования
-  console.log('Бронирование события:', event.value?.title);
+  // При клике на "Забронировать" звоним в ресторан
+  const phone = event.value?.restaurant?.phone;
+  if (phone) {
+    const cleanPhone = phone.replace(/[^\d+]/g, '');
+    window.location.href = `tel:${cleanPhone}`;
+  } else {
+    console.log('Номер телефона ресторана не найден');
+  }
 };
 
 const handleTelegramShare = () => {
-  // TODO: Реализовать логику поделиться в Telegram
-  console.log('Поделиться в Telegram:', event.value?.title);
+  if (!event.value) return;
+  
+  open(ShareBottomSheet, { 
+    type: 'event',
+    item: event.value,
+    slug,
+    itemSlug: eventSlug 
+  }, { 
+    height: 30,
+    showHandle: true,
+    closableByBackdrop: true,
+    closableBySwipe: true
+  });
 };
 
 onBeforeMount(async () => {

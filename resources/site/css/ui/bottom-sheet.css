@@ -5,7 +5,7 @@
 
 .bottom-sheet {
     @apply w-full flex flex-col relative overflow-hidden bg-[var(--color-bg-card)] rounded-t-[var(--radius-card)] rounded-b-none shadow-[var(--shadow-bottom)] [will-change:transform];
-    max-height: min(60dvh, 100dvh);
+    max-height: 90dvh;
     --bottom-gap: 0px;
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--bottom-gap));
 }
@@ -15,7 +15,9 @@
 }
 
 .bottom-sheet__handle {
-    @apply flex justify-center p-[var(--spacing-xl)] cursor-grab select-none [touch-action:none];
+    @apply flex justify-center p-[var(--spacing-xl)] cursor-grab select-none;
+    /* Handle zone: полный контроль над touch событиями для закрытия */
+    touch-action: none;
 }
 
 .bottom-sheet__handle:active {
@@ -27,7 +29,12 @@
 }
 
 .bottom-sheet__content {
-    @apply flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] [touch-action:pan-y];
+    @apply flex-1 overflow-y-auto [-webkit-overflow-scrolling:touch];
+    /* Content zone: только вертикальный скролл, без возможности закрытия BottomSheet */
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+    /* Предотвращаем цепочку прокрутки */
+    overscroll-behavior-y: contain;
 }
 
 .bottom-sheet-backdrop-enter-active,

@@ -11,22 +11,6 @@
             object-fit="cover"
           />
           <div v-else class="event-card__image-placeholder"></div>
-          
-          <!-- Кнопка репоста в сторис -->
-          <button
-            v-if="canShareToStory"
-            class="event-card__share-story-btn"
-            @click.stop="handleShareToStory"
-            :title="shareButtonTitle"
-          >
-            <Icon 
-              name="mdi:send" 
-              :size="20" 
-              class="shrink-0 text-white"
-              color="#fff"
-              aria-label="Поделиться в сторис"
-            />
-          </button>
         </div>
 
         <div class="event-card__content">
@@ -65,20 +49,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import type { Event as EventItem } from '@/shared';
 import AppImage from '@site/ts/shared/ui/AppImage.vue';
 import Icon from '@shared/ui/Icon.vue';
 import { dayjs } from '@site/ts/shared/lib/dayjs';
 import { formatPrice } from '@site/ts/shared/lib';
-import { useTelegramStoryShare } from '../../shared/composables/useTelegramStoryShare';
 
 interface Props {
   item: EventItem;
   slug: string;
 }
 
-const { item, slug } = defineProps<Props>();
+const { item } = defineProps<Props>();
 
 const emit = defineEmits<{
   click: [item: EventItem];
@@ -95,44 +77,4 @@ const formatDate = (date: Date): string => {
 const formatTime = (date: Date): string => {
   return dayjs(date).format('HH:mm');
 };
-
-// Логика для репоста в сторис
-const { isAvailable, isVersionSupported, shareEventToStory } = useTelegramStoryShare();
-
-const hasImages = computed(() => Boolean(item.images?.[0]));
-
-const canShareToStory = computed(() => {
-  return (
-    isAvailable.value && 
-    isVersionSupported.value && 
-    hasImages.value
-  );
-});
-
-const shareButtonTitle = computed(() => {
-  if (!isAvailable.value) return 'Функция недоступна в этом браузере';
-  if (!isVersionSupported.value) return 'Требуется обновление Telegram';
-  if (!hasImages.value) return 'Нет изображений для публикации';
-  return 'Поделиться в сторис Telegram';
-});
-
-const handleShareToStory = () => {
-  if (!canShareToStory.value || !item.images?.[0]) return;
-  
-  const firstImage = item.images[0];
-  const imageUrl = typeof firstImage.url === 'string' ? firstImage.url : String(firstImage.url);
-  
-  const success = shareEventToStory(
-    imageUrl,
-    item.title,
-    slug,
-    item.slug
-  );
-  
-  if (!success) {
-    console.warn('Не удалось поделиться в сторис');
-  }
-};
-
-// Используем общий хелпер formatPrice из shared/lib
 </script>

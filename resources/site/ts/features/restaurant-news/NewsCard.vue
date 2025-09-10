@@ -9,16 +9,13 @@
         border-radius="20px"
         pagination-bottom="24px"
       />
-      
-      <!-- Кнопка репоста в сторис -->
       <button
-        v-if="canShareToStory"
         class="news-card__share-story-btn"
         @click.stop="handleShareToStory"
         :title="shareButtonTitle"
       >
         <Icon 
-          name="mdi:send" 
+          name="basil:telegram-solid" 
           :size="20" 
           class="shrink-0 text-white"
           color="#fff"
@@ -51,6 +48,8 @@ import { dayjs } from '@site/ts/shared/lib/dayjs';
 import HeroCarousel from '@shared/ui/HeroCarousel.vue';
 import CollapsibleText from '../../shared/ui/CollapsibleText.vue';
 import { useTelegramStoryShare } from '../../shared/composables/useTelegramStoryShare';
+import { useBottomSheet } from '../../shared/lib/composables/useBottomSheet';
+import ShareBottomSheet from '../share-bottom-sheet/ShareBottomSheet.vue';
 import type { News } from '@/shared';
 import Icon from '@shared/ui/Icon.vue';
 
@@ -80,8 +79,8 @@ const formattedDate = computed(() => {
   return dayjs(createdAt.value).fromNow();
 });
 
-// Логика для репоста в сторис
-const { isAvailable, isVersionSupported, shareNewsToStory } = useTelegramStoryShare();
+const { isAvailable, isVersionSupported } = useTelegramStoryShare();
+const { open } = useBottomSheet();
 
 const canShareToStory = computed(() => {
   return (
@@ -95,22 +94,20 @@ const shareButtonTitle = computed(() => {
   if (!isAvailable.value) return 'Функция недоступна в этом браузере';
   if (!isVersionSupported.value) return 'Требуется обновление Telegram';
   if (imageItems.value.length === 0) return 'Нет изображений для публикации';
-  return 'Поделиться в сторис Telegram';
+  return 'Поделиться';
 });
 
 const handleShareToStory = () => {
-  if (!canShareToStory.value || imageItems.value.length === 0) return;
-  
-  const firstImage = imageItems.value[0];
-  const success = shareNewsToStory(
-    firstImage.url,
-    title.value,
+  open(ShareBottomSheet, { 
+    type: 'news',
+    item: item,
     slug,
-    item.slug
-  );
-  
-  if (!success) {
-    console.warn('Не удалось поделиться в сторис');
-  }
+    itemSlug: item.slug 
+  }, { 
+    height: 30,
+    showHandle: true,
+    closableByBackdrop: true,
+    closableBySwipe: true
+  });
 };
 </script>
