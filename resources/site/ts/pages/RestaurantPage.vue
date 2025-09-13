@@ -52,8 +52,8 @@ const chefRecommendations = computed(() => {
 });
 
 const contactInfo = computed(() => ({
-  phone: '+7 (495) 123-45-67',
-  telegram: 'restaurant_bot',
+  phone: restaurant.value?.phone,
+  telegram: restaurant.value?.bot_username,
 }));
 
 const galleryImages = computed(() => {

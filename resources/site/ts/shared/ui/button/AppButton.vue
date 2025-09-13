@@ -11,6 +11,7 @@
 import { computed } from 'vue';
 import Button from 'primevue/button';
 import type { ButtonProps } from 'primevue';
+import { useHapticFeedback } from '../../lib/composables';
 
 interface AppButtonProps extends /* @vue-ignore */ ButtonProps {
   variant?: 'primary' | 'secondary' | 'help';
@@ -30,7 +31,10 @@ const buttonClasses = computed(() => {
   return [sizeClass, widthClass].filter(Boolean).join(' ');
 });
 
+const { trigger } = useHapticFeedback();
+
 const handleClick = (event: Event) => {
+  trigger();
   emit('click', event);
 };
 </script>

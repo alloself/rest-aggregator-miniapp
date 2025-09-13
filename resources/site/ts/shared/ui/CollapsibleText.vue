@@ -7,7 +7,8 @@
     >
       <div class="collapsible-text__text">
         <template v-if="!isExpanded && shouldShowToggle">
-          <span class="collapsible-text__collapsed">{{ collapsed_text }}</span><span class="collapsible-text__ellipsis">… </span>
+          <span class="collapsible-text__collapsed">{{ collapsed_text }}</span
+          ><span class="collapsible-text__ellipsis">… </span>
           <span
             class="collapsible-text__more"
             role="button"
@@ -32,12 +33,12 @@
       </div>
     </div>
   </div>
-  
 </template>
 
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
 import { sanitizeHtml } from '../lib/html';
+import { useHapticFeedback } from '../lib/composables';
 
 interface Props {
   text: string;
@@ -156,9 +157,12 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateToggleVisibility);
 });
 
-watch(() => props.text, () => {
-  updateToggleVisibility();
-});
+watch(
+  () => props.text,
+  () => {
+    updateToggleVisibility();
+  },
+);
 
 const expand = async () => {
   if (!contentRef.value) return;
@@ -192,7 +196,10 @@ const expand = async () => {
   }, props.animationDuration);
 };
 
+const { trigger } = useHapticFeedback();
+
 const collapse = async () => {
+  trigger();
   if (!contentRef.value) return;
 
   const element = contentRef.value;
@@ -240,9 +247,15 @@ const collapse = async () => {
   max-height: calc(3 * 1em * 1.2);
 }
 
-.collapsible-text__collapse-container { margin-top: 8px; }
-.collapsible-text__toggle-collapse { color: var(--color-text-secondary); }
-.collapsible-text__toggle-collapse:hover { color: var(--color-text-muted); }
+.collapsible-text__collapse-container {
+  margin-top: 8px;
+}
+.collapsible-text__toggle-collapse {
+  color: var(--color-text-secondary);
+}
+.collapsible-text__toggle-collapse:hover {
+  color: var(--color-text-muted);
+}
 
 .collapsible-text__measure {
   position: fixed;
@@ -256,7 +269,15 @@ const collapse = async () => {
   hyphens: auto;
 }
 
-.collapsible-text__ellipsis { opacity: 0.7; }
-.collapsible-text__more { cursor: pointer; user-select: none; color: var(--color-text-secondary); }
-.collapsible-text__more:hover { color: var(--color-text-muted); }
+.collapsible-text__ellipsis {
+  opacity: 0.7;
+}
+.collapsible-text__more {
+  cursor: pointer;
+  user-select: none;
+  color: var(--color-text-secondary);
+}
+.collapsible-text__more:hover {
+  color: var(--color-text-muted);
+}
 </style>

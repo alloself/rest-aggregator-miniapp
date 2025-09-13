@@ -9,14 +9,10 @@
         border-radius="20px"
         pagination-bottom="24px"
       />
-      <button
-        class="news-card__share-story-btn"
-        @click.stop="handleShareToStory"
-        :title="shareButtonTitle"
-      >
-        <Icon 
-          name="basil:telegram-solid" 
-          :size="20" 
+      <button class="news-card__share-story-btn" @click.stop="handleShareToStory" :title="shareButtonTitle">
+        <Icon
+          name="basil:telegram-solid"
+          :size="20"
           class="shrink-0 text-white"
           color="#fff"
           aria-label="Поделиться в сторис"
@@ -49,6 +45,7 @@ import HeroCarousel from '@shared/ui/HeroCarousel.vue';
 import CollapsibleText from '../../shared/ui/CollapsibleText.vue';
 import { useTelegramStoryShare } from '../../shared/composables/useTelegramStoryShare';
 import { useBottomSheet } from '../../shared/lib/composables/useBottomSheet';
+import { useHapticFeedback } from '../../shared/lib/composables';
 import ShareBottomSheet from '../share-bottom-sheet/ShareBottomSheet.vue';
 import type { News } from '@/shared';
 import Icon from '@shared/ui/Icon.vue';
@@ -83,11 +80,7 @@ const { isAvailable, isVersionSupported } = useTelegramStoryShare();
 const { open } = useBottomSheet();
 
 const canShareToStory = computed(() => {
-  return (
-    isAvailable.value && 
-    isVersionSupported.value && 
-    imageItems.value.length > 0
-  );
+  return isAvailable.value && isVersionSupported.value && imageItems.value.length > 0;
 });
 
 const shareButtonTitle = computed(() => {
@@ -97,17 +90,24 @@ const shareButtonTitle = computed(() => {
   return 'Поделиться';
 });
 
+const { trigger } = useHapticFeedback();
+
 const handleShareToStory = () => {
-  open(ShareBottomSheet, { 
-    type: 'news',
-    item: item,
-    slug,
-    itemSlug: item.slug 
-  }, { 
-    height: 30,
-    showHandle: true,
-    closableByBackdrop: true,
-    closableBySwipe: true
-  });
+  trigger();
+  open(
+    ShareBottomSheet,
+    {
+      type: 'news',
+      item: item,
+      slug,
+      itemSlug: item.slug,
+    },
+    {
+      height: 30,
+      showHandle: true,
+      closableByBackdrop: true,
+      closableBySwipe: true,
+    },
+  );
 };
 </script>

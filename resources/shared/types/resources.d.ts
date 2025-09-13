@@ -1,5 +1,5 @@
 import type {
-  Restaurant,News,File,Category,User,Dish,Event
+  Event,News,Restaurant,Dish,Category,File,User
 } from './models'
 
 // Автоматически сгенерированные типы для Laravel API Resources
@@ -20,20 +20,21 @@ export interface WorkingHours {
     is_closed: boolean
   } | null
 }
-export interface RestaurantResourceData {
+export interface EventResourceData {
   id: string
-  name: string
-  subtitle?: string | null
   slug: string
+  title: string
+  subtitle?: string | null
+  start_at?: Date | null
+  price?: number | null
   description?: string | null
-  working_hours?: WorkingHours | null
-  address?: string | null
-  average_receipt?: number | null
-  phone?: string | null
-  bot_username: string
+  order?: number | null
+  created_at?: Date | null
+  updated_at?: Date | null
+  restaurant?: RestaurantResourceData
+  is_sold_out: boolean
   files?: FileResourceData[]
   images?: FileResourceData[]
-  categories?: CategoryResourceData[]
 }
 
 export interface NewsResourceData {
@@ -47,34 +48,6 @@ export interface NewsResourceData {
   restaurant?: RestaurantResourceData
   files?: FileResourceData[]
   images?: FileResourceData[]
-}
-
-export interface FileResourceData {
-  id: string
-  name: string
-  url: string
-  extension: string
-  created_at?: Date | null
-  updated_at?: Date | null
-  pivot?: CategoryPivot
-}
-
-export interface CategoryResourceData {
-  id: string
-  name: string
-  slug: string
-  order?: number | null
-  dishes?: DishResourceData[]
-  pivot?: CategoryPivot
-  children?: CategoryResourceData[]
-}
-
-export interface UserResourceData {
-  id: string
-  first_name: string
-  last_name?: string | null
-  middle_name?: string | null
-  email?: string | null
 }
 
 export interface DishResourceData {
@@ -91,19 +64,46 @@ export interface DishResourceData {
   files?: FileResourceData[]
 }
 
-export interface EventResourceData {
+export interface CategoryResourceData {
   id: string
+  name: string
   slug: string
-  title: string
-  subtitle?: string | null
-  start_at?: Date | null
-  price?: number | null
-  description?: string | null
   order?: number | null
+  dishes?: DishResourceData[]
+  pivot?: CategoryPivot
+  children?: CategoryResourceData[]
+}
+
+export interface FileResourceData {
+  id: string
+  name: string
+  url: string
+  extension: string
   created_at?: Date | null
   updated_at?: Date | null
-  restaurant?: RestaurantResourceData
-  is_sold_out: boolean
+  pivot?: CategoryPivot
+}
+
+export interface UserResourceData {
+  id: string
+  first_name: string
+  last_name?: string | null
+  middle_name?: string | null
+  email?: string | null
+}
+
+export interface RestaurantResourceData {
+  id: string
+  name: string
+  subtitle?: string | null
+  slug: string
+  description?: string | null
+  working_hours?: WorkingHours | null
+  address?: string | null
+  average_receipt?: number | null
+  phone?: string | null
+  bot_username: string
   files?: FileResourceData[]
   images?: FileResourceData[]
+  categories?: CategoryResourceData[]
 }

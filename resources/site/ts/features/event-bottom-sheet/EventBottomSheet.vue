@@ -7,7 +7,7 @@
     <div v-else-if="error" class="event-bottom-sheet__error">
       {{ error }}
     </div>
-    
+
     <div v-else-if="event" class="event-bottom-sheet__content">
       <HeroCarousel
         :images="carousel_images"
@@ -64,6 +64,7 @@ import { onBeforeMount, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useEventStore } from '../../entities/event';
 import { useBottomSheet } from '../../shared/lib/composables/useBottomSheet';
+import { useHapticFeedback } from '../../shared/lib/composables';
 import Icon from '@shared/ui/Icon.vue';
 import HeroCarousel from '@shared/ui/HeroCarousel.vue';
 import ShareBottomSheet from '../share-bottom-sheet/ShareBottomSheet.vue';
@@ -87,9 +88,7 @@ const carousel_images = computed<CarouselImage[]>(() => {
   return imgs.filter((img) => Boolean(img.url)).map((img) => ({ url: img.url, alt: img.name || event.value?.title }));
 });
 
-const sanitizedDescription = computed(() => 
-  sanitizeHtml(event.value?.description ?? '')
-);
+const sanitizedDescription = computed(() => sanitizeHtml(event.value?.description ?? ''));
 
 const formatDate = (date: Date): string => {
   return dayjs(date).format('D MMMM');
@@ -99,11 +98,14 @@ const formatTime = (date: Date): string => {
   return dayjs(date).format('HH:mm');
 };
 
+const { trigger } = useHapticFeedback();
+
 const handleBooking = () => {
   // При клике на "Забронировать" звоним в ресторан
   const phone = event.value?.restaurant?.phone;
   if (phone) {
     const cleanPhone = phone.replace(/[^\d+]/g, '');
+    trigger();
     window.location.href = `tel:${cleanPhone}`;
   } else {
     console.log('Номер телефона ресторана не найден');
@@ -112,18 +114,23 @@ const handleBooking = () => {
 
 const handleTelegramShare = () => {
   if (!event.value) return;
-  
-  open(ShareBottomSheet, { 
-    type: 'event',
-    item: event.value,
-    slug,
-    itemSlug: eventSlug 
-  }, { 
-    height: 30,
-    showHandle: true,
-    closableByBackdrop: true,
-    closableBySwipe: true
-  });
+  trigger();
+
+  open(
+    ShareBottomSheet,
+    {
+      type: 'event',
+      item: event.value,
+      slug,
+      itemSlug: eventSlug,
+    },
+    {
+      height: 30,
+      showHandle: true,
+      closableByBackdrop: true,
+      closableBySwipe: true,
+    },
+  );
 };
 
 onBeforeMount(async () => {

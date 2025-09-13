@@ -1,51 +1,36 @@
 <template>
   <div class="repeat-button-container">
-    <!-- Тоггл кнопка -->
-    <button 
+    <button
       class="repeat-button__toggle"
       :class="{ 'repeat-button__toggle--active': isRepeated }"
       :disabled="disabled"
       @click="handleToggle"
     >
-      <div 
-        class="repeat-button__toggle-indicator"
-        :class="{ 'repeat-button__toggle-indicator--active': isRepeated }"
-      >
+      <div class="repeat-button__toggle-indicator" :class="{ 'repeat-button__toggle-indicator--active': isRepeated }">
         R
       </div>
-      
-      <!-- Лейбл внутри тоггла -->
+
       <span class="repeat-button__label">Repeat</span>
     </button>
-    
-    <!-- Аватары друзей и счетчик -->
-    <div 
-      v-if="(props.friends || []).length > 0" 
-      class="repeat-button__friends"
-      @click="handleFriendsClick"
-    >
+
+    <div v-if="(props.friends || []).length > 0" class="repeat-button__friends" @click="handleFriendsClick">
       <div class="repeat-button__avatars">
-        <div 
-          v-for="(friend, index) in visibleFriends" 
+        <div
+          v-for="(friend, index) in visibleFriends"
           :key="friend.id"
           class="repeat-button__avatar"
-          :style="{ 
+          :style="{
             zIndex: 3 - index,
-            backgroundColor: getAvatarUrl(friend) ? 'transparent' : generateRandomColor(getDisplayName(friend))
+            backgroundColor: getAvatarUrl(friend) ? 'transparent' : generateRandomColor(getDisplayName(friend)),
           }"
         >
-          <!-- Аватар изображение -->
-          <img 
-            v-if="getAvatarUrl(friend)" 
-            :src="getAvatarUrl(friend)" 
+          <img
+            v-if="getAvatarUrl(friend)"
+            :src="getAvatarUrl(friend)"
             :alt="getDisplayName(friend)"
             class="repeat-button__avatar-img"
           />
-          <!-- Инициалы -->
-          <span 
-            v-else 
-            class="repeat-button__avatar-initials"
-          >
+          <span v-else class="repeat-button__avatar-initials">
             {{ getInitials(friend) }}
           </span>
         </div>
@@ -57,9 +42,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useHapticFeedback } from '../../shared/lib/composables';
 import type { User } from '@/shared/types';
 
-// Структура друга из API
 interface Friend {
   id: string;
   name: string;
@@ -67,7 +52,6 @@ interface Friend {
   profile_photo_url?: string | null;
 }
 
-// Union type для всех кто лайкнул ресторан
 type UserOrFriend = User | Friend;
 
 interface Props {
@@ -89,39 +73,50 @@ const emit = defineEmits<{
   friendsClick: [friends: UserOrFriend[]];
 }>();
 
-// Обработка клика по тогглу
+const { trigger } = useHapticFeedback();
+
 const handleToggle = (): void => {
   const newState = !props.isRepeated;
+  trigger();
   emit('toggle', newState);
 };
 
-// Обработка клика по секции друзей
 const handleFriendsClick = (): void => {
+  trigger();
   emit('friendsClick', props.friends || []);
 };
 
-// Генерация рандомного цвета для инициалов
 const generateRandomColor = (seed: string): string => {
   const colors = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57',
-    '#FF9FF3', '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43',
-    '#EE5A24', '#0ABDE3', '#10AC84', '#F79F1F', '#A3CB38'
+    '#FF6B6B',
+    '#4ECDC4',
+    '#45B7D1',
+    '#96CEB4',
+    '#FECA57',
+    '#FF9FF3',
+    '#54A0FF',
+    '#5F27CD',
+    '#00D2D3',
+    '#FF9F43',
+    '#EE5A24',
+    '#0ABDE3',
+    '#10AC84',
+    '#F79F1F',
+    '#A3CB38',
   ];
-  
+
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
     hash = seed.charCodeAt(i) + ((hash << 5) - hash);
   }
-  
+
   return colors[Math.abs(hash) % colors.length];
 };
 
-// Проверка является ли объект Friend или User
 const isFriend = (user: UserOrFriend): user is Friend => {
   return 'name' in user;
 };
 
-// Получение URL аватара
 const getAvatarUrl = (user: UserOrFriend): string | undefined => {
   if (isFriend(user)) {
     return user.profile_photo_url || undefined;
@@ -129,7 +124,6 @@ const getAvatarUrl = (user: UserOrFriend): string | undefined => {
   return user.full_avatar_url || user.avatar_url || undefined;
 };
 
-// Получение отображаемого имени для цвета
 const getDisplayName = (user: UserOrFriend): string => {
   if (isFriend(user)) {
     return user.name;
@@ -137,28 +131,23 @@ const getDisplayName = (user: UserOrFriend): string => {
   return `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User';
 };
 
-// Получение инициалов из имени пользователя
 const getInitials = (user: UserOrFriend): string => {
-  // Для друзей есть поле name
   if (isFriend(user)) {
     const parts = user.name.split(' ');
     const firstInitial = parts[0]?.charAt(0) || '';
     const lastInitial = parts[1]?.charAt(0) || '';
     return (firstInitial + lastInitial).toUpperCase() || firstInitial.toUpperCase() || 'U';
   }
-  
-  // Для обычных пользователей
+
   const firstInitial = user.first_name?.charAt(0) || '';
   const lastInitial = user.last_name?.charAt(0) || '';
   return (firstInitial + lastInitial).toUpperCase() || user.first_name?.charAt(0)?.toUpperCase() || 'U';
 };
 
-// Получение видимых друзей (максимум 3)
 const visibleFriends = computed(() => {
   return (props.friends || []).slice(0, 3);
 });
 
-// Количество дополнительных друзей (которые не помещаются в кружки)
 const additionalFriendsCount = computed(() => {
   const totalFriends = (props.friends || []).length;
   return totalFriends > 3 ? totalFriends - 3 : 0;
@@ -211,7 +200,7 @@ const additionalFriendsCount = computed(() => {
   width: 32px;
   height: 32px;
   border-radius: 18px;
-  background: #FFF1C3;
+  background: #fff1c3;
   border: 1px solid rgba(255, 251, 239, 0.7);
   display: flex;
   align-items: center;
@@ -248,7 +237,7 @@ const additionalFriendsCount = computed(() => {
 }
 
 .repeat-button__toggle--active .repeat-button__label {
-  color: #FFFFFF;
+  color: #ffffff;
   left: 13px;
 }
 
@@ -299,7 +288,7 @@ const additionalFriendsCount = computed(() => {
   font-weight: 600;
   font-size: 12px;
   line-height: 1;
-  color: #FFFFFF;
+  color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
@@ -321,7 +310,7 @@ const additionalFriendsCount = computed(() => {
   font-size: 14px;
   line-height: 1.35;
   letter-spacing: -0.03em;
-  color: #FFFFFF;
+  color: #ffffff;
   flex-shrink: 0;
 }
 </style>

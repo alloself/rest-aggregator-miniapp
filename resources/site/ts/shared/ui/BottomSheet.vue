@@ -70,6 +70,7 @@ const sheetHeight = ref(0);
 const rafId = ref(0);
 const hasScheduledFrame = ref(false);
 const pendingTranslateY = ref(0);
+// Бэкдроп без fade на закрытие — флага не требуется
 
 const handleBackdropClick = () => {
   if (props.closableByBackdrop) {
@@ -83,10 +84,10 @@ const handleBackdropClick = () => {
 const handleTouchStart = (event: TouchEvent) => {
   if (!props.closableBySwipe) return;
   if (event.touches.length > 1) return;
-  
+
   isDragging.value = true;
   startY.value = event.touches[0].clientY;
-  
+
   if (sheetRef.value) {
     sheetHeight.value = sheetRef.value.offsetHeight;
   }
@@ -118,7 +119,12 @@ const handleTouchEnd = () => {
   const distanceThreshold = sheetHeight.value * 0.25;
 
   if (deltaY > distanceThreshold) {
-    startClose();
+    animateSheetToBottomThenClose();
+    // оставляем isDragging=true до момента фактического закрытия,
+    // чтобы startClose не сбрасывал inline-transform
+    startY.value = 0;
+    currentY.value = 0;
+    return;
   } else {
     animateSheetToZero();
   }
@@ -127,7 +133,6 @@ const handleTouchEnd = () => {
   startY.value = 0;
   currentY.value = 0;
 };
-
 
 /**
  * Мышь: начать перетаскивание за хэндл
@@ -198,12 +203,34 @@ const applyDragFriction = (dragDistancePx: number, containerHeightPx: number): n
 const animateSheetToZero = () => {
   if (!sheetRef.value) return;
   cancelScheduledTransform();
-  sheetRef.value.style.transition = 'transform 250ms cubic-bezier(0.32,0.72,0,1)';
+  sheetRef.value.style.transition = 'transform 280ms cubic-bezier(0,0,0.2,1)';
   sheetRef.value.style.transform = 'translate3d(0, 0, 0)';
   const handleTransitionEnd = () => {
     if (!sheetRef.value) return;
     sheetRef.value.style.transition = '';
     sheetRef.value.removeEventListener('transitionend', handleTransitionEnd);
+  };
+  sheetRef.value.addEventListener('transitionend', handleTransitionEnd);
+};
+
+/**
+ * Плавно докатить шит до низа и затем закрыть (для свайп-закрытия)
+ */
+const animateSheetToBottomThenClose = () => {
+  if (!sheetRef.value) {
+    isVisible.value = false;
+    return;
+  }
+  cancelScheduledTransform();
+  sheetRef.value.style.transition = 'transform 200ms cubic-bezier(0.4,0,1,1)';
+  sheetRef.value.style.transform = 'translate3d(0, 100%, 0)';
+  const handleTransitionEnd = () => {
+    if (!sheetRef.value) return;
+    sheetRef.value.style.transition = '';
+    sheetRef.value.removeEventListener('transitionend', handleTransitionEnd);
+    // После докатывания скрываем оверлей (fade бэкдропа)
+    isVisible.value = false;
+    isDragging.value = false;
   };
   sheetRef.value.addEventListener('transitionend', handleTransitionEnd);
 };
@@ -241,6 +268,11 @@ const handleEscapeKey = (event: KeyboardEvent) => {
 
 const startClose = () => {
   if (!isVisible.value) return;
+  // Если закрываем не жестом — сначала докатываем вниз, затем скрываем бэкдроп
+  if (!isDragging.value && sheetRef.value) {
+    animateSheetToBottomThenClose();
+    return;
+  }
   isVisible.value = false;
 };
 
@@ -297,5 +329,34 @@ onUnmounted(() => {
 :deep(.bottom-sheet__content) {
   touch-action: pan-y;
   overscroll-behavior: contain;
+}
+
+/* Transitions */
+/* Backdrop: fade только на enter, без fade на leave */
+.bottom-sheet-backdrop-enter-active {
+  transition: opacity 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+.bottom-sheet-backdrop-enter-from {
+  opacity: 0;
+}
+.bottom-sheet-backdrop-enter-to {
+  opacity: 1;
+}
+
+/* Sheet: slide-up/slide-down с зеркальными длительностями */
+.bottom-sheet-enter-active {
+  transition: transform 280ms cubic-bezier(0, 0, 0.2, 1);
+}
+.bottom-sheet-leave-active {
+  transition: transform 200ms cubic-bezier(0.4, 0, 1, 1);
+}
+/* Убрали класс принудительного fadeout на закрытие */
+.bottom-sheet-enter-from,
+.bottom-sheet-leave-to {
+  transform: translate3d(0, 100%, 0);
+}
+.bottom-sheet-enter-to,
+.bottom-sheet-leave-from {
+  transform: translate3d(0, 0, 0);
 }
 </style>
