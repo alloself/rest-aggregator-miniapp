@@ -21,7 +21,14 @@
               <div class="bottom-sheet__handle-line"></div>
             </div>
 
-            <div class="bottom-sheet__content">
+            <div
+              ref="contentRef"
+              class="bottom-sheet__content"
+              @touchstart.stop="handleContentTouchStart"
+              @touchmove.stop="handleContentTouchMove"
+              @touchend.stop="handleContentTouchEnd"
+              @touchcancel.stop="handleContentTouchEnd"
+            >
               <slot />
             </div>
           </div>
@@ -63,6 +70,7 @@ const isVisible = ref(true);
 const sheetClasses = computed(() => ['bottom-sheet--default', { 'bottom-sheet--gap': props.bottomGap }]);
 
 const sheetRef = ref<HTMLElement>();
+const contentRef = ref<HTMLElement>();
 const isDragging = ref(false);
 const startY = ref(0);
 const currentY = ref(0);
@@ -77,6 +85,39 @@ const handleBackdropClick = () => {
     startClose();
   }
 };
+
+/**
+ * Найти ближайший скроллируемый контейнер внутри contentRef
+ */
+const findScrollableAncestor = (startNode: EventTarget | null): HTMLElement | null => {
+  if (!startNode || !(startNode instanceof Node) || !contentRef.value) return null;
+  let el: Node | null = startNode as Node;
+  while (el && el !== contentRef.value) {
+    if (el instanceof HTMLElement && isElementScrollable(el)) return el;
+    el = el.parentNode;
+  }
+  // Сам contentRef может быть скроллируемым
+  if (contentRef.value && isElementScrollable(contentRef.value)) return contentRef.value;
+  return null;
+};
+
+/**
+ * Проверить, может ли элемент скроллиться по вертикали
+ */
+const isElementScrollable = (el: HTMLElement): boolean => {
+  const style = window.getComputedStyle(el);
+  const overflowY = style.overflowY;
+  const canOverflow = overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay';
+  return canOverflow && el.scrollHeight > el.clientHeight + 1;
+};
+
+/**
+ * На верхней кромке скролла?
+ */
+const isScrolledToTop = (el: HTMLElement): boolean => el.scrollTop <= 0;
+
+const activeScrollerRef = ref<HTMLElement | null>(null);
+const contentTouchStartY = ref(0);
 
 /**
  * Начать жест перетаскивания с хэндла
@@ -132,6 +173,66 @@ const handleTouchEnd = () => {
   isDragging.value = false;
   startY.value = 0;
   currentY.value = 0;
+};
+
+/**
+ * Контент: начало жеста. Решаем, кому отдать жест — скроллу или шиту
+ */
+const handleContentTouchStart = (event: TouchEvent) => {
+  if (!props.closableBySwipe) return;
+  if (event.touches.length > 1) return;
+  contentTouchStartY.value = event.touches[0].clientY;
+  activeScrollerRef.value = findScrollableAncestor(event.target);
+};
+
+/**
+ * Контент: движение. Если свайп вниз и скролл на верхней кромке/нет скролла — перехватываем и двигаем шит
+ */
+const handleContentTouchMove = (event: TouchEvent) => {
+  if (!props.closableBySwipe || !sheetRef.value) return;
+  const y = event.touches[0].clientY;
+  const deltaY = y - contentTouchStartY.value;
+
+  // Свайп вверх — отдаем жест контенту
+  if (deltaY <= 0) {
+    // Если мы уже начали тянуть шит, откатим его
+    if (isDragging.value) {
+      animateSheetToZero();
+      isDragging.value = false;
+      startY.value = 0;
+      currentY.value = 0;
+    }
+    return;
+  }
+
+  // Свайп вниз. Проверяем, можно ли закрывать (скролл сверху или нет скролла)
+  const scroller = activeScrollerRef.value;
+  const allowIntercept = !scroller || isScrolledToTop(scroller);
+  if (!allowIntercept) return; // даем контенту скроллиться вверх до верха
+
+  // Перехватываем: тянем шит
+  if (event.cancelable) event.preventDefault();
+  if (!isDragging.value) {
+    isDragging.value = true;
+    startY.value = y;
+    currentY.value = y;
+    sheetHeight.value = sheetRef.value.offsetHeight;
+  } else {
+    currentY.value = y;
+  }
+
+  const translateY = applyDragFriction(currentY.value - startY.value, sheetHeight.value);
+  if (translateY > 0) scheduleTransform(translateY);
+};
+
+/**
+ * Контент: завершение. Если тянули шит — завершаем как обычный свайп-закрытие
+ */
+const handleContentTouchEnd = () => {
+  if (isDragging.value) {
+    handleTouchEnd();
+  }
+  activeScrollerRef.value = null;
 };
 
 /**
