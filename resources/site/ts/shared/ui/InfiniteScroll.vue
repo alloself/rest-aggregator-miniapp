@@ -1,17 +1,18 @@
 <template>
   <div class="infinite-scroll">
-    <div v-if="loading" class="infinite-scroll__state">Загрузка…</div>
+    <div v-if="loading" class="infinite-scroll__state"><AppLoader /></div>
     <div v-else-if="error" class="infinite-scroll__state">{{ error }}</div>
     <div v-else class="infinite-scroll__content">
       <slot />
       <div v-if="hasMore" ref="sentinel" class="infinite-scroll__sentinel" aria-hidden="true" />
-      <div v-if="isLoadingMore" class="infinite-scroll__state">Загрузка…</div>
+      <div v-if="isLoadingMore" class="infinite-scroll__state"><AppLoader /></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, useTemplateRef, watch } from 'vue';
+import { AppLoader } from './index';
 
 interface Props {
   loading: boolean;

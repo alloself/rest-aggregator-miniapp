@@ -1,6 +1,7 @@
 export { AppButton } from './button';
 export { default as AppCard } from './AppCard.vue';
 export { default as AppImage } from './AppImage.vue';
+export { default as AppLoader } from './AppLoader.vue';
 export { default as WorkingHours } from '../../features/working-hours/WorkingHours.vue';
 export { default as CollapsibleText } from './CollapsibleText.vue';
 export { default as ContactDropdown } from '../../features/contact-dropdown/ContactDropdown.vue';

@@ -1,7 +1,7 @@
 <template>
   <div class="event-bottom-sheet">
     <div v-if="loading" class="event-bottom-sheet__loading">
-      <div class="loading-spinner">Загрузка...</div>
+      <AppLoader />
     </div>
 
     <div v-else-if="error" class="event-bottom-sheet__error">
@@ -69,6 +69,7 @@ import Icon from '@shared/ui/Icon.vue';
 import HeroCarousel from '@shared/ui/HeroCarousel.vue';
 import ShareBottomSheet from '../share-bottom-sheet/ShareBottomSheet.vue';
 import { dayjs, sanitizeHtml, formatPrice } from '../../shared/lib';
+import { AppLoader } from '../../shared/ui';
 import type { Event } from '@/shared/types/models';
 
 type Props = {

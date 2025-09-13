@@ -1,6 +1,6 @@
 <template>
   <div class="news-bottom-sheet">
-    <div v-if="loading" class="news-bottom-sheet__loading">Загрузка...</div>
+    <div v-if="loading" class="news-bottom-sheet__loading"><AppLoader /></div>
     <div v-else-if="error" class="news-bottom-sheet__error">{{ error }}</div>
     <div v-else-if="news" class="news-bottom-sheet__content">
       <HeroCarousel
@@ -24,6 +24,7 @@ import { client } from '../../shared/api/axios';
 import type { News } from '@/shared/types/models';
 import HeroCarousel from '@shared/ui/HeroCarousel.vue';
 import { sanitizeHtml } from '../../shared/lib';
+import { AppLoader } from '../../shared/ui';
 
 type Props = {
   slug: string;
@@ -60,7 +61,7 @@ onBeforeMount(async () => {
 </script>
 
 <style scoped>
-.news-bottom-sheet { 
+.news-bottom-sheet {
   /* фон соответствует карточкам, чтобы скругления смотрелись цельно */
   background: var(--color-bg-primary);
 }
@@ -70,16 +71,14 @@ onBeforeMount(async () => {
   padding: 16px 16px 16px;
 }
 
-.news-bottom-sheet__title { 
-  margin: 0 0 16px 0; 
-  font-weight: 600; 
-  font-size: 18px; 
+.news-bottom-sheet__title {
+  margin: 0 0 16px 0;
+  font-weight: 600;
+  font-size: 18px;
 }
 
-.news-bottom-sheet__description { 
+.news-bottom-sheet__description {
   /* внутренние отступы уже задаются контейнером */
-  padding: 0; 
+  padding: 0;
 }
 </style>
-
-

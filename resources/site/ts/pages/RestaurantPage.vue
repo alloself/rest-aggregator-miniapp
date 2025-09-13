@@ -1,7 +1,7 @@
 <template>
   <div class="restaurant-page">
     <div v-if="loading" class="restaurant-page__loading">
-      <div class="loading-spinner">Загрузка...</div>
+      <AppLoader />
     </div>
 
     <div v-else-if="error" class="restaurant-page__error">
@@ -32,6 +32,7 @@ import RestaurantCard from '../widgets/restaurant-page/RestaurantCard.vue';
 import { useRestaurantMedia } from '../features/restaurant-media-bottom-sheet';
 import { useMiniAppStore } from '../shared/stores/miniapp';
 import { useBottomSheet } from '../shared/lib/composables/useBottomSheet';
+import { AppLoader } from '../shared/ui';
 import { EventBottomSheet } from '../features/event-bottom-sheet';
 import { NewsBottomSheet } from '../features/news-bottom-sheet/index';
 
