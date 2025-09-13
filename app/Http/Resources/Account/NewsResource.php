@@ -19,7 +19,7 @@ class NewsResource extends JsonResource
             'slug' => $this->slug,
             'title' => $this->title,
             'description' => $this->description,
-            'order' => $this->order,
+            'order' => $this->order ?? 0,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'restaurant' => $this->whenLoaded('restaurant'),

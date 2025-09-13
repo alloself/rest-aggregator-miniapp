@@ -186,7 +186,9 @@ export const useRestaurantDetailFormFields = (props: { id?: string }) => {
             },
           },
         },
-        initialValues: {},
+        initialValues: {
+          restaurant_id: props.id,
+        },
       },
       key: 'news',
     },
