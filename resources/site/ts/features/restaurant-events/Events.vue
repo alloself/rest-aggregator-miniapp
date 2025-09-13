@@ -21,7 +21,7 @@ import { useBottomSheet } from '../../shared/lib/composables/useBottomSheet';
 import { EventBottomSheet } from '../event-bottom-sheet';
 
 const { slug } = defineProps<{ slug: string }>();
-T;
+
 const { open } = useBottomSheet();
 
 const store = useEventsStore();
