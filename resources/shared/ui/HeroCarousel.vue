@@ -3,12 +3,7 @@
     <div class="swiper hero-carousel__swiper" ref="swiperContainer">
       <div class="swiper-wrapper">
         <div v-for="(image, index) in images" :key="index" class="swiper-slide hero-carousel__slide">
-          <img
-            :src="image.url"
-            :alt="image.alt || `Слайд ${index + 1}`"
-            class="hero-carousel__image"
-            loading="lazy"
-          />
+          <img :src="image.url" :alt="image.alt || `Слайд ${index + 1}`" class="hero-carousel__image" loading="lazy" />
         </div>
       </div>
 
@@ -127,6 +122,9 @@ defineExpose({
   border-radius: v-bind(borderRadius);
   overflow: hidden;
   background-color: #f4f3f3;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 
   &__swiper {
     width: 100%;
@@ -252,4 +250,3 @@ defineExpose({
   }
 }
 </style>
-
