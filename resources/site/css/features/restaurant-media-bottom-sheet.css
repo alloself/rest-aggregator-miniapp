@@ -50,7 +50,7 @@
 /* Responsive */
 @media (max-width: 480px) {
     .restaurant-media-bottom-sheet__header {
-        @apply px-[20px] pt-[16px] pb-[12px] flex-col gap-[8px] items-start;
+        @apply px-[20px] pt-[16px] pb-[12px] gap-[8px] items-start;
     }
 
     .restaurant-media-bottom-sheet__title {
