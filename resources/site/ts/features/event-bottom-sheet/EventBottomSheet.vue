@@ -102,7 +102,6 @@ const formatTime = (date: Date): string => {
 const { trigger } = useHapticFeedback();
 
 const handleBooking = () => {
-  // При клике на "Забронировать" звоним в ресторан
   const phone = event.value?.restaurant?.phone;
   if (phone) {
     const cleanPhone = phone.replace(/[^\d+]/g, '');
@@ -140,3 +139,10 @@ onBeforeMount(async () => {
   }
 });
 </script>
+
+<style scoped>
+.event-bottom-sheet {
+  background: var(--color-bg-primary);
+  width: 100%;
+}
+</style>
