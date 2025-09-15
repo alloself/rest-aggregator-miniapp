@@ -7,6 +7,8 @@ import BaseFileList from '@/shared/components/BaseFileList.vue';
 import { FILE_BASE_URL } from '../../category/const';
 import { client } from '@/account/ts/shared/api/axios';
 import BaseNumberInput from '@/shared/components/BaseNumberInput.vue';
+import BaseDatePicker from '@/shared/components/BaseDatePicker.vue';
+import BaseCheckbox from '@/shared/components/BaseCheckbox.vue';
 
 export const useEventsDetailFormFields = () => {
   const fields = computed<ISmartFormField[]>(() => [
@@ -44,6 +46,27 @@ export const useEventsDetailFormFields = () => {
         autocomplete: 'event_subtitle',
         name: 'subtitle',
       },
+    },
+    {
+      component: BaseDatePicker,
+      key: 'start_at',
+      props: {
+        label: 'Дата и время начала',
+        name: 'start_at',
+        showTime: true,
+        hourFormat: '24',
+        showIcon: true,
+      },
+      rule: z.date({ required_error: 'Укажите дату и время' }),
+    },
+    {
+      component: BaseCheckbox,
+      key: 'is_sold_out',
+      props: {
+        label: 'Распродано',
+        name: 'is_sold_out',
+      },
+      rule: z.boolean().optional(),
     },
     {
       component: BaseNumberInput,
