@@ -5,10 +5,11 @@
     <div v-else-if="news" class="news-bottom-sheet__content">
       <HeroCarousel
         :images="carouselImages"
-        :height="'287px'"
         :autoplay="false"
+        :height="'340px'"
         :showPagination="(news.images?.length || 0) > 1"
         :paginationBottom="'12px'"
+        border-radius="40px"
       />
 
       <h1 class="news-bottom-sheet__title">{{ news.title }}</h1>
@@ -64,6 +65,7 @@ onBeforeMount(async () => {
 .news-bottom-sheet {
   /* фон соответствует карточкам, чтобы скругления смотрелись цельно */
   background: var(--color-bg-primary);
+  width: 100%;
 }
 
 .news-bottom-sheet__content {
