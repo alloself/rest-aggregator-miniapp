@@ -10,8 +10,7 @@
 
     <div v-else-if="event" class="event-bottom-sheet__content">
       <HeroCarousel
-        :images="carousel_images"
-        :height="'287px'"
+        :images="carouselImages"
         :autoplay="false"
         :showPagination="(event.images?.length || 0) > 1"
         :paginationBottom="'12px'"
@@ -84,7 +83,8 @@ const { event, loading, error } = storeToRefs(store);
 const { open } = useBottomSheet();
 
 type CarouselImage = { url: string; alt?: string };
-const carousel_images = computed<CarouselImage[]>(() => {
+
+const carouselImages = computed<CarouselImage[]>(() => {
   const imgs = event.value?.images ?? [];
   return imgs.filter((img) => Boolean(img.url)).map((img) => ({ url: img.url, alt: img.name || event.value?.title }));
 });
