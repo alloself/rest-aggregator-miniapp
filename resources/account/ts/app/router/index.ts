@@ -19,24 +19,16 @@ const routes: RouteRecordRaw[] = [
             title: "Главная",
         },
         children: [
-            {
-                path: "/dashboard",
-                alias: "/",
-                name: "dashboard",
-                component: () => import("@account/ts/pages/Dashboard.vue"),
-            },
-            ...createCRUDRoutes("category", {
-                prefix: "account",
-            }),
             ...createCRUDRoutes("restaurant", {
                 prefix: "account",
+                root: true,
             }),
         ],
     },
     {
         path: "/:pathMatch(.*)*",
         name: "404",
-        redirect: "/dashboard",
+        redirect: "/restaurant",
     },
 ];
 

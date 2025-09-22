@@ -112,18 +112,6 @@ const sidebarCollapsed = ref(true);
 
 const navigationItems = [
     {
-        name: "dashboard",
-        path: "/",
-        label: "Главная",
-        icon: "mdi:home",
-    },
-    {
-        name: "category",
-        path: "/category",
-        label: "Категории",
-        icon: "mdi:tag",
-    },
-    {
         name: "restaurant",
         path: "/restaurant",
         label: "Рестораны",

@@ -55,7 +55,7 @@ const submitLogin = async () => {
             email: values.email,
             password: values.password,
         });
-        router.push("/account/dashboard");
+        router.push("/account/restaurant");
     } catch (error: any) {
         if (error?.response?.data?.errors) {
             formContext.value?.setErrors(error.response.data.errors);
