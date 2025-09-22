@@ -24,7 +24,6 @@
 
 /* CSS Variables для Design Tokens */
 @theme {
-    /* Основные цвета */
     --color-bg-primary: #fffefb;
     --color-bg-secondary: #f4f3f3;
     --color-secondary: #f4f3f3;
