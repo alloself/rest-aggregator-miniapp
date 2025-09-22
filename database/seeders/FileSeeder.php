@@ -28,29 +28,38 @@ class FileSeeder extends Seeder
         // Убеждаемся, что директория для файлов существует
         Storage::disk('public')->makeDirectory('files');
 
-        $this->seedImagesFromDirectory($grettoRestaurant, $seedFilesPath, 'cover');
-        $this->seedImagesFromDirectory($grettoRestaurant, $seedFilesPath, 'gallery');
+        // Собираем все файлы из всех типов
+        $allFiles = [];
+        $allFiles = array_merge($allFiles, $this->getImagesFromDirectory($seedFilesPath, 'cover'));
+        $allFiles = array_merge($allFiles, $this->getImagesFromDirectory($seedFilesPath, 'gallery'));
+        $allFiles = array_merge($allFiles, $this->getImagesFromDirectory($seedFilesPath, 'telegram_avatar'));
+
+        // Синхронизируем все файлы одним вызовом
+        if (!empty($allFiles)) {
+            $grettoRestaurant->syncImages($allFiles);
+            $this->command->info('Добавлено ' . count($allFiles) . ' изображений для ресторана Gretto.');
+        }
 
         $this->command->info('Файлы успешно добавлены для ресторана Gretto.');
     }
 
     /**
-     * Загружает изображения из указанной директории
+     * Получает изображения из указанной директории
      */
-    private function seedImagesFromDirectory(Restaurant $restaurant, string $basePath, string $key): void
+    private function getImagesFromDirectory(string $basePath, string $key): array
     {
         $directoryPath = $basePath . '/' . $key;
         
         if (!is_dir($directoryPath)) {
             $this->command->warn("Директория {$directoryPath} не найдена.");
-            return;
+            return [];
         }
 
-        $files = glob($directoryPath . '/*.{jpg,jpeg,png,gif,webp}', GLOB_BRACE);
+        $files = glob($directoryPath . '/*.{jpg,jpeg,png,gif,webp}', defined('GLOB_BRACE') ? GLOB_BRACE : 0);
         
         if (empty($files)) {
             $this->command->warn("Файлы изображений не найдены в директории {$key}.");
-            return;
+            return [];
         }
 
         $order = 1;
@@ -93,10 +102,10 @@ class FileSeeder extends Seeder
             $order++;
         }
 
-        // Привязываем файлы к ресторану как изображения
         if (!empty($copiedFiles)) {
-            $restaurant->syncImages($copiedFiles);
-            $this->command->info("Добавлено " . count($copiedFiles) . " изображений с ключом '{$key}' для ресторана {$restaurant->name}.");
+            $this->command->info("Подготовлено " . count($copiedFiles) . " изображений с ключом '{$key}'.");
         }
+
+        return $copiedFiles;
     }
 }

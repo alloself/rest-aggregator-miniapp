@@ -1,158 +1,248 @@
-import type { ISmartFormField } from "@/shared/types";
-import { computed } from "vue";
-import BaseInput from "@/shared/components/BaseInput.vue";
-import BaseWorkingHoursEditor from "@/shared/components/BaseWorkingHoursEditor.vue";
-import { z } from "zod";
-import BaseFileList from "@/shared/components/BaseFileList.vue";
-import { client } from "@/account/ts/shared/api/axios";
-import { FILE_BASE_URL } from "../../category/const";
-import BaseTree from "@/shared/components/BaseTree.vue";
-import BaseEditor from "@/shared/components/BaseEditor.vue";
-import BaseRelationTable from "@/shared/components/BaseRelationTable.vue";
-import { NewsDetail } from "../../news";
+import type { Category, ISmartFormField, News } from '@/shared/types';
+import { computed } from 'vue';
+import BaseInput from '@/shared/components/BaseInput.vue';
+import BaseWorkingHoursEditor from '@/shared/components/BaseWorkingHoursEditor.vue';
+import { z } from 'zod';
+import BaseFileList from '@/shared/components/BaseFileList.vue';
+import { client } from '@/account/ts/shared/api/axios';
+import { FILE_BASE_URL } from '../../category/const';
+import BaseTree from '@/shared/components/BaseTree.vue';
+import BaseEditor from '@/shared/components/BaseEditor.vue';
+import BaseRelationTable from '@/shared/components/BaseRelationTable.vue';
+import { NewsDetail } from '../../news';
+import { EventsDetail } from '../../events';
+import { CategoryDetail } from '../../category';
+import { CATEGORY_BASE_URL } from '../../category/const';
 
 export const useRestaurantDetailFormFields = (props: { id?: string }) => {
   const fields = computed<ISmartFormField[]>(() => [
     {
       component: BaseInput,
-      key: "name",
+      key: 'name',
       props: {
-        type: "name",
+        type: 'name',
         fluid: true,
-        autocomplete: "restaurant_name",
-        label: "Название",
-        name: "name",
+        autocomplete: 'restaurant_name',
+        label: 'Название',
+        name: 'name',
       },
       rule: z
         .string({
-          required_error: "Название обязательно",
+          required_error: 'Название обязательно',
         })
-        .min(1, "Название обязательно"),
+        .min(1, 'Название обязательно'),
     },
     {
       component: BaseInput,
-      key: "subtitle",
+      key: 'subtitle',
       props: {
-        type: "subtitle",
+        type: 'subtitle',
         fluid: true,
-        autocomplete: "restaurant_name",
-        label: "Подзаголовок",
-        name: "subtitle",
+        autocomplete: 'restaurant_name',
+        label: 'Подзаголовок',
+        name: 'subtitle',
       },
     },
     {
       component: BaseInput,
-      key: "slug",
+      key: 'bot_username',
       props: {
-        type: "slug",
-        label: "Slug",
+        type: 'bot_username',
         fluid: true,
-        autocomplete: "restaurant_slug",
-        name: "slug",
+        autocomplete: 'restaurant_bot_username',
+        label: 'Имя бота',
+        name: 'bot_username',
       },
     },
     {
       component: BaseInput,
-      key: "yandex_metrica_code",
+      key: 'phone',
       props: {
-        type: "yandex_metrica_code",
-        label: "Код метрики",
+        type: 'phone',
         fluid: true,
-        autocomplete: "restaurant_yandex_metrica_code",
-        name: "yandex_metrica_code",
+        autocomplete: 'restaurant_phone',
+        label: 'Телефон',
+        name: 'phone',
       },
     },
     {
       component: BaseInput,
-      key: "average_receipt",
+      key: 'slug',
       props: {
-        type: "average_receipt",
-        label: "Средний чек",
+        type: 'slug',
+        label: 'Slug',
         fluid: true,
-        autocomplete: "restaurant_average_receipt",
-        name: "average_receipt",
+        autocomplete: 'restaurant_slug',
+        name: 'slug',
       },
     },
     {
       component: BaseInput,
-      key: "address",
+      key: 'yandex_metrica_code',
       props: {
-        type: "address",
-        label: "Адрес",
+        type: 'yandex_metrica_code',
+        label: 'Код метрики',
         fluid: true,
-        autocomplete: "restaurant_address",
-        name: "address",
+        autocomplete: 'restaurant_yandex_metrica_code',
+        name: 'yandex_metrica_code',
+      },
+    },
+    {
+      component: BaseInput,
+      key: 'average_receipt',
+      props: {
+        type: 'average_receipt',
+        label: 'Средний чек',
+        fluid: true,
+        autocomplete: 'restaurant_average_receipt',
+        name: 'average_receipt',
+      },
+    },
+    {
+      component: BaseInput,
+      key: 'address',
+      props: {
+        type: 'address',
+        label: 'Адрес',
+        fluid: true,
+        autocomplete: 'restaurant_address',
+        name: 'address',
+      },
+    },
+    {
+      component: BaseInput,
+      key: 'telegram_bot_token',
+      props: {
+        type: 'text',
+        label: 'Токен Telegram бота',
+        fluid: true,
+        autocomplete: 'telegram_bot_token',
+        name: 'telegram_bot_token',
+        placeholder: 'Введите токен вашего Telegram бота',
       },
     },
     {
       component: BaseEditor,
-      key: "description",
+      key: 'description',
       props: {
-        type: "description",
-        title: "Описание",
-        fluid: true,
-        autocomplete: "restaurant_description",
-        name: "description",
+        title: 'Описание',
+        autocomplete: 'restaurant_description',
+        name: 'description',
+      },
+    },
+    {
+      component: BaseEditor,
+      key: 'welcome_message',
+      props: {
+        title: 'Приветственное сообщение бота телеграм',
+        autocomplete: 'restaurant_welcome_message',
+        name: 'welcome_message',
       },
     },
     {
       component: BaseWorkingHoursEditor,
-      key: "working_hours",
+      key: 'working_hours',
     },
     {
       component: BaseFileList,
       props: {
-        type: "file",
+        type: 'file',
         baseUrl: FILE_BASE_URL,
         client: client,
-        title: "Файлы",
+        title: 'Файлы',
       },
-      key: "files",
+      key: 'files',
     },
     {
       component: BaseFileList,
       props: {
-        type: "image",
+        type: 'image',
         baseUrl: FILE_BASE_URL,
         client: client,
-        title: "Изображения",
+        title: 'Изображения',
       },
-      key: "images",
+      key: 'images',
     },
     {
       component: BaseRelationTable,
       props: {
-        title: "Новости",
-        entity: "news",
+        title: 'Новости',
+        entity: 'news',
         columns: [
           {
-            field: "title",
-            header: "Название",
+            field: 'title',
+            header: 'Название',
           },
           {
-            field: "order",
-            header: "Порядок",
+            field: 'order',
+            header: 'Порядок',
           },
         ],
-        detailComponent: NewsDetail,
+        detailComponent: {
+          component: NewsDetail,
+          props: {
+            onSave: (data: News) => {
+              console.log(data);
+            },
+          },
+        },
         initialValues: {
           restaurant_id: props.id,
         },
       },
-      key: "news",
+      key: 'news',
+    },
+    {
+      component: BaseRelationTable,
+      props: {
+        title: 'События',
+        entity: 'events',
+        columns: [
+          {
+            field: 'title',
+            header: 'Название',
+          },
+          {
+            field: 'subtitle',
+            header: 'Подзаголовок',
+          },
+          {
+            field: 'start_at',
+            header: 'Дата начала',
+          },
+          {
+            field: 'price',
+            header: 'Цена',
+          },
+
+          {
+            field: 'order',
+            header: 'Порядок',
+          },
+        ],
+        detailComponent: {
+          component: EventsDetail,
+        },
+      },
+      key: 'events',
     },
     {
       component: BaseTree,
       props: {
-        title: "Категории",
+        title: 'Категории',
         columns: [
           {
-            field: "name",
-            header: "Название",
+            field: 'name',
+            header: 'Название',
           },
         ],
+        detailComponent: {
+          component: CategoryDetail,
+        },
+        client: client,
+        baseUrl: CATEGORY_BASE_URL,
       },
-      key: "categories",
+      key: 'categories',
     },
   ]);
 

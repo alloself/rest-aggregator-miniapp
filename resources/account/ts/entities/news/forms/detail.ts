@@ -1,82 +1,82 @@
-import type { ISmartFormField } from "@/shared/types";
-import { computed } from "vue";
-import BaseInput from "@/shared/components/BaseInput.vue";
-import BaseEditor from "@/shared/components/BaseEditor.vue";
-import { z } from "zod";
-import BaseFileList from "@/shared/components/BaseFileList.vue";
-import { FILE_BASE_URL } from "../../category/const";
-import { client } from "@/account/ts/shared/api/axios";
-
+import type { ISmartFormField } from '@/shared/types';
+import { computed } from 'vue';
+import BaseInput from '@/shared/components/BaseInput.vue';
+import BaseEditor from '@/shared/components/BaseEditor.vue';
+import { z } from 'zod';
+import BaseFileList from '@/shared/components/BaseFileList.vue';
+import { FILE_BASE_URL } from '../../category/const';
+import { client } from '@/account/ts/shared/api/axios';
+import BaseNumberInput from '@/shared/components/BaseNumberInput.vue';
 export const useNewsDetailFormFields = () => {
   const fields = computed<ISmartFormField[]>(() => [
     {
       component: BaseInput,
-      key: "title",
+      key: 'title',
       props: {
-        type: "title",
+        type: 'title',
         fluid: true,
-        autocomplete: "news_title",
-        label: "Заголовок",
-        name: "title",
+        autocomplete: 'news_title',
+        label: 'Заголовок',
+        name: 'title',
       },
       rule: z
         .string({
-          required_error: "Название обязательно",
+          required_error: 'Название обязательно',
         })
-        .min(1, "Название обязательно"),
+        .min(1, 'Название обязательно'),
     },
     {
       component: BaseInput,
-      key: "slug",
+      key: 'slug',
       props: {
-        type: "slug",
-        label: "Slug",
+        type: 'slug',
+        label: 'Slug',
         fluid: true,
-        autocomplete: "news_slug",
-        name: "slug",
+        autocomplete: 'news_slug',
+        name: 'slug',
       },
     },
     {
-      component: BaseInput,
-      key: "order",
+      component: BaseNumberInput,
+      key: 'order',
       props: {
-        type: "order",
-        label: "Порядок",
+        type: 'order',
+        label: 'Порядок',
         fluid: true,
-        autocomplete: "news_order",
-        name: "order",
+        autocomplete: 'news_order',
+        name: 'order',
       },
     },
     {
       component: BaseEditor,
-      key: "description",
+      key: 'description',
       props: {
-        type: "description",
-        title: "Описание",
+        type: 'description',
+        title: 'Описание',
         fluid: true,
-        autocomplete: "news_description",
-        name: "description",
+        autocomplete: 'news_description',
+        name: 'description',
       },
     },
     {
       component: BaseFileList,
       props: {
-        type: "file",
+        type: 'file',
         baseUrl: FILE_BASE_URL,
         client: client,
-        title: "Файлы",
+        title: 'Файлы',
       },
-      key: "files",
+      key: 'files',
     },
     {
       component: BaseFileList,
       props: {
-        type: "image",
+        type: 'image',
         baseUrl: FILE_BASE_URL,
         client: client,
-        title: "Изображения",
+        title: 'Изображения',
       },
-      key: "images",
+      key: 'images',
     },
   ]);
 

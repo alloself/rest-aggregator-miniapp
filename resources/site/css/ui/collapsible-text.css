@@ -1,0 +1,66 @@
+.collapsible-text {
+    @apply text-left;
+}
+
+.collapsible-text__content {
+    @apply [transition:all_var(--transition-slow)];
+}
+
+.collapsible-text__text {
+    @apply m-0 text-base text-[var(--color-text-primary)] leading-[var(--line-height-body-md)];
+}
+
+.collapsible-text__text-truncated {
+    @apply inline;
+}
+
+.collapsible-text__toggle-inline {
+    @apply bg-transparent border-0 text-[var(--color-text-secondary)] cursor-pointer [font:inherit] p-0 ml-[2px] [transition:color_var(--transition-default)];
+}
+
+.collapsible-text__toggle-inline:hover {
+    @apply text-[var(--color-text-muted)];
+}
+
+.collapsible-text__toggle-inline:focus {
+    @apply outline-none;
+}
+
+.collapsible-text__collapse-container {
+    @apply flex justify-center mt-[12px] opacity-100 translate-y-0 [transition:all_var(--transition-slow)];
+}
+
+.collapsible-text__toggle-collapse {
+    @apply bg-transparent border-0 text-[var(--color-text-secondary)] cursor-pointer text-base font-[var(--font-weight-body-lg)] py-[var(--spacing-sm)] px-[var(--spacing-2xl)] [transition:color_var(--transition-default)];
+}
+
+.collapsible-text__toggle-collapse:hover {
+    @apply text-[var(--color-text-muted)];
+}
+
+.collapsible-text__toggle-collapse:focus {
+    @apply outline-none;
+}
+
+.collapsible-text__content--expanded .collapsible-text__collapse-container {
+    @apply [animation:fade-slide-in_var(--transition-slow)];
+}
+
+@keyframes fade-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.collapsible-text__content.expanding {
+    @apply overflow-hidden [transition:height_350ms_cubic-bezier(0.4,0,0.2,1)];
+}
+
+.collapsible-text__content.collapsing {
+    @apply overflow-hidden [transition:height_350ms_cubic-bezier(0.4,0,0.2,1)];
+}

@@ -11,6 +11,11 @@
     >
       <Column selectionMode="multiple"></Column>
       <Column field="name" header="Name"></Column>
+      <Column v-if="type === 'image'" field="preview" header="Preview">
+        <template #body="{ data }">
+          <img :src="data.url" alt="Preview" class="object-contain" />
+        </template>
+      </Column>
       <Column field="pivot.order" header="Order">
         <template #body="{ data }">
           <InputNumber v-model="data.pivot.order" />
@@ -41,7 +46,7 @@
 
   <Dialog v-model:visible="showDialog" modal header="Создать файл">
     <div class="flex flex-col gap-4">
-      <FileUpload customUpload mode="basic" @select="onSelect" :accept="acceptType" :maxFileSize="1000000">
+      <FileUpload customUpload mode="basic" @select="onSelect" :accept="acceptType">
       </FileUpload>
     </div>
     <template #footer>

@@ -15,9 +15,12 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             UserSeeder::class,
             RestaurantRolesSeeder::class,
-            RestaurantSeeder::class,
+            RestaurantSeeder::class, 
             FileSeeder::class,
             NewsSeeder::class,
+            EventSeeder::class,
+            CategorySeeder::class,
+            DishSeeder::class,
         ]);
     }
 }

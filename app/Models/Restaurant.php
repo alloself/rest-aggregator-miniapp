@@ -9,6 +9,14 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\Pivot\Categorizable;
+use App\Models\Category;
+use App\Services\TelegramBotService;
+use App\Models\User;
+use App\Models\Like;
 
 class Restaurant extends BaseModel
 {
@@ -22,14 +30,17 @@ class Restaurant extends BaseModel
         'yandex_metrica_code',
         'address',
         'average_receipt',
-        'user_id',
-        'subtitle'
+        'phone',
+        'telegram_bot_token',
+        'subtitle',
+        'welcome_message',
+        'bot_username',
     ];
 
 
     protected $casts = [
         'order' => 'integer',
-        'working_hours' => 'array',
+        'working_hours' => 'object',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -47,105 +58,75 @@ class Restaurant extends BaseModel
         return $this->hasMany(News::class);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * Получить всех пользователей этого ресторана (включая владельца и сотрудников)
-     */
-    public function users()
+    public function events(): HasMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->hasMany(Event::class);
     }
 
     /**
-     * Получить владельца ресторана
+     * Получить владельца ресторана на основе роли restaurant_owner в контексте текущего ресторана (teams).
      */
-    public function user()
+    public function getOwner(): ?User
     {
-        return $this->belongsTo(User::class);
+        $currentTeam = getPermissionsTeamId();
+        setPermissionsTeamId($this->getKey());
+        /** @var User|null $owner */
+        $owner = User::role('restaurant_owner')->first();
+        setPermissionsTeamId($currentTeam);
+        return $owner;
+    }
+
+    public function categories(): MorphToMany
+    {
+        return $this->morphToMany(Category::class, 'categorizable')
+            ->using(Categorizable::class)
+            ->withPivot(['id', 'key', 'order'])
+            ->withTimestamps();
+    }
+
+    
+
+    /**
+     * Получить пользователей, связанных с рестораном (many-to-many)
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot(['chat_id', 'chat_type'])
+            ->withTimestamps();
     }
 
     /**
-     * Получить всех пользователей с их ролями в этом ресторане
+     * Добавить пользователя к ресторану с возможностью указания роли
      */
-    public function getUsersWithRoles()
+    public function addUser(User $user, ?string $role = null): void
     {
-        // Временно сохраняем текущий team_id
-        $currentTeamId = getPermissionsTeamId();
-
-        // Устанавливаем team_id этого ресторана
-        setPermissionsTeamId($this->id);
-
-        // Получаем всех пользователей с их ролями в этом ресторане
-        $users = $this->users()->with(['roles' => function ($query) {
-            $query->where('restaurant_id', $this->id);
-        }])->get();
-
-        // Восстанавливаем предыдущий team_id
-        setPermissionsTeamId($currentTeamId);
-
-        return $users;
-    }
-
-    /**
-     * Добавить пользователя с ролью в ресторан
-     */
-    public function addUser(User $user, string $role): void
-    {
-        // Добавляем связь многие-ко-многим если её нет
+        // Добавляем пользователя к ресторану через many-to-many отношение
         if (!$this->users()->where('user_id', $user->id)->exists()) {
-            $this->users()->attach($user->id);
+            $this->users()->attach($user->id, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
-        // Назначаем роль в контексте этого ресторана
-        $user->assignRestaurantRole($this->id, $role);
+        if ($role) {
+            $user->assignRestaurantRole($this->id, $role);
+        }
     }
 
     /**
-     * Удалить пользователя из ресторана
+     * Удобный доступ к Telegram сервису в контексте этого ресторана.
      */
-    public function removeUser(User $user): void
+    public function bot(): TelegramBotService
     {
-        // Временно сохраняем текущий team_id
-        $currentTeamId = getPermissionsTeamId();
-
-        // Устанавливаем team_id этого ресторана
-        setPermissionsTeamId($this->id);
-
-        // Удаляем все роли пользователя в этом ресторане
-        $user->syncRoles([]);
-
-        // Восстанавливаем предыдущий team_id
-        setPermissionsTeamId($currentTeamId);
-
-        // Удаляем связь многие-ко-многим
-        $this->users()->detach($user->id);
+        return new TelegramBotService($this->telegram_bot_token);
     }
 
     /**
-     * Изменить роль пользователя в ресторане
+     * Лайки ресторана (полиморфное отношение)
      */
-    public function changeUserRole(User $user, string $newRole): void
+    public function likes(): MorphMany
     {
-        $user->assignRestaurantRole($this->id, $newRole);
+        return $this->morphMany(Like::class, 'likeable');
     }
 }

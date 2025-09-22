@@ -8,7 +8,6 @@
       showGridlines
       stripedRows
       @row-click="toEdit"
-      selectionMode="multiple"
       v-model:selection="selectedItems"
       size="small"
     >
@@ -36,7 +35,13 @@ const { title, columns, entity, detailComponent, initialValues } = defineProps<{
   title: string;
   columns: IBaseColumn[];
   entity: string;
-  detailComponent: Component;
+  detailComponent: {
+    component: Component;
+    props: Record<string, unknown> & {
+      onSave?: (payload: IBaseEntity) => void;
+      onDelete?: (payload: { id: string }) => void;
+    };
+  };
   initialValues?: Record<string, unknown>;
 }>();
 
@@ -50,15 +55,41 @@ const items = defineModel<T[]>("modelValue", {
 
 const selectedItems = ref<T[]>([]);
 
+const handleSaved = (saved: T) => {
+  const index = items.value.findIndex((i) => i.id === saved.id);
+  if (index >= 0) {
+    const next = [...items.value];
+    next.splice(index, 1, saved);
+    items.value = next;
+  } else {
+    items.value = [...items.value, saved];
+  }
+  const external = detailComponent.props && detailComponent.props.onSave;
+  if (external) external(saved);
+};
+
+const handleDeleted = (payload: { id: string }) => {
+  const next = items.value.filter((i) => i.id !== payload.id);
+  items.value = next;
+  const external = detailComponent.props && detailComponent.props.onDelete;
+  if (external) external(payload);
+};
+
 const toEdit = ({ data }: { data: T }) => {
-  pushComponent(detailComponent, {
+  pushComponent(detailComponent.component, {
     id: data.id,
     initialValues,
+    ...detailComponent.props,
+    onSave: handleSaved,
+    onDelete: handleDeleted,
   });
 };
 const toCreate = () => {
-  pushComponent(detailComponent, {
+  pushComponent(detailComponent.component, {
     initialValues,
+    ...detailComponent.props,
+    onSave: handleSaved,
+    onDelete: handleDeleted,
   });
 };
 </script>

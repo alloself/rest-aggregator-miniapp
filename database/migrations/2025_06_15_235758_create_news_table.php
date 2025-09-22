@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('slug');
             $table->string('title');
             $table->longText('description');
+            $table->boolean('is_published')->default(false);
 
             $table->uuid('restaurant_id');
             $table->foreign('restaurant_id')->references('id')->on('restaurants');

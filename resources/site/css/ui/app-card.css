@@ -1,0 +1,21 @@
+.card--elevated {
+    @apply shadow-[var(--box-shadow-elevated)] bg-[var(--bg-card)];
+}
+
+.card--padding-none .card__header,
+.card--padding-none .card__body,
+.card--padding-none .card__footer {
+    @apply p-0;
+}
+
+.card--padding-small .card__header,
+.card--padding-small .card__body,
+.card--padding-small .card__footer {
+    @apply p-[var(--spacing-sm)];
+}
+
+.card--padding-large .card__header,
+.card--padding-large .card__body,
+.card--padding-large .card__footer {
+    @apply p-[var(--spacing-2xl)];
+}

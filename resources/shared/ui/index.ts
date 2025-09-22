@@ -1,2 +1,2 @@
 export { default as Icon } from './Icon.vue'
-export { default as RestaurantHeroCarousel } from './RestaurantHeroCarousel.vue' 
+export { default as MediaViewer } from './MediaViewer.vue'

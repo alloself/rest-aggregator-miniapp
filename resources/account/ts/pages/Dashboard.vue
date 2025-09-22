@@ -166,6 +166,7 @@ import StatCard from "@account/ts/shared/ui/StatCard.vue";
 import Icon from "@shared/ui/Icon.vue";
 import Button from "primevue/button";
 import Badge from "primevue/badge";
+import { dayjs } from "@site/ts/shared/lib/dayjs";
 
 const router = useRouter();
 
@@ -202,13 +203,7 @@ const recentOrders = ref([
 ]);
 
 const lastUpdated = computed(() => {
-    return new Date().toLocaleString("ru-RU", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+    return dayjs().format("DD.MM.YYYY HH:mm");
 });
 
 const formatCurrency = (amount: number) => {
@@ -220,13 +215,7 @@ const formatCurrency = (amount: number) => {
 };
 
 const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString("ru-RU", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+    return dayjs(dateString).format("DD.MM.YYYY HH:mm");
 };
 
 const getStatusLabel = (status: string) => {

@@ -1,0 +1,43 @@
+.restaurant-page {
+    @apply w-full mx-auto min-h-screen overflow-x-hidden bg-[var(--color-bg-primary)];
+}
+
+.restaurant-page__loading,
+.restaurant-page__error,
+.restaurant-page__not-found {
+    @apply flex items-center justify-center min-h-[60vh] text-center py-10 px-5;
+}
+
+.restaurant-page__error {
+    @apply text-base text-[var(--color-accent-error)];
+}
+
+.restaurant-page__not-found {
+    @apply text-base text-[var(--color-text-secondary)];
+}
+
+.loading-spinner {
+    @apply text-base text-[var(--color-text-secondary)];
+}
+
+.restaurant-page__wrapper {
+    @apply w-full;
+}
+
+.restaurant-page__photos-sheet {
+    @apply h-[80vh] max-h-[80vh];
+}
+
+.restaurant-page__photos-sheet .bottom-sheet__content {
+    @apply h-[calc(100%_-_25px)] overflow-hidden p-0;
+}
+
+.restaurant-page__pdf-sheet {
+    @apply h-[85vh] max-h-[85vh];
+}
+
+.restaurant-page__pdf-sheet .bottom-sheet__content {
+    @apply h-[calc(100%_-_25px)] overflow-hidden p-0 m-0;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}

@@ -1,0 +1,47 @@
+.working-hours {
+    @apply flex flex-col gap-[var(--gap-tiny)] cursor-pointer;
+}
+
+.working-hours__item {
+    @apply flex items-center justify-between text-[var(--font-size-body-sm)] leading-[var(--line-height-body-default)];
+}
+
+.working-hours__days {
+    @apply font-medium text-[var(--color-text-primary)];
+}
+
+.working-hours__time {
+    @apply font-normal ml-2 text-[var(--color-text-primary)];
+}
+
+.working-hours-dialog .p-dialog {
+    @apply w-auto min-w-[300px] max-w-[400px];
+}
+
+.working-hours-dialog .p-dialog-header {
+    @apply pt-6 pr-6 pb-4 pl-6 text-center;
+}
+
+.working-hours-dialog .p-dialog-title {
+    @apply text-[var(--font-size-heading-lg)] font-semibold text-[var(--color-text-primary)] m-0;
+}
+
+.working-hours-dialog .p-dialog-content {
+    @apply pt-0 pr-6 pb-6 pl-6;
+}
+
+.working-hours-dialog__content {
+    @apply flex flex-col gap-3;
+}
+
+.working-hours-dialog__item {
+    @apply flex items-center justify-between text-[var(--font-size-body-md)] leading-[var(--line-height-body-default)] py-0.5;
+}
+
+.working-hours-dialog__day {
+    @apply font-normal text-[var(--color-text-primary)] min-w-6;
+}
+
+.working-hours-dialog__time {
+    @apply font-normal text-[var(--color-text-primary)] ml-4;
+}

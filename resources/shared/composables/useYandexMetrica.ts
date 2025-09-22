@@ -1,4 +1,4 @@
-import { ref, watch, onUnmounted, readonly } from 'vue'
+import { ref, onUnmounted, readonly } from 'vue'
 
 /**
  * Composable для динамического подключения Яндекс.Метрики

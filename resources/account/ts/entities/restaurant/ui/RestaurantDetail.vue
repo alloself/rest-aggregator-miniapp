@@ -11,35 +11,26 @@
   />
 </template>
 
-<script setup lang="ts" generic="T extends Restaurant & IBaseEntity">
-import { client } from "../../../shared/api/axios";
-import { RESTAURANT_BASE_URL } from "../const";
-import { useRestaurantDetailFormFields } from "../forms/detail";
-import { FormContext } from "vee-validate";
-import { computed, ref } from "vue";
-import BaseDetail from "../../../../../shared/components/BaseDetail.vue";
-import { Restaurant, IBaseEntity } from "../../../../../shared/types";
-import { useAuthStore } from "@/shared";
-import { storeToRefs } from "pinia";
+<script setup lang="ts">
+import { client } from '../../../shared/api/axios';
+import { RESTAURANT_BASE_URL } from '../const';
+import { useRestaurantDetailFormFields } from '../forms/detail';
+import { FormContext } from 'vee-validate';
+import { ref } from 'vue';
+import BaseDetail from '../../../../../shared/components/BaseDetail.vue';
+import { Restaurant } from '../../../../../shared/types';
 
 const { id } = defineProps<{
   id?: string;
 }>();
 
-const { fields } = useRestaurantDetailFormFields({id});
+const { fields } = useRestaurantDetailFormFields({ id });
 
-const form = ref<FormContext<T>>();
+const form = ref<FormContext<Restaurant, Restaurant>>();
 
-const authStore = useAuthStore();
+const initialValues = {
+  working_hours: {},
+};
 
-const { user } = storeToRefs(authStore);
-
-const initialValues = computed<Partial<T>>(() => {
-  return {
-    user_id: user.value?.id,
-    working_hours: {},
-  } as Partial<T>;
-});
-
-const relations = ["files", "images", "news"];
+const relations = ['files', 'images', 'news', 'events', 'categories.descendants'];
 </script>

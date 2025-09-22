@@ -6,16 +6,29 @@ trait HasCRUD
 {
     public static function createEntity(array $data, array $relations = []): self
     {
+        // Нормализуем имена связей для синхронизации: categories.descendants -> categories
+        $relationsForSync = array_values(array_unique(array_map(function ($rel) {
+            return explode('.', $rel)[0] ?? $rel;
+        }, $relations)));
 
+        // Выделяем данные для связей из входного payload
+        $relationData = [];
+        foreach ($relationsForSync as $relation) {
+            if (isset($data[$relation])) {
+                $relationData[$relation] = $data[$relation];
+                unset($data[$relation]);
+            }
+        }
+        
         $entity = static::query()->create($data);
 
-        $entity->syncRelations($relations);
+        if (!empty($relationData)) {
+            $entity->syncRelations($relationData);
+        }
 
         if (!empty($relations)) {
             $entity->load($relations);
         }
-
-
 
         return $entity;
     }
@@ -34,7 +47,13 @@ trait HasCRUD
     public function updateEntity(array $data, array $relations = []): self
     {
         $relationData = [];
-        foreach ($relations as $relation) {
+
+        // Нормализуем имена связей для синхронизации: categories.descendants -> categories
+        $relationsForSync = array_values(array_unique(array_map(function ($rel) {
+            return explode('.', $rel)[0] ?? $rel;
+        }, $relations)));
+
+        foreach ($relationsForSync as $relation) {
             if (isset($data[$relation])) {
                 $relationData[$relation] = $data[$relation];
                 unset($data[$relation]);

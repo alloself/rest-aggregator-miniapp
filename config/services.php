@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'telegram' => [
+        // Enable Telegram Bot API Test Environment per docs:
+        // https://core.telegram.org/bots/webapps#using-bots-in-the-test-environment
+        'test_environment' => env('TELEGRAM_TEST_ENV', false),
+    ],
+
 ];

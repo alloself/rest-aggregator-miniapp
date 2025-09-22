@@ -1,0 +1,73 @@
+.bottom-sheet-backdrop {
+    @apply fixed left-0 right-0 bottom-0 flex items-end bg-black/50 [backdrop-filter:var(--shadow-backdrop)];
+    height: 100vh;
+}
+
+.bottom-sheet {
+    @apply w-full flex flex-col relative overflow-hidden bg-[var(--color-bg-card)] rounded-t-[var(--radius-card)] rounded-b-none shadow-[var(--shadow-bottom)] [will-change:transform];
+    max-height: 90dvh;
+    --bottom-gap: 0px;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--bottom-gap));
+}
+
+.bottom-sheet--gap {
+    --bottom-gap: 1rem; /* эквивалент прежнего pb-4 */
+}
+
+.bottom-sheet__handle {
+    @apply flex justify-center p-[var(--spacing-xl)] cursor-grab select-none;
+    /* Handle zone: полный контроль над touch событиями для закрытия */
+    touch-action: none;
+}
+
+.bottom-sheet__handle:active {
+    @apply cursor-grabbing;
+}
+
+.bottom-sheet__handle-line {
+    @apply w-12 h-[5px] bg-[var(--color-border-light)] rounded-[2.5px];
+}
+
+.bottom-sheet__content {
+    @apply flex-1 overflow-y-auto [-webkit-overflow-scrolling:touch];
+    /* Content zone: только вертикальный скролл, без возможности закрытия BottomSheet */
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+    /* Предотвращаем цепочку прокрутки */
+    overscroll-behavior-y: contain;
+}
+
+.bottom-sheet-backdrop-enter-active,
+.bottom-sheet-backdrop-leave-active {
+    @apply transition-opacity duration-300 ease-[ease];
+}
+
+.bottom-sheet-backdrop-enter-from,
+.bottom-sheet-backdrop-leave-to {
+    @apply opacity-0;
+}
+
+.bottom-sheet-enter-active {
+    @apply transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)];
+}
+
+.bottom-sheet-leave-active {
+    @apply transition-transform duration-[250ms] ease-[cubic-bezier(0.32,0.72,0,1)];
+}
+
+.bottom-sheet-enter-from,
+.bottom-sheet-leave-to {
+    @apply transform translate-y-full;
+}
+
+@media (max-width: 768px) {
+    .bottom-sheet {
+        @apply rounded-t-[16px] rounded-b-none;
+    }
+}
+
+@supports (-webkit-touch-callout: none) {
+    .bottom-sheet {
+        @apply [-webkit-tap-highlight-color:transparent];
+    }
+}

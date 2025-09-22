@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->uuid('restaurant_id');
             $table->uuid('user_id');
+            $table->string('chat_id')->nullable();
+            $table->string('chat_type')->nullable(); // private, group, supergroup, channel
             $table->timestamps();
 
             // Внешние ключи

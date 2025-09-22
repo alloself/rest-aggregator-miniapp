@@ -4,9 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Account\CategoryController;
 use App\Http\Controllers\Account\RestaurantController;
+use App\Http\Controllers\Account\DishController;
 use App\Http\Controllers\Account\FileController;
 use App\Http\Controllers\Site\RestaurantController as SiteRestaurantController;
 use App\Http\Controllers\Account\NewsController;
+use App\Http\Controllers\Account\EventController;
+use App\Http\Controllers\Telegram\WebhookController as TelegramWebhookController;
+use App\Http\Controllers\MiniAppAuthController;
+use App\Http\Controllers\LikeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,11 +29,14 @@ $accountResources = [
     'restaurants' => RestaurantController::class,
     'files' => FileController::class,
     'news' => NewsController::class,
+    'events' => EventController::class,
+    'dishes' => DishController::class,
 ];
 
-Route::middleware(['auth:sanctum'])->get('me', [AuthController::class, 'me']);
 
-Route::prefix('account')->middleware(['auth:sanctum', 'role:restaurant_owner|root'])->group(function () use ($accountResources) {
+
+Route::prefix('account')->middleware(['auth:sanctum', 'restaurant.team', 'account.permission'])->group(function () use ($accountResources) {
+    Route::get('me', [AuthController::class, 'me']);
     Route::apiResources($accountResources);
 
     Route::prefix('destroy')->group(function () use ($accountResources) {
@@ -38,7 +46,15 @@ Route::prefix('account')->middleware(['auth:sanctum', 'role:restaurant_owner|roo
     });
 });
 
-Route::prefix('site')->middleware(['web'])->group(function () {
+Route::prefix('site')->group(function () {
     Route::get('restaurants/{slug}', [SiteRestaurantController::class, 'show']);
     Route::get('restaurants/{slug}/news', [SiteRestaurantController::class, 'news']);
+    Route::get('restaurants/{slug}/news/{newsSlug}', [SiteRestaurantController::class, 'newsItem']);
+    Route::get('restaurants/{slug}/events', [SiteRestaurantController::class, 'events']);
+    Route::get('restaurants/{slug}/events/{eventSlug}', [SiteRestaurantController::class, 'event']);
+    Route::post('likes', [LikeController::class, 'store']);
+    Route::delete('likes', [LikeController::class, 'destroy']);
+    Route::post('miniapp/restaurants/{slug}/auth', [MiniAppAuthController::class, 'auth']);
 });
+
+Route::post('telegram/webhook/{restaurant}', [TelegramWebhookController::class, 'handle']);

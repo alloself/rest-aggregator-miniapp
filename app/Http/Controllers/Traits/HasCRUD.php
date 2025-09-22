@@ -13,6 +13,11 @@ trait HasCRUD
     abstract public function model(): string;
 
     /**
+     * Абстрактный метод для получения класса ресурса
+     */
+    abstract public function resource(): string;
+
+    /**
      * Проверка доступности действия
      */
     public function hasAction(string $action): bool
@@ -28,21 +33,6 @@ trait HasCRUD
         return $this->actions ?? [];
     }
 
-    /**
-     * Проверка и выполнение действия если оно доступно
-     */
-    public function executeActionIfAllowed(string $action, ...$parameters)
-    {
-        if (!$this->hasAction($action)) {
-            return response()->json(['message' => "Method {$action} is not allowed for this controller"], 405);
-        }
-
-        if (!method_exists($this, $action)) {
-            return response()->json(['message' => "Method {$action} is not implemented"], 500);
-        }
-
-        return $this->{$action}(...$parameters);
-    }
 
     /**
      * Получение списка сущностей
@@ -65,7 +55,8 @@ trait HasCRUD
             ? $this->model()::getPaginateList($request->all(), $relations)
             : $this->model()::getList($request->all(), $relations);
 
-        return $data;
+        $resourceClass = $this->resource();
+        return $resourceClass::collection($data);
     }
 
     /**
@@ -80,8 +71,9 @@ trait HasCRUD
         return DB::transaction(function () use ($request) {
             $relations = $request->input('relations', []);
             $entity = $this->model()::createEntity($request->all(), $relations);
-            
-            return $entity;
+
+            $resourceClass = $this->resource();
+            return new $resourceClass($entity);
         });
     }
 
@@ -105,7 +97,8 @@ trait HasCRUD
             $relations
         );
 
-        return $entity;
+        $resourceClass = $this->resource();
+        return new $resourceClass($entity);
     }
 
     /**
@@ -123,7 +116,8 @@ trait HasCRUD
             $relations = $request->input('relations', []);
 
             $entity->updateEntity($request->all(), $relations);
-            return $entity;
+            $resourceClass = $this->resource();
+            return new $resourceClass($entity);
         });
     }
 
