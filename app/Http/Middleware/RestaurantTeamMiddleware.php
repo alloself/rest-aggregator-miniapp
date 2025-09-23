@@ -5,9 +5,10 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Str;
+use App\Models\Restaurant;
 
 class RestaurantTeamMiddleware
 {
@@ -20,8 +21,15 @@ class RestaurantTeamMiddleware
     {
         if (Auth::check()) {
             if ($request->route('restaurant')) {
-                $candidate = (string) $request->route('restaurant');
-                $restaurantId = $this->normalizeRestaurantId($candidate);
+                $param = $request->route('restaurant');
+                $restaurantId = null;
+
+                if ($param instanceof Restaurant) {
+                    $restaurantId = (string) $param->getKey();
+                } elseif (is_string($param) && Str::isUuid($param)) {
+                    $restaurantId = $param;
+                }
+
                 if ($restaurantId) {
                     setPermissionsTeamId($restaurantId);
                     session(['active_restaurant_id' => $restaurantId]);
@@ -52,21 +60,4 @@ class RestaurantTeamMiddleware
         return $next($request);
     }
 
-    /**
-     * Преобразует входящее значение (UUID либо slug ресторана) в UUID ресторана.
-     * Возвращает UUID либо null, если ресторан не найден.
-     */
-    private function normalizeRestaurantId(string $value): ?string
-    {
-        if ($value === '') {
-            return null;
-        }
-
-        if (Str::isUuid($value)) {
-            return $value;
-        }
-
-        $id = DB::table('restaurants')->where('slug', $value)->value('id');
-        return $id ? (string) $id : null;
-    }
 }
