@@ -42,16 +42,8 @@ class RestaurantTeamMiddleware
                 setPermissionsTeamId(session('active_restaurant_id'));
             }
 
-            // 5) если всё ещё нет контекста — берём первый ресторан пользователя (через pivot ресторанов)
-            if (! getPermissionsTeamId()) {
-                $firstRestaurantId = DB::table('restaurant_user')
-                    ->where('user_id', Auth::id())
-                    ->value('restaurant_id');
-
-                if ($firstRestaurantId) {
-                    setPermissionsTeamId($firstRestaurantId);
-                    session(['active_restaurant_id' => $firstRestaurantId]);
-                }
+            if (!getPermissionsTeamId()) {
+                abort(428, 'Active restaurant context is required');
             }
         }
 
