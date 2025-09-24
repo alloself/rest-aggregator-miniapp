@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary()->unique();
             $table->string('slug');
             $table->string('title');
-            $table->string('subtitle');
+            $table->string('subtitle')->nullable();
             $table->datetime('start_at');
             $table->decimal('price', 10, 2)->nullable();
             $table->boolean('is_sold_out')->default(false);
