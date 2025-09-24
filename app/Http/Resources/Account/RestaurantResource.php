@@ -30,6 +30,7 @@ class RestaurantResource extends JsonResource
             'news' => NewsResource::collection($this->whenLoaded('news')),
             'events' => EventResource::collection($this->whenLoaded('events')),
             'categories' => CategoryResource::collection($this->whenLoaded('categories')),
+            'telegram_bot_token' => $this->telegram_bot_token,
         ];
     }
 }
