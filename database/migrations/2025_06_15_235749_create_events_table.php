@@ -19,7 +19,7 @@ return new class extends Migration
             $table->datetime('start_at');
             $table->decimal('price', 10, 2)->nullable();
             $table->boolean('is_sold_out')->default(false);
-            $table->longText('description');
+            $table->longText('description')->nullable();
 
             $table->uuid('restaurant_id');
             $table->foreign('restaurant_id')->references('id')->on('restaurants');

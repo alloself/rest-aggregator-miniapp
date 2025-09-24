@@ -222,6 +222,11 @@ export const useRestaurantDetailFormFields = (props: { id?: string }) => {
         ],
         detailComponent: {
           component: EventsDetail,
+          props: {
+            initialValues: {
+              restaurant_id: props.id,
+            },
+          },
         },
       },
       key: 'events',
