@@ -216,7 +216,7 @@ class WebhookController extends Controller
         // Приветственное сообщение
         $greeting = $this->buildWelcomeMessage($restaurant);
         if ($invitedByText !== '') {
-            $greeting = $invitedByText . "\n\n" . $greeting;
+            $greeting = implode("\n\n", [$invitedByText, $greeting]);
         }
 
         // Отправляем приветственное сообщение БЕЗ клавиатуры
@@ -247,7 +247,14 @@ class WebhookController extends Controller
      */
     private function sendContactRequestMessage(int $chatId, TelegramBotService $service, Restaurant $restaurant): void
     {
-        $contactMessage = "Поделитесь своими контактами и друзьями, чтобы:\n📱 Мы могли связаться с вами для подтверждения брони\n🔔 Отправлять уведомления о специальных предложениях\n👥 Помочь вам найти друзей в приложении!\n\n\Это необходимо сделать один раз — и отметки Repeat ваших друзей будут видны во всех приложениях Eat.Drink.Repeat.";
+        $contactMessage = implode("\n", [
+            'Поделитесь своими контактами и друзьями, чтобы:',
+            '📱 Мы могли связаться с вами для подтверждения брони',
+            '🔔 Отправлять уведомления о специальных предложениях',
+            '👥 Помочь вам найти друзей в приложении!',
+            '',
+            'Это необходимо сделать один раз — и отметки Repeat ваших друзей будут видны во всех приложениях Eat.Drink.Repeat.',
+        ]);
 
         // Отправляем сообщение БЕЗ кнопок
         $service->sendMessage([
@@ -341,14 +348,19 @@ class WebhookController extends Controller
         $results = [];
 
         // Создаем результат с информацией о ресторане
+        $descriptionText = $restaurant->description ? strip_tags($restaurant->description) : 'Добро пожаловать в наш ресторан!';
+        $inlineMessageText = implode("\n", [
+            "🏪 *{$restaurant->name}*",
+            '',
+            $descriptionText,
+        ]);
         $results[] = [
             'type' => 'article',
             'id' => 'restaurant_info',
             'title' => $restaurant->name,
             'description' => $restaurant->subtitle ?? 'Информация о ресторане',
             'input_message_content' => [
-                'message_text' => "🏪 *{$restaurant->name}*\n\n"
-                    . ($restaurant->description ? strip_tags($restaurant->description) : 'Добро пожаловать в наш ресторан!'),
+                'message_text' => $inlineMessageText,
                 'parse_mode' => 'Markdown',
             ],
         ];
@@ -403,10 +415,14 @@ class WebhookController extends Controller
     private function buildWelcomeMessage(Restaurant $restaurant): string
     {
         // Используем фиксированный текст приветствия вместо поля welcome_message
-        return "Привет! В этом приложении — все самое важное о {$restaurant->name}: меню, фото, адрес, актуальные новости, анонсы событий и бронирование.\n
-        <strong>Откройте приложение</strong>, чтобы увидеть, сколько друзей поставили Repeat.\n
-        🖇️ <strong>Repeat</strong> — это отметка о том, что заведение понравилось и сюда хочется вернуться.\n
-        Её видят ваши контакты — удобный способ поделиться своим выбором и узнать, куда ходят друзья.\n";
+        return implode("\n", [
+            "Привет! В этом приложении — все самое важное о {$restaurant->name}: меню, фото, адрес, актуальные новости, анонсы событий и бронирование.",
+            '',
+            '<strong>Откройте приложение</strong>, чтобы увидеть, сколько друзей поставили Repeat.',
+            '',
+            '🖇️ <strong>Repeat</strong> — это отметка о том, что заведение понравилось и сюда хочется вернуться.',
+            'Её видят ваши контакты — удобный способ поделиться своим выбором и узнать, куда ходят друзья.',
+        ]) . "\n";
     }
 
     /**
@@ -878,18 +894,22 @@ class WebhookController extends Controller
             // Отправляем подтверждение
             $usersCount = count($users);
             $friendsWord = $this->pluralizeRussian($usersCount, 'друге', 'друзьях', 'друзьях');
-            $confirmationText = "✅ Спасибо! Получена информация о {$usersCount} {$friendsWord} из вашей адресной книги.";
-
+            $lines = [
+                "✅ Спасибо! Получена информация о {$usersCount} {$friendsWord} из вашей адресной книги.",
+            ];
 
             if ($usersCount > 0) {
-                $confirmationText .= "\n\n📋 Список переданных друзей:\n";
+                $lines[] = '';
+                $lines[] = '📋 Список переданных друзей:';
                 foreach ($users as $index => $sharedUser) {
                     $name = ($sharedUser['first_name'] ?? '') .
                         (isset($sharedUser['last_name']) ? ' ' . $sharedUser['last_name'] : '');
                     $username = isset($sharedUser['username']) ? ' (@' . $sharedUser['username'] . ')' : '';
-                    $confirmationText .= ($index + 1) . ". {$name}{$username}\n";
+                    $lines[] = ($index + 1) . ". {$name}{$username}";
                 }
             }
+
+            $confirmationText = implode("\n", $lines);
 
             $service->sendMessage([
                 'chat_id' => $chatId,
@@ -929,11 +949,15 @@ class WebhookController extends Controller
     {
         $directSent = false;
         try {
-            $greetingText = "Привет" . ($invitedDisplayName ? ", {$invitedDisplayName}" : "") . "! {$inviterName} пригласил(а) вас в {$restaurant->name}. Откройте приложение, чтобы посмотреть меню, фото, новости и события, а также узнать, кто из друзей поставил Repeat.";
+            $lines = [
+                'Привет' . ($invitedDisplayName ? ", {$invitedDisplayName}" : '') . "! {$inviterName} пригласил(а) вас в {$restaurant->name}.",
+                'Откройте приложение, чтобы посмотреть меню, фото, новости и события,',
+                'а также узнать, кто из друзей поставил Repeat.',
+            ];
 
             $service->sendMessage([
                 'chat_id' => $invitedTelegramId,
-                'text' => $greetingText,
+                'text' => implode("\n", $lines),
             ]);
 
             Log::info('✅ Отправлено приветственное сообщение приглашенному пользователю', [
@@ -973,15 +997,22 @@ class WebhookController extends Controller
         }
 
         $payload = 'r' . $restaurant->id . '-i' . $inviterChatId;
-        $startLink = $botUsername ? ("https://t.me/{$botUsername}?start={$payload}") : null;
-        $fallbackText = $directSent
-            ? ('На всякий случай — вот ссылка для друга: ' . ($startLink ?? ''))
-            : ('Мы не смогли написать приглашенному пользователю. Попросите его начать чат с ботом' . ($startLink ? ": {$startLink}" : '.'));
+        $startLink = $botUsername ? "https://t.me/{$botUsername}?start={$payload}" : null;
+
+        $fallbackLines = $directSent
+            ? [
+                'На всякий случай — вот ссылка для друга:',
+                $startLink ?? '',
+            ]
+            : array_filter([
+                'Мы не смогли написать приглашенному пользователю. Попросите его начать чат с ботом.',
+                $startLink ? "Ссылка: {$startLink}" : null,
+            ]);
 
         try {
             $service->sendMessage([
                 'chat_id' => $inviterChatId,
-                'text' => $fallbackText,
+                'text' => implode("\n", $fallbackLines),
             ]);
         } catch (Throwable $e) {
             Log::warning('⚠️ Не удалось отправить fallback-сообщение приглашателю', [
@@ -1012,79 +1043,6 @@ class WebhookController extends Controller
                 return $few;
             default:
                 return $many;
-        }
-    }
-
-    /**
-     * Извлечь URL аватара из данных пошаренного пользователя
-     */
-    private function extractAvatarFromSharedUser(array $sharedUser, int $userId, TelegramBotService $service): ?string
-    {
-        try {
-            Log::info('🖼️ ОТЛАДКА: Начало извлечения аватара из пошаренных данных', [
-                'user_id' => $userId,
-                'has_photo' => isset($sharedUser['photo']),
-                'step' => 'start_extract_avatar_from_shared'
-            ]);
-
-            // Проверяем, есть ли фото в данных пошаренного пользователя
-            if (isset($sharedUser['photo']) && is_array($sharedUser['photo'])) {
-                $photos = $sharedUser['photo'];
-
-                Log::info('🖼️ ОТЛАДКА: Найдены фотографии в пошаренных данных', [
-                    'user_id' => $userId,
-                    'photos_count' => count($photos),
-                    'photos' => $photos,
-                    'step' => 'found_photos_in_shared_data'
-                ]);
-
-                // Берем фото с самым высоким разрешением (последнее в массиве)
-                $highestResPhoto = end($photos);
-
-                if (isset($highestResPhoto['file_id'])) {
-                    Log::info('🖼️ ОТЛАДКА: Выбрано фото высокого разрешения', [
-                        'user_id' => $userId,
-                        'file_id' => $highestResPhoto['file_id'],
-                        'width' => $highestResPhoto['width'] ?? 'unknown',
-                        'height' => $highestResPhoto['height'] ?? 'unknown',
-                        'step' => 'selected_high_res_photo'
-                    ]);
-
-                    // Получаем информацию о файле через Telegram API
-                    $fileResponse = $service->getFile([
-                        'file_id' => $highestResPhoto['file_id']
-                    ]);
-
-                    if (isset($fileResponse['result']['file_path'])) {
-                        $avatarUrl = $service->getFileUrl($fileResponse['result']['file_path']);
-
-                        Log::info('✅ ОТЛАДКА: Получен URL аватара из пошаренных данных', [
-                            'user_id' => $userId,
-                            'avatar_url' => $avatarUrl,
-                            'file_path' => $fileResponse['result']['file_path'],
-                            'step' => 'got_avatar_url_from_shared_data'
-                        ]);
-
-                        return $avatarUrl;
-                    }
-                }
-            }
-
-            // Если нет фото в пошаренных данных, пытаемся получить через getUserProfilePhotos
-            Log::info('🖼️ ОТЛАДКА: Фото в пошаренных данных не найдено, пытаемся через API', [
-                'user_id' => $userId,
-                'step' => 'fallback_to_api'
-            ]);
-
-            return $this->getUserAvatarUrl($userId, $service);
-        } catch (Throwable $e) {
-            Log::error('❌ ОТЛАДКА: Ошибка извлечения аватара из пошаренных данных', [
-                'error' => $e->getMessage(),
-                'user_id' => $userId,
-                'step' => 'error_extract_avatar_from_shared'
-            ]);
-
-            return null;
         }
     }
 
@@ -1366,9 +1324,18 @@ class WebhookController extends Controller
                 'step' => 'sending_confirmation'
             ]);
 
+            $lines = [
+                '✅ Спасибо! Контакт сохранен.',
+            ];
+            if (!empty($messageText)) {
+                $lines[] = '';
+                $lines[] = $messageText;
+            }
+            $text = implode("\n", $lines);
+
             $service->sendMessage([
                 'chat_id' => $chatId,
-                'text' => '✅ Спасибо! Контакт сохранен.',
+                'text' => $text,
             ]);
 
             Log::info('📞 ОТЛАДКА: Подтверждение отправлено', [
@@ -1491,7 +1458,16 @@ class WebhookController extends Controller
                 'step' => 'sending_keyboard_message'
             ]);
 
-            $text = $messageText ?? "🎉 Отлично! Регистрация завершена!\n\n📱 Поделитесь контактами для уведомлений\n👥 Найдите друзей через адресную книгу";
+            $lines = [
+                '🎉 Отлично! Регистрация завершена!',
+                '',
+                '📱 Поделитесь контактами для уведомлений',
+                '👥 Найдите друзей через адресную книгу',
+            ];
+            if ($messageText !== null) {
+                $lines = [$messageText];
+            }
+            $text = implode("\n", $lines);
 
             $result = $service->sendMessage([
                 'chat_id' => $chatId,
@@ -1555,9 +1531,16 @@ class WebhookController extends Controller
             $payload = 'r' . $restaurant->id . '-i' . $chatId;
             $inviteLink = 'https://t.me/' . $botUsername . '?start=' . $payload;
 
+            $lines = [
+                '🔗 Ваша персональная ссылка-приглашение:',
+                $inviteLink,
+                '',
+                'Отправьте её другу. Как только он запустит бота, он появится у вас в друзьях, и вы увидите его отметки Repeat во всех приложениях by Eat.Drink.Repeat.',
+            ];
+
             $service->sendMessage([
                 'chat_id' => $chatId,
-                'text' => "🔗 Ваша персональная ссылка-приглашение:\n" . $inviteLink . "\n\nОтправьте её другу. Как только он запустит бота, он появится у вас в друзьях, и вы увидите его отметки Repeat во всех приложениях by Eat.Drink.Repeat.",
+                'text' => implode("\n", $lines),
             ]);
 
             Log::info('Сформирована ссылка-приглашение', [
