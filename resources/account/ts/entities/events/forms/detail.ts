@@ -88,7 +88,7 @@ export const useEventsDetailFormFields = () => {
     },
     {
       component: BaseNumberInput,
-      key: 'price ',
+      key: 'price',
       props: {
         type: 'number',
         label: 'Цена',
