@@ -1,5 +1,5 @@
 .event-card {
-    @apply cursor-pointer transition-all relative overflow-hidden mx-[16px] shadow-[var(--box-shadow-card)];
+    @apply cursor-pointer transition-all relative overflow-hidden mx-[16px] shadow-[var(--box-shadow-card)] p-0;
 }
 
 .event-card__layout {
