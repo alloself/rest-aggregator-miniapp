@@ -168,7 +168,7 @@
     ]
   },
   "resources/account/css/app.css": {
-    "file": "assets/app-BwyMX7rT.css",
+    "file": "assets/app-BFq8dNPg.css",
     "src": "resources/account/css/app.css",
     "isEntry": true,
     "names": [
@@ -176,7 +176,7 @@
     ]
   },
   "resources/account/ts/main.ts": {
-    "file": "assets/main-Ota_6RDp.js",
+    "file": "assets/main-BSqgeUvr.js",
     "name": "main",
     "src": "resources/account/ts/main.ts",
     "isEntry": true,
@@ -197,7 +197,7 @@
     ]
   },
   "resources/account/ts/pages/Login.vue": {
-    "file": "assets/Login-BtYrfcIt.js",
+    "file": "assets/Login-CndzBL8z.js",
     "name": "Login",
     "src": "resources/account/ts/pages/Login.vue",
     "isDynamicEntry": true,
@@ -218,7 +218,7 @@
     ]
   },
   "resources/account/ts/pages/Restaurant/Detail.vue": {
-    "file": "assets/Detail-C23FADLV.js",
+    "file": "assets/Detail-DZM_DeIE.js",
     "name": "Detail",
     "src": "resources/account/ts/pages/Restaurant/Detail.vue",
     "isDynamicEntry": true,
@@ -256,7 +256,7 @@
     ]
   },
   "resources/account/ts/widgets/Layout/ui/Layout.vue": {
-    "file": "assets/Layout-aZKksL4I.js",
+    "file": "assets/Layout-C0Dfexaz.js",
     "name": "Layout",
     "src": "resources/account/ts/widgets/Layout/ui/Layout.vue",
     "isDynamicEntry": true,
@@ -271,7 +271,7 @@
     ]
   },
   "resources/admin/css/app.css": {
-    "file": "assets/app-DedvZTwE.css",
+    "file": "assets/app-CPGmtpVw.css",
     "src": "resources/admin/css/app.css",
     "isEntry": true,
     "names": [
@@ -288,7 +288,7 @@
     ]
   },
   "resources/site/css/app.css": {
-    "file": "assets/app-DuC-13uY.css",
+    "file": "assets/app-CYtv-kz5.css",
     "src": "resources/site/css/app.css",
     "isEntry": true,
     "names": [
