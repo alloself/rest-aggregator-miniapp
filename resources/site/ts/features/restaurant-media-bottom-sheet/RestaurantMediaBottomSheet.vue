@@ -69,7 +69,7 @@ const mediaTitle = computed(() => {
     case 'menu':
       return `Меню ${baseName}`;
     case 'bar':
-      return `Карта бара ${baseName}`;
+      return `Барная карта ${baseName}`;
     default:
       return `Медиа ${baseName}`;
   }
@@ -82,7 +82,7 @@ const emptyStateText = computed(() => {
     case 'menu':
       return 'Меню ресторана пока не добавлено';
     case 'bar':
-      return 'Карта бара пока не добавлена';
+      return 'Барная карта пока не добавлена';
     default:
       return 'Медиа файлы не найдены';
   }

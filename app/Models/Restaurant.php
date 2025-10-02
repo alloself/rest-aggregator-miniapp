@@ -35,6 +35,16 @@ class Restaurant extends BaseModel
         'subtitle',
         'welcome_message',
         'bot_username',
+        // SEO
+        'seo_title',
+        'seo_description',
+        'seo_keywords',
+        'seo_robots',
+        'seo_canonical_url',
+        // Open Graph
+        'og_title',
+        'og_description',
+        'og_image_url',
     ];
 
 

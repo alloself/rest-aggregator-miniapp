@@ -32,6 +32,16 @@ export interface RestaurantResourceData {
   phone?: string | null
   bot_username: string
   yandex_metrica_code?: string | null
+  // seo
+  seo_title?: string | null
+  seo_description?: string | null
+  seo_keywords?: string | null
+  seo_robots?: string | null
+  seo_canonical_url?: string | null
+  // og
+  og_title?: string | null
+  og_description?: string | null
+  og_image_url?: string | null
   files?: FileResourceData[]
   images?: FileResourceData[]
   categories?: CategoryResourceData[]

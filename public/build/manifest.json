@@ -296,7 +296,7 @@
     ]
   },
   "resources/site/ts/app/main.ts": {
-    "file": "assets/main-CGx6PzO2.js",
+    "file": "assets/main-BeUemw29.js",
     "name": "main",
     "src": "resources/site/ts/app/main.ts",
     "isEntry": true,
@@ -315,7 +315,7 @@
     ]
   },
   "resources/site/ts/pages/RestaurantPage.vue": {
-    "file": "assets/RestaurantPage-C8Cn1omX.js",
+    "file": "assets/RestaurantPage-TC15UmrC.js",
     "name": "RestaurantPage",
     "src": "resources/site/ts/pages/RestaurantPage.vue",
     "isDynamicEntry": true,

@@ -25,6 +25,16 @@ class RestaurantResource extends JsonResource
             'average_receipt' => $this->average_receipt,
             'yandex_metrica_code' => $this->yandex_metrica_code,
             'bot_username' => $this->bot_username,
+            // SEO
+            'seo_title' => $this->seo_title,
+            'seo_description' => $this->seo_description,
+            'seo_keywords' => $this->seo_keywords,
+            'seo_robots' => $this->seo_robots,
+            'seo_canonical_url' => $this->seo_canonical_url,
+            // Open Graph
+            'og_title' => $this->og_title,
+            'og_description' => $this->og_description,
+            'og_image_url' => $this->og_image_url,
             'files' => FileResource::collection($this->whenLoaded('files')),
             'images' => FileResource::collection($this->whenLoaded('images')),
             'news' => NewsResource::collection($this->whenLoaded('news')),

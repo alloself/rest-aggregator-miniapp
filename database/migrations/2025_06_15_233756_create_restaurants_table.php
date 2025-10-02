@@ -25,6 +25,16 @@ return new class extends Migration
             $table->longText('welcome_message')->nullable();
             $table->json('working_hours')->nullable();
             $table->string('yandex_metrica_code')->nullable();
+            // SEO
+            $table->string('seo_title')->nullable();
+            $table->longText('seo_description')->nullable();
+            $table->longText('seo_keywords')->nullable();
+            $table->string('seo_robots')->nullable();
+            $table->string('seo_canonical_url')->nullable();
+            // Open Graph
+            $table->string('og_title')->nullable();
+            $table->longText('og_description')->nullable();
+            $table->string('og_image_url')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
