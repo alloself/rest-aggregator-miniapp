@@ -19,12 +19,12 @@
 }
 
 .restaurant-card__title {
-    @apply text-xl font-semibold text-gray-900 leading-tight mb-3 font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+    @apply text-xl font-semibold text-gray-900 leading-tight mb-3 font-['SF_Pro_Display',-apple-system,BlinkMacSystemFont,sans-serif];
     letter-spacing: -0.03em;
 }
 
 .restaurant-card__description {
-    @apply text-[17px] text-black leading-tight font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+    @apply text-[17px] text-black leading-tight font-['SF_Pro_Display',-apple-system,BlinkMacSystemFont,sans-serif];
     letter-spacing: -0.03em;
 }
 
@@ -49,12 +49,12 @@
 }
 
 .restaurant-card__detail-text {
-    @apply text-[15px] text-black font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+    @apply text-[15px] text-black font-['SF_Pro_Display',-apple-system,BlinkMacSystemFont,sans-serif];
     letter-spacing: -0.05em;
 }
 
 .restaurant-card__detail-schedule {
-    @apply text-[15px] text-black leading-tight font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+    @apply text-[15px] text-black leading-tight font-['SF_Pro_Display',-apple-system,BlinkMacSystemFont,sans-serif];
     letter-spacing: -0.05em;
 }
 
@@ -67,7 +67,7 @@
 }
 
 .restaurant-card__full-description-text {
-    @apply text-[15px] text-black text-center leading-tight font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+    @apply text-[15px] text-black text-center leading-tight font-['SF_Pro_Display',-apple-system,BlinkMacSystemFont,sans-serif];
     letter-spacing: -0.03em;
 }
 
@@ -76,6 +76,6 @@
 }
 
 .restaurant-card__footer-text {
-    @apply text-base font-medium leading-tight font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+    @apply text-base font-medium leading-tight font-['SF_Pro_Display',-apple-system,BlinkMacSystemFont,sans-serif];
     color: rgba(0, 0, 0, 0.35);
 }

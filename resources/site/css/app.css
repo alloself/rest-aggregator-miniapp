@@ -1,3 +1,4 @@
+@import './fonts.css';
 @import 'tailwindcss';
 @import 'tailwindcss-primeui';
 
@@ -166,6 +167,7 @@
     --transition-slow: 0.3s ease-in-out;
 
     /* Типографика */
+    --font-family-sans: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
     --font-size-heading-lg: 20px;
     --font-size-heading-md: 18px;
     --font-size-heading-sm: 16px;

@@ -81,21 +81,21 @@ export const designTokens = {
         fontWeight: '600',
         lineHeight: '1.3em',
         letterSpacing: '0px',
-        fontFamily: 'Inter',
+        fontFamily: 'SF Pro Display',
       },
       medium: {
         fontSize: '18px', // style_991H6N, style_ZJQTQD
         fontWeight: '600',
         lineHeight: '1em',
         letterSpacing: '-4%',
-        fontFamily: 'Inter',
+        fontFamily: 'SF Pro Display',
       },
       small: {
         fontSize: '16px', // style_8U1PQJ
         fontWeight: '500',
         lineHeight: '1.1em',
         letterSpacing: '-1%',
-        fontFamily: 'Inter',
+        fontFamily: 'SF Pro Display',
       },
     },
 
@@ -106,35 +106,35 @@ export const designTokens = {
         fontWeight: '400',
         lineHeight: '1.3em',
         letterSpacing: '-3%',
-        fontFamily: 'Inter',
+        fontFamily: 'SF Pro Display',
       },
       medium: {
         fontSize: '16px', // style_INPN3S, style_IEY2MM
         fontWeight: '500',
         lineHeight: '1.3em',
         letterSpacing: '0px',
-        fontFamily: 'Inter',
+        fontFamily: 'SF Pro Display',
       },
       default: {
         fontSize: '15px', // style_ATDVJF, style_US8IR9, style_YPBUFV
         fontWeight: '400',
         lineHeight: '1.44em',
         letterSpacing: '-6%',
-        fontFamily: 'Inter',
+        fontFamily: 'SF Pro Display',
       },
       small: {
         fontSize: '14px', // style_MVJOW8, style_CL3WPL, style_4W79AS
         fontWeight: '400',
         lineHeight: '1.1em',
         letterSpacing: '-2%',
-        fontFamily: 'Inter',
+        fontFamily: 'SF Pro Display',
       },
       tiny: {
         fontSize: '12px', // style_A7TYO8
         fontWeight: '500',
         lineHeight: '0.95em',
         letterSpacing: '-1%',
-        fontFamily: 'Inter',
+        fontFamily: 'SF Pro Display',
       },
     },
 
@@ -145,14 +145,14 @@ export const designTokens = {
         fontWeight: '500',
         lineHeight: '1em',
         letterSpacing: '-2%',
-        fontFamily: 'Inter',
+        fontFamily: 'SF Pro Display',
       },
       bold: {
         fontSize: '15px', // style_3335PF
         fontWeight: '600',
         lineHeight: '1.3em',
         letterSpacing: '-3%',
-        fontFamily: 'Inter',
+        fontFamily: 'SF Pro Display',
       },
     },
   },

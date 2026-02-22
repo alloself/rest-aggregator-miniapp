@@ -262,7 +262,7 @@ const handleShare = async () => {
 }
 
 .share-bottom-sheet__action-text {
-  font-family: Inter, sans-serif;
+  font-family: "SF Pro Display", sans-serif;
   font-weight: 500;
   font-size: 12px;
   line-height: 1.1;

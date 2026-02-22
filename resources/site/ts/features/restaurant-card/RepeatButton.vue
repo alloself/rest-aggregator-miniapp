@@ -205,7 +205,7 @@ const additionalFriendsCount = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: Inter, sans-serif;
+  font-family: "SF Pro Display", sans-serif;
   font-weight: 600;
   font-size: 10px;
   line-height: 1.35;
@@ -225,7 +225,7 @@ const additionalFriendsCount = computed(() => {
   left: 40px;
   top: 50%;
   transform: translateY(-50%);
-  font-family: Inter, sans-serif;
+  font-family: "SF Pro Display", sans-serif;
   font-weight: 500;
   font-size: 10px;
   line-height: 1.35;
@@ -284,7 +284,7 @@ const additionalFriendsCount = computed(() => {
 }
 
 .repeat-button__avatar-initials {
-  font-family: Inter, sans-serif;
+  font-family: "SF Pro Display", sans-serif;
   font-weight: 600;
   font-size: 12px;
   line-height: 1;
@@ -305,7 +305,7 @@ const additionalFriendsCount = computed(() => {
 }
 
 .repeat-button__count {
-  font-family: Inter, sans-serif;
+  font-family: "SF Pro Display", sans-serif;
   font-weight: 600;
   font-size: 14px;
   line-height: 1.35;

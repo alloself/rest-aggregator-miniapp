@@ -1,5 +1,6 @@
 .restaurant-page {
     @apply w-full mx-auto min-h-screen overflow-x-hidden bg-[var(--color-bg-primary)];
+    font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .restaurant-page__loading,

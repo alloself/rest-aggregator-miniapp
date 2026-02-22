@@ -3,7 +3,7 @@
 }
 
 .chef-recommendations__title {
-    @apply text-lg font-semibold text-black mb-4 px-4 font-['Inter',-apple-system,BlinkMacSystemFont,sans-serif];
+    @apply text-lg font-semibold text-black mb-4 px-4 font-['SF_Pro_Display',-apple-system,BlinkMacSystemFont,sans-serif];
     letter-spacing: -0.04em;
 }
 

@@ -156,7 +156,7 @@ const getDisplayName = (user: UserOrFriend): string => {
 }
 
 .friends-bottom-sheet__title {
-  font-family: Inter, sans-serif;
+  font-family: "SF Pro Display", sans-serif;
   font-weight: 600;
   font-size: 20px;
   line-height: 1.35;
@@ -204,7 +204,7 @@ const getDisplayName = (user: UserOrFriend): string => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: Inter, sans-serif;
+  font-family: "SF Pro Display", sans-serif;
   font-weight: 600;
   font-size: 16px;
   color: #FFFFFF;
@@ -223,7 +223,7 @@ const getDisplayName = (user: UserOrFriend): string => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: Inter, sans-serif;
+  font-family: "SF Pro Display", sans-serif;
   font-weight: 600;
   font-size: 6px;
   line-height: 1.35;
@@ -234,7 +234,7 @@ const getDisplayName = (user: UserOrFriend): string => {
 }
 
 .friends-bottom-sheet__username {
-  font-family: Inter, sans-serif;
+  font-family: "SF Pro Display", sans-serif;
   font-weight: 600;
   font-size: 16px;
   line-height: 1.35;
