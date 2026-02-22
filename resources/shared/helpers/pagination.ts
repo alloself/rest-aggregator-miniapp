@@ -45,7 +45,7 @@ export function usePagination<T>(
     savedSlug.value = slug;
 
     try {
-      const response = await client.get<PaginatedResponse<T>>(`api/site/restaurants/${slug}/${endpoint}`, {
+      const response = await client.get<PaginatedResponse<T>>(`/api/site/restaurants/${slug}/${endpoint}`, {
         params: { page: page.value, per_page: perPage.value },
       });
       items.value = response.data.data;
@@ -79,7 +79,7 @@ export function usePagination<T>(
     error.value = null;
     try {
       const nextPage = page.value + 1;
-      const response = await client.get<PaginatedResponse<T>>(`api/site/restaurants/${savedSlug.value}/${endpoint}`, {
+      const response = await client.get<PaginatedResponse<T>>(`/api/site/restaurants/${savedSlug.value}/${endpoint}`, {
         params: { page: nextPage, per_page: perPage.value },
       });
       items.value = [...items.value, ...response.data.data];

@@ -30,7 +30,7 @@ export const useEventStore = defineStore('event', () => {
     event.value = null;
 
     try {
-      const response = await client.get<Event>(`api/site/restaurants/${slug}/events/${event_slug}`);
+      const response = await client.get<Event>(`/api/site/restaurants/${slug}/events/${event_slug}`);
       event.value = response.data;
     } catch (e: unknown) {
       event.value = null;

@@ -16,7 +16,7 @@ export const useRestaurantStore = defineStore('restaurant', () => {
     restaurant.value = null;
 
     try {
-      const response = await client.get<RestaurantResourceData>(`api/site/restaurants/${slug}`);
+      const response = await client.get<RestaurantResourceData>(`/api/site/restaurants/${slug}`);
       restaurant.value = response.data;
     } catch (e: unknown) {
       restaurant.value = null;

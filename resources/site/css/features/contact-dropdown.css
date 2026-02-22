@@ -15,7 +15,7 @@
 }
 
 .contact-dropdown__menu {
-    @apply absolute right-0 top-[calc(100%+8px)] bg-[var(--color-white-pure)] rounded-[var(--radius-small)] shadow-[var(--shadow-button)] w-[177px] min-h-[134px] z-[100] py-[var(--spacing-xs)] px-0 animate-[dropdown-appear_0.2s_ease-out];
+    @apply overflow-hidden p-0 absolute right-0 top-[calc(100%+8px)] bg-[var(--color-white-pure)] rounded-[var(--radius-small)] shadow-[var(--shadow-button)] w-[177px] min-h-[134px] z-[100] animate-[dropdown-appear_0.2s_ease-out];
 }
 
 .contact-dropdown__item {

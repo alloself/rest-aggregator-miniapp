@@ -50,7 +50,7 @@ onBeforeMount(async () => {
   error.value = null;
   news.value = null;
   try {
-    const { data } = await client.get<News>(`api/site/restaurants/${slug}/news/${newsSlug}`);
+    const { data } = await client.get<News>(`/api/site/restaurants/${slug}/news/${newsSlug}`);
     news.value = data;
   } catch (e: unknown) {
     error.value = 'Не удалось загрузить новость';
