@@ -12,6 +12,8 @@ use App\Http\Controllers\AggregatorController;
 
 Route::get('/', [AggregatorController::class, 'site'])->name('site');
 
+Route::get('/legal/{any?}', [AggregatorController::class, 'site'])->where('any', '.*')->name('site.legal');
+
 Route::get('/restaurant/{any?}', [AggregatorController::class, 'site'])->where('any', '.*')->name('site');
 
 Route::get('/account/{any?}', [AggregatorController::class, 'account'])->where('any', '.*')->name('account');

@@ -425,12 +425,19 @@ class WebhookController extends Controller
      */
     private function buildWelcomeMessage(Restaurant $restaurant, bool $openAppWithPeriod = false): string
     {
+        $baseUrl = rtrim((string) config('app.url'), '/');
+        $slug = $restaurant->slug;
+        $escapedName = htmlspecialchars($restaurant->name, ENT_QUOTES, 'UTF-8');
+
+        $consentUrl = "{$baseUrl}/legal/personal-data?restaurant={$slug}";
+        $privacyUrl = "{$baseUrl}/legal/privacy?restaurant={$slug}";
+        $privacyText = 'Продолжая использовать чат-бот, вы даете <a href="' . $consentUrl . '">согласие</a> на обработку ваших персональных данных в соответствии с условиями <a href="' . $privacyUrl . '">политики конфиденциальности</a>.';
+
         $openAppText = $openAppWithPeriod ? 'Откройте приложение.' : 'Откройте приложение';
-        $privacyText = "Продолжая использование чат-бота и Mini App ресторана {$restaurant->name}, вы подтверждаете согласие на обработку ваших персональных данных в соответствии с условиями политики конфиденциальности.";
 
         return implode("\n", [
             'Привет!',
-            "В приложении собрана вся информация о {$restaurant->name}: меню, фото, адрес, новости и бронирование.",
+            "В приложении собрана вся информация о {$escapedName}: меню, фото, адрес, новости и бронирование.",
             '',
             'Здесь можно поставить «Repeat», если вы планируете вернуться сюда ещё раз. Отметку увидят ваши друзья — так они узнают, какие места вы рекомендуете.',
             '',
