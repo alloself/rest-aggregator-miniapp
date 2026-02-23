@@ -35,6 +35,11 @@ class RestaurantResource extends JsonResource
             'og_title' => $this->og_title,
             'og_description' => $this->og_description,
             'og_image_url' => $this->og_image_url,
+            // Theme colors
+            'primary_color' => $this->primary_color ?: '#FFFEFD',
+            'secondary_color' => $this->secondary_color ?: '#EEEEEE',
+            'tertiary_color' => $this->tertiary_color ?: '#EBEBEB',
+            'background_color' => $this->background_color ?: '#FFFEFB',
             'files' => FileResource::collection($this->whenLoaded('files')),
             'images' => FileResource::collection($this->whenLoaded('images')),
             'news' => NewsResource::collection($this->whenLoaded('news')),

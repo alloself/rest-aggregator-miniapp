@@ -1,5 +1,5 @@
 .news-card {
-    @apply flex flex-col overflow-hidden mx-[16px] bg-[var(--color-white-pure)] rounded-[var(--radius-card)] shadow-[var(--box-shadow-card)];
+    @apply flex flex-col overflow-hidden mx-[16px] rounded-[var(--radius-card)] shadow-[var(--box-shadow-card)] bg-[var(--color-bg-card)];
 }
 
 .news-card__media {

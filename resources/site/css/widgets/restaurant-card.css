@@ -7,7 +7,7 @@
 }
 
 .restaurant-card__card {
-    @apply bg-white rounded-[20px] shadow-[0px_2px_4px_0px_rgba(0,0,0,0.15)] relative z-10 -mt-9 mx-4;
+    @apply rounded-[20px] shadow-[0px_2px_4px_0px_rgba(0,0,0,0.15)] relative z-10 -mt-9 mx-4 bg-[var(--color-bg-card)];
 }
 
 .restaurant-card__content {
@@ -63,7 +63,7 @@
 }
 
 .restaurant-card__full-description {
-    @apply bg-secondary rounded-b-[20px] px-[18px] pt-8 pb-6 relative -mt-2 mx-4 mb-6;
+    @apply rounded-b-[20px] px-[18px] pt-8 pb-6 relative -mt-2 mx-4 mb-6 bg-[var(--color-bg-secondary)];
 }
 
 .restaurant-card__full-description-text {

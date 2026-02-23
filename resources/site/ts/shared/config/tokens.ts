@@ -9,11 +9,11 @@ export const designTokens = {
   colors: {
     // Основной фон
     background: {
-      primary: '#FFFEFB', // fill_CKYBBK - основной фон приложения
-      secondary: '#F4F3F3', // fill_6AOEJP - фон для фото контейнеров
-      secondaryHover: '#EBEAEA', // hover состояние для secondary фона
-      secondaryActive: '#E1E0E0', // active состояние для secondary фона
-      card: '#FFFEFD', // fill_LXFTDP - фон карточек
+      primary: '#FFFEFB', // fill_GHP0VJ - основной фон приложения
+      secondary: '#EEEEEE', // fill_E1ZDQP - кнопки Меню/Бар/Фото
+      secondaryHover: '#E5E5E5', // hover состояние для secondary фона
+      secondaryActive: '#DCDCDC', // active состояние для secondary фона
+      card: '#FFFEFD', // fill_GD1MSZ - фон карточек
       overlay: 'rgba(235, 235, 235, 0.38)', // fill_LXG6D8 - полупрозрачный overlay
       disabled: 'rgba(0, 0, 0, 0.2)', // fill_PV2D36 - фон отключенных элементов
       section: '#BDBDBD', // fill_WR6U3B - фон секций
@@ -39,7 +39,7 @@ export const designTokens = {
       default: '#EEEEEE', // fill_RLS316 - стандартные кнопки и поверхности
       light: '#F2F2F1', // fill_S82JE9 - светлые поверхности
       warm: '#F8F7F5', // fill_ZT3IAY - теплая поверхность
-      cool: 'rgba(238, 238, 238, 0.5)', // fill_GJH6X1 - прохладная поверхность
+      cool: 'rgba(235, 235, 235, 0.38)', // fill_UOBLHO - область описания
       muted: 'rgba(238, 238, 238, 0.73)', // fill_FBNN2H - приглушенная поверхность
     },
 

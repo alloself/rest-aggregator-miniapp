@@ -28,6 +28,7 @@ import { onBeforeMount, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useRestaurantStore } from '../entities/restaurant';
+import { useRestaurantTheme } from '../shared/lib/composables/useRestaurantTheme';
 import RestaurantCard from '../widgets/restaurant-page/RestaurantCard.vue';
 import { useRestaurantMedia } from '../features/restaurant-media-bottom-sheet';
 import { useMiniAppStore } from '../shared/stores/miniapp';
@@ -45,6 +46,8 @@ const { openMenu, openBar, openPhotos } = useRestaurantMedia();
 const store = useRestaurantStore();
 const { restaurant, loading, error } = storeToRefs(store);
 const mini = useMiniAppStore();
+
+useRestaurantTheme(restaurant);
 
 const chefRecommendations = computed(() => {
   const categories = restaurant.value?.categories ?? [];

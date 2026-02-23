@@ -45,6 +45,11 @@ class Restaurant extends BaseModel
         'og_title',
         'og_description',
         'og_image_url',
+        // Theme colors
+        'primary_color',
+        'secondary_color',
+        'tertiary_color',
+        'background_color',
     ];
 
 

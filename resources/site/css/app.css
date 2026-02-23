@@ -26,10 +26,10 @@
 /* CSS Variables для Design Tokens */
 @theme {
     --color-bg-primary: #fffefb;
-    --color-bg-secondary: #f4f3f3;
-    --color-secondary: #f4f3f3;
-    --color-bg-secondary-hover: #ebeaea;
-    --color-bg-secondary-active: #e1e0e0;
+    --color-bg-secondary: #eeeeee;
+    --color-secondary: #eeeeee;
+    --color-bg-secondary-hover: #e5e5e5;
+    --color-bg-secondary-active: #dcdcdc;
     --color-bg-card: #fffefd;
     --color-bg-overlay: rgba(235, 235, 235, 0.38);
     --color-bg-disabled: rgba(0, 0, 0, 0.2);
@@ -51,7 +51,7 @@
     --color-surface-default: #eeeeee;
     --color-surface-light: #f2f2f1;
     --color-surface-warm: #f8f7f5;
-    --color-surface-cool: rgba(238, 238, 238, 0.5);
+    --color-surface-cool: rgba(235, 235, 235, 0.38);
     --color-surface-muted: rgba(238, 238, 238, 0.73);
 
     /* Акцентные цвета */

@@ -122,7 +122,7 @@ class WebhookController extends Controller
         }
 
         // Обработка запроса на создание ссылки-приглашения
-        if ($text === '🔗 Создать ссылку-приглашение') {
+        if ($text === 'Пригласить друга') {
             $this->handleCreateInviteLink($chatId, $service, $restaurant);
             return;
         }
@@ -187,18 +187,35 @@ class WebhookController extends Controller
                             'friend_telegram_id' => (int) $chatId,
                         ]);
 
-                        $inviterName = trim((string)$inviter->first_name . ($inviter->last_name ? ' ' . (string)$inviter->last_name : ''));
-                        if ($inviterName !== '') {
-                            $invitedByText = "Вас пригласил(а) {$inviterName}.";
+                        $inviterDisplayName = !empty($inviter->username)
+                            ? '@' . $inviter->username
+                            : trim((string)$inviter->first_name . ($inviter->last_name ? ' ' . (string)$inviter->last_name : ''));
+                        if ($inviterDisplayName !== '') {
+                            $invitedByText = "Вас пригласил(а) {$inviterDisplayName}.";
                         }
 
                         // Уведомляем приглашавшего только один раз — при первом присоединении друга по инвайту
                         if (!$alreadyFriend) {
                             try {
-                                $joinedName = trim((string)$user->first_name . ($user->last_name ? ' ' . (string)$user->last_name : ''));
+                                $joinedDisplayName = !empty($user->username)
+                                    ? '@' . $user->username
+                                    : trim((string)$user->first_name . ($user->last_name ? ' ' . (string)$user->last_name : ''));
+                                if ($joinedDisplayName === '') {
+                                    $joinedDisplayName = 'Ваш друг';
+                                }
+                                $inviterNotificationLines = [
+                                    "✅ {$joinedDisplayName} присоединился(ась) к Eat.Drink.Repeat! Теперь вы можете видеть отметки Repeat друг друга во всех ресторанах платформы.",
+                                    '',
+                                    '📋 Ваши друзья в Eat.Drink.Repeat:',
+                                ];
+                                $friends = $inviter->friends()->orderBy('users.first_name')->get();
+                                foreach ($friends as $index => $friend) {
+                                    $friendDisplay = !empty($friend->username) ? '@' . $friend->username : trim($friend->first_name . ($friend->last_name ? ' ' . $friend->last_name : ''));
+                                    $inviterNotificationLines[] = '      ' . ($index + 1) . '. ' . $friendDisplay;
+                                }
                                 $service->sendMessage([
                                     'chat_id' => (int)$inviterChatId,
-                                    'text' => '✅ ' . ($joinedName !== '' ? $joinedName : 'Ваш друг') . ' присоединился(лась).',
+                                    'text' => implode("\n", $inviterNotificationLines),
                                 ]);
                             } catch (\Throwable $e) {
                                 Log::warning('Не удалось уведомить пригласившего о присоединении друга', [
@@ -214,7 +231,7 @@ class WebhookController extends Controller
         }
 
         // Приветственное сообщение
-        $greeting = $this->buildWelcomeMessage($restaurant);
+        $greeting = $this->buildWelcomeMessage($restaurant, $invitedByText !== '');
         if ($invitedByText !== '') {
             $greeting = implode("\n\n", [$invitedByText, $greeting]);
         }
@@ -233,13 +250,8 @@ class WebhookController extends Controller
             'user_id' => $user?->id,
         ]);
 
-        // Отправляем второе сообщение с предложением поделиться контактами только если нет startParam
-        if ($startParam === null) {
-            $this->sendContactRequestMessage($chatId, $service, $restaurant);
-        } else {
-            // Для deep-link сценария не навязываем онбординг
-            $this->setAppKeyboard($chatId, $service, $restaurant, 'Добро пожаловать! Откройте приложение или поделитесь контактами и друзьями.');
-        }
+        // Отправляем второе сообщение с предложением поделиться контактами (и при /start, и при переходе по ссылке)
+        $this->sendContactRequestMessage($chatId, $service, $restaurant);
     }
 
     /**
@@ -248,12 +260,9 @@ class WebhookController extends Controller
     private function sendContactRequestMessage(int $chatId, TelegramBotService $service, Restaurant $restaurant): void
     {
         $contactMessage = implode("\n", [
-            'Чтобы приложение заработало на все 100% и вы смогли видеть отметки Repeat друзей, нажмите на 📲',
+            '👥 Пригласите друзей, чтобы видеть отметки Repeat друг друга.',
             '',
-            '📲 Разрешите доступ к телефону',
-            '👥 Добавьте друзей (поиск по контактам)',
-            '',
-            '*это необходимо сделать один раз — и отметки Repeat ваших друзей будут видны во всех приложениях Eat.Drink.Repeat.',
+            'Это нужно сделать один раз — платформа Eat.Drink.Repeat объединяет друзей во всех подключенных ресторанах.',
         ]);
 
         // Отправляем сообщение БЕЗ кнопок
@@ -298,7 +307,7 @@ class WebhookController extends Controller
         // Кнопка создания ссылки-приглашения
         $contactKeyboardButtons[] = [
             [
-                'text' => '🔗 Создать ссылку-приглашение',
+                'text' => 'Пригласить друга',
             ],
         ];
 
@@ -312,7 +321,7 @@ class WebhookController extends Controller
 
         $service->sendMessage([
             'chat_id' => $chatId,
-            'text' => '👇 Используйте кнопки ниже:',
+            'text' => '👇 Используйте кнопку ниже:',
             'reply_markup' => $contactKeyboard,
         ]);
 
@@ -411,17 +420,23 @@ class WebhookController extends Controller
 
     /**
      * Построение приветственного сообщения
+     *
+     * @param  bool  $openAppWithPeriod  true — для приглашённых («Откройте приложение.»)
      */
-    private function buildWelcomeMessage(Restaurant $restaurant): string
+    private function buildWelcomeMessage(Restaurant $restaurant, bool $openAppWithPeriod = false): string
     {
-        // Используем фиксированный текст приветствия вместо поля welcome_message
+        $openAppText = $openAppWithPeriod ? 'Откройте приложение.' : 'Откройте приложение';
+        $privacyText = "Продолжая использование чат-бота и Mini App ресторана {$restaurant->name}, вы подтверждаете согласие на обработку ваших персональных данных в соответствии с условиями политики конфиденциальности.";
+
         return implode("\n", [
-            "Привет! В этом приложении — все самое важное о {$restaurant->name}: меню, фото, адрес, актуальные новости, анонсы событий и бронирование.",
+            'Привет!',
+            "В приложении собрана вся информация о {$restaurant->name}: меню, фото, адрес, новости и бронирование.",
             '',
-            '<strong>Откройте приложение</strong>, чтобы увидеть, сколько друзей поставили Repeat.',
+            'Здесь можно поставить «Repeat», если вы планируете вернуться сюда ещё раз. Отметку увидят ваши друзья — так они узнают, какие места вы рекомендуете.',
             '',
-            '🖇️ <strong>Repeat</strong> — это отметка о том, что заведение понравилось и сюда хочется вернуться.',
-            'Её видят ваши контакты — удобный способ поделиться своим выбором и узнать, куда ходят друзья.',
+            $openAppText,
+            '',
+            $privacyText,
         ]) . "\n";
     }
 
@@ -1442,7 +1457,7 @@ class WebhookController extends Controller
             // Всегда добавляем кнопку для создания пригласительной ссылки
             $buttons[] = [
                 [
-                    'text' => '🔗 Создать ссылку-приглашение',
+                    'text' => 'Пригласить друга',
                 ],
             ];
 
@@ -1531,10 +1546,10 @@ class WebhookController extends Controller
             $inviteLink = 'https://t.me/' . $botUsername . '?start=' . $payload;
 
             $lines = [
-                '🔗 Ваша персональная ссылка-приглашение:',
+                '🔗 Ваша персональная ссылка-приглашение готова. Отправьте ее другу.',
                 $inviteLink,
                 '',
-                'Отправьте её другу. Как только он запустит бота, он появится у вас в друзьях, и вы увидите его отметки Repeat во всех приложениях by Eat.Drink.Repeat.',
+                'Когда он присоединится, вы начнете видеть отметки "Repeat" друг друга во всех ресторанах, подключенных к платформе Eat.Drink.Repeat.',
             ];
 
             $service->sendMessage([

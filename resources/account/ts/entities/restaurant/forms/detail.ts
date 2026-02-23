@@ -1,6 +1,7 @@
 import type { Category, ISmartFormField, News } from '@/shared/types';
 import { computed } from 'vue';
 import BaseInput from '@/shared/components/BaseInput.vue';
+import BaseColorInput from '@/shared/components/BaseColorInput.vue';
 import BaseWorkingHoursEditor from '@/shared/components/BaseWorkingHoursEditor.vue';
 import { z } from 'zod';
 import BaseFileList from '@/shared/components/BaseFileList.vue';
@@ -142,6 +143,54 @@ export const useRestaurantDetailFormFields = (props: { id?: string }) => {
     {
       component: BaseWorkingHoursEditor,
       key: 'working_hours',
+    },
+    {
+      component: BaseColorInput,
+      key: 'primary_color',
+      props: {
+        label: 'Основной цвет',
+        name: 'primary_color',
+      },
+      rule: z
+        .string()
+        .optional()
+        .refine((val) => !val || /^#[a-fA-F0-9]{6}$/.test(val), 'Формат: #RRGGBB'),
+    },
+    {
+      component: BaseColorInput,
+      key: 'secondary_color',
+      props: {
+        label: 'Вторичный цвет',
+        name: 'secondary_color',
+      },
+      rule: z
+        .string()
+        .optional()
+        .refine((val) => !val || /^#[a-fA-F0-9]{6}$/.test(val), 'Формат: #RRGGBB'),
+    },
+    {
+      component: BaseColorInput,
+      key: 'tertiary_color',
+      props: {
+        label: 'Третичный цвет',
+        name: 'tertiary_color',
+      },
+      rule: z
+        .string()
+        .optional()
+        .refine((val) => !val || /^#[a-fA-F0-9]{6}$/.test(val), 'Формат: #RRGGBB'),
+    },
+    {
+      component: BaseColorInput,
+      key: 'background_color',
+      props: {
+        label: 'Цвет фона',
+        name: 'background_color',
+      },
+      rule: z
+        .string()
+        .optional()
+        .refine((val) => !val || /^#[a-fA-F0-9]{6}$/.test(val), 'Формат: #RRGGBB'),
     },
     {
       component: BaseFileList,

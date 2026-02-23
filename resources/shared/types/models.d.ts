@@ -229,6 +229,11 @@ export interface Restaurant {
   og_title?: string | null
   og_description?: string | null
   og_image_url?: string | null
+  // theme colors
+  primary_color?: string | null
+  secondary_color?: string | null
+  tertiary_color?: string | null
+  background_color?: string | null
   deleted_at?: Date | null
   created_at?: Date | null
   updated_at?: Date | null
