@@ -219,24 +219,25 @@ export interface Restaurant {
   welcome_message?: string | null
   working_hours?: Record<string, unknown> | null
   yandex_metrica_code?: string | null
-  // seo
+  deleted_at?: Date | null
+  created_at?: Date | null
+  updated_at?: Date | null
+  theme_color_primary?: string | null
+  theme_color_secondary?: string | null
+  theme_color_tertiary?: string | null
+  theme_color_background?: string | null
   seo_title?: string | null
   seo_description?: string | null
   seo_keywords?: string | null
   seo_robots?: string | null
   seo_canonical_url?: string | null
-  // open graph
   og_title?: string | null
   og_description?: string | null
   og_image_url?: string | null
-  // theme colors
   primary_color?: string | null
   secondary_color?: string | null
   tertiary_color?: string | null
   background_color?: string | null
-  deleted_at?: Date | null
-  created_at?: Date | null
-  updated_at?: Date | null
   // relations
   news?: News[]
   events?: Event[]
@@ -292,6 +293,7 @@ export interface User {
   username?: string | null
   avatar_url?: string | null
   email_verified_at?: Date | null
+  offer_accepted_at?: Date | null
   created_at?: Date | null
   updated_at?: Date | null
   deleted_at?: Date | null

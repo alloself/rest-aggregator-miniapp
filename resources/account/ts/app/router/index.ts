@@ -12,6 +12,30 @@ const routes: RouteRecordRaw[] = [
         },
     },
     {
+        path: "/legal/offer",
+        name: "legal-offer",
+        component: () => import("@account/ts/pages/Legal/Offer.vue"),
+        meta: {
+            title: "Оферта",
+        },
+    },
+    {
+        path: "/legal/personal-data",
+        name: "legal-personal-data",
+        component: () => import("@account/ts/pages/Legal/PersonalData.vue"),
+        meta: {
+            title: "Поручение на обработку персональных данных",
+        },
+    },
+    {
+        path: "/legal/privacy",
+        name: "legal-privacy",
+        component: () => import("@account/ts/pages/Legal/Privacy.vue"),
+        meta: {
+            title: "Политика конфиденциальности",
+        },
+    },
+    {
         path: "/",
         name: "App",
         component: () => import("@account/ts/widgets/Layout/ui/Layout.vue"),

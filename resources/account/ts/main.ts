@@ -19,11 +19,13 @@ async function initAccountApp() {
     const currentPath = window.location.pathname;
     const loginUrl = router.resolve({ name: 'login' }).href;
     const isLoginPage = currentPath === loginUrl;
+    const isLegalPage = currentPath.startsWith('/account/legal/');
+    const isPublicPage = isLoginPage || isLegalPage;
 
     const authStore = useAuthStore();
 
     const { user } = storeToRefs(authStore);
-    if (!isLoginPage) {
+    if (!isPublicPage) {
       try {
         await authStore.fetchUser();
       } catch (error) {
@@ -31,7 +33,7 @@ async function initAccountApp() {
       }
     }
 
-    if (!user.value && !isLoginPage) {
+    if (!user.value && !isPublicPage) {
       window.location.href = loginUrl;
       return;
     }

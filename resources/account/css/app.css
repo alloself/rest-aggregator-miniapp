@@ -6,3 +6,7 @@
 @source "../../views/**/*.blade.php";
 
 @custom-variant dark (&:where(.p-dark, .p-dark *));
+
+.p-password-toggle-mask-icon {
+    cursor: pointer;
+}

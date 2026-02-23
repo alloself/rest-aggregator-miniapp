@@ -47,6 +47,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone',
         'username',
         'avatar_url',
+        'offer_accepted_at',
     ];
 
     /**
@@ -73,6 +74,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'datetime',
+            'offer_accepted_at' => 'datetime',
             'password' => 'hashed',
             'phone' => 'hashed',
         ];

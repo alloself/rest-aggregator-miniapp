@@ -117,6 +117,24 @@ const navigationItems = [
         label: "Рестораны",
         icon: "mdi:restaurant",
     },
+    {
+        name: "legal-offer",
+        path: "/legal/offer",
+        label: "Оферта",
+        icon: "mdi:file-document-outline",
+    },
+    {
+        name: "legal-personal-data",
+        path: "/legal/personal-data",
+        label: "Поручение на обработку ПДн",
+        icon: "mdi:shield-account-outline",
+    },
+    {
+        name: "legal-privacy",
+        path: "/legal/privacy",
+        label: "Политика конфиденциальности",
+        icon: "mdi:lock-outline",
+    },
 ];
 
 const toggleSidebar = () => {

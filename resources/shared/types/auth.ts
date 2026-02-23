@@ -12,6 +12,7 @@ export interface LoginRequest {
   email: string;
   password: string;
   remember?: boolean;
+  offer_accepted?: boolean;
 }
 
 export interface LoginResponse {
