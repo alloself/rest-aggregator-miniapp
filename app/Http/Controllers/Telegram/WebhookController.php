@@ -126,12 +126,6 @@ class WebhookController extends Controller
             $this->handleCreateInviteLink($chatId, $service, $restaurant);
             return;
         }
-
-        // Обработка текстовых сообщений
-        if ($text === '⏭️ Пропустить') {
-            $this->handleSkipMessage($chatId, $service, $restaurant);
-            return;
-        }
     }
 
     /**
@@ -292,28 +286,7 @@ class WebhookController extends Controller
 
         $contactKeyboardButtons[] = [
             [
-                'text' => '👥 Поделиться друзьями',
-                'request_users' => [
-                    'request_id' => 1,
-                    'user_is_bot' => false,
-                    'max_quantity' => 10,
-                    'request_name' => true,
-                    'request_username' => true,
-                    'request_photo' => true,
-                ],
-            ],
-        ];
-
-        // Кнопка создания ссылки-приглашения
-        $contactKeyboardButtons[] = [
-            [
                 'text' => 'Пригласить друга',
-            ],
-        ];
-
-        $contactKeyboardButtons[] = [
-            [
-                'text' => '⏭️ Пропустить',
             ],
         ];
 
@@ -1191,27 +1164,6 @@ class WebhookController extends Controller
     }
 
     /**
-     * Обработка сообщения "Пропустить"
-     */
-    private function handleSkipMessage(int $chatId, TelegramBotService $service, Restaurant $restaurant): void
-    {
-        // Отправляем подтверждение
-        $service->sendMessage([
-            'chat_id' => $chatId,
-            'text' => '⏭️ Вы пропустили отправку контакта.',
-        ]);
-
-        // Показываем обновленную клавиатуру (с контактами и приложением)  
-        $this->setAppKeyboard($chatId, $service, $restaurant, 'Откройте приложение или поделитесь контактами и друзьями.');
-
-        Log::info('Пользователь пропустил шаг регистрации', [
-            'restaurant_id' => $restaurant->id,
-            'chat_id' => $chatId,
-        ]);
-    }
-
-
-    /**
      * Обработка контактных данных
      */
     private function handleContactMessage(array $contact, int $chatId, TelegramBotService $service, Restaurant $restaurant, array $from): void
@@ -1432,31 +1384,6 @@ class WebhookController extends Controller
                     [
                         'text' => '📞 Поделиться контактом',
                         'request_contact' => true,
-                    ],
-                    [
-                        'text' => '👥 Поделиться друзьями',
-                        'request_users' => [
-                            'request_id' => 1,
-                            'user_is_bot' => false,
-                            'max_quantity' => 10,
-                            'request_name' => true,
-                            'request_username' => true,
-                            'request_photo' => true,
-                        ],
-                    ],
-                ];
-            } else {
-                $buttons[] = [
-                    [
-                        'text' => '👥 Поделиться друзьями',
-                        'request_users' => [
-                            'request_id' => 1,
-                            'user_is_bot' => false,
-                            'max_quantity' => 10,
-                            'request_name' => true,
-                            'request_username' => true,
-                            'request_photo' => true,
-                        ],
                     ],
                 ];
             }
