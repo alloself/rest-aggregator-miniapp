@@ -37,6 +37,8 @@ $accountResources = [
 
 Route::prefix('account')->middleware(['auth:sanctum', 'restaurant.team', 'account.permission'])->group(function () use ($accountResources) {
     Route::get('me', [AuthController::class, 'me']);
+    Route::post('restaurants/{restaurant}/sync-bot-settings', [RestaurantController::class, 'syncBotSettings'])
+        ->name('restaurants.sync-bot-settings');
     Route::apiResources($accountResources);
 
     Route::prefix('destroy')->group(function () use ($accountResources) {

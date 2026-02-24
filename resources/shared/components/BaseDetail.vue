@@ -13,6 +13,7 @@
       <slot name="footer">
         <div class="flex gap-4 mt-1">
           <div class="flex-1" />
+          <slot name="footer-extra" />
           <Button label="Cancel" severity="secondary" outlined @click="onCancel" />
           <Button v-if="id" label="Delete" severity="danger" outlined @click="remove" />
           <Button label="Save" @click="handleSubmit" />

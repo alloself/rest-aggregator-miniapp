@@ -1,5 +1,6 @@
 import type { App } from "vue";
 import PrimeVue from "primevue/config";
+import ToastService from "primevue/toastservice";
 import { definePreset } from "@primeuix/themes";
 import Lara from "@primeuix/themes/lara";
 
@@ -22,6 +23,7 @@ const AccountPreset = definePreset(Lara, {
 });
 
 export function setupPrimeVue(app: App): void {
+    app.use(ToastService);
     app.use(PrimeVue, {
         theme: {
             preset: AccountPreset,

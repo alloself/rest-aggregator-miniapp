@@ -67,6 +67,7 @@ class AccountPermissionMiddleware
                 'update' => 'restaurant.edit',
                 'destroy' => 'restaurant.delete',
                 'deleteMany' => 'restaurant.delete',
+                'syncBotSettings' => 'restaurant.edit',
             ]),
 
             'FileController' => $this->mapCrudToPermission($action, [

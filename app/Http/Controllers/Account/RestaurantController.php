@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Account;
 use App\Http\Controllers\BaseCRUDController;
 use App\Models\Restaurant;
 use App\Http\Resources\Account\RestaurantResource;
+use App\Services\TelegramBotSetupService;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class RestaurantController extends BaseCRUDController
@@ -51,5 +53,37 @@ class RestaurantController extends BaseCRUDController
         }
 
         return RestaurantResource::collection($data);
+    }
+
+    /**
+     * Синхронизировать настройки Telegram-бота с данными ресторана
+     */
+    public function syncBotSettings(Restaurant $restaurant): JsonResponse
+    {
+        $this->authorizeRestaurantAccess($restaurant);
+
+        try {
+            app(TelegramBotSetupService::class)->setupBot($restaurant);
+            return response()->json(['message' => 'Настройки бота успешно обновлены']);
+        } catch (\RuntimeException $e) {
+            return response()->json(
+                ['message' => $e->getMessage()],
+                422
+            );
+        } catch (\Throwable $e) {
+            report($e);
+            return response()->json(
+                ['message' => 'Ошибка при обновлении настроек бота'],
+                500
+            );
+        }
+    }
+
+    private function authorizeRestaurantAccess(Restaurant $restaurant): void
+    {
+        $hasAccess = $restaurant->users()->where('users.id', Auth::id())->exists();
+        if (!$hasAccess) {
+            abort(403, 'Forbidden');
+        }
     }
 }
