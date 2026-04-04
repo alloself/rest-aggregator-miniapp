@@ -145,13 +145,11 @@ const isBotLinkAvailable = computed(() => botUsername.value.length > 0);
 function handleToggleLike(nextRepeated: boolean): void {
   const restaurantId = props.restaurant?.id;
   if (!restaurantId) return;
+  mini.toggleRestaurantLike(restaurantId);
 
   if (nextRepeated && shouldShowDirectLinkBanner.value) {
     isDirectLinkBannerVisible.value = true;
-    return;
   }
-
-  void mini.toggleRestaurantLike(restaurantId);
 }
 
 function handleDirectLinkBannerClose(): void {
