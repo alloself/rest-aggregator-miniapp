@@ -21,6 +21,8 @@ declare global {
       query_id?: string;
       user?: unknown;
       receiver?: unknown;
+      chat_type?: string;
+      chat_instance?: string;
       start_param?: string;
       auth_date?: string;
       hash?: string;

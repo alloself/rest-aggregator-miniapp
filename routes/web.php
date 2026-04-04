@@ -16,6 +16,8 @@ Route::get('/legal/{any?}', [AggregatorController::class, 'site'])->where('any',
 
 Route::get('/restaurant/{any?}', [AggregatorController::class, 'site'])->where('any', '.*')->name('site');
 
+Route::get('/account/login', [AggregatorController::class, 'account'])->name('login');
+
 Route::get('/account/{any?}', [AggregatorController::class, 'account'])->where('any', '.*')->name('account');
 
 Route::get('/admin', [AggregatorController::class, 'admin'])->name('admin');
