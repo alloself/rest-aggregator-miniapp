@@ -6,19 +6,13 @@
 
         <div class="direct-link-banner__body">
           <div class="direct-link-banner__text">
-            <strong class="direct-link-banner__title">
-              Вы поставили Repeat!
-            </strong>
+            <strong class="direct-link-banner__title"> Вы поставили Repeat! </strong>
 
             <div class="direct-link-banner__description">
-              <p class="direct-link-banner__description-strong">
-                Значит это место, куда вам хочется вернуться!
-              </p>
+              <p class="direct-link-banner__description-strong">Значит это место, куда вам хочется вернуться!</p>
               <p class="direct-link-banner__description-text">
-                Пригласите друзей, чтобы делиться рекомендациями и видеть
-                <strong> Репиты </strong>
-                друг друга во всех приложениях, подключённых к платформе
-                Eat.Drink.Repeat.
+                Пригласите друзей, чтобы делиться рекомендациями и видеть Репиты друг друга во всех приложениях,
+                подключённых к платформе Eat.Drink.Repeat.
               </p>
             </div>
           </div>
@@ -60,11 +54,7 @@ interface Props {
   isBotLinkAvailable?: boolean;
 }
 
-const {
-  isVisible = false,
-  botLink = '',
-  isBotLinkAvailable = false,
-} = defineProps<Props>();
+const { isVisible = false, botLink = '', isBotLinkAvailable = false } = defineProps<Props>();
 
 const emit = defineEmits<{
   close: [];
