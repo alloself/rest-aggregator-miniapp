@@ -1,14 +1,14 @@
 <template>
   <Teleport to="body">
-    <div v-if="shouldShowBanner" class="direct-link-banner">
+    <div v-if="isVisible" class="direct-link-banner">
       <div class="direct-link-banner__content">
         <div class="direct-link-banner__badge">R</div>
 
         <div class="direct-link-banner__body">
           <div class="direct-link-banner__text">
-            <p class="direct-link-banner__title">
-              Вы поставили <strong>Repeat</strong>!
-            </p>
+            <strong class="direct-link-banner__title">
+              Вы поставили Repeat!
+            </strong>
 
             <div class="direct-link-banner__description">
               <p class="direct-link-banner__description-strong">
@@ -54,40 +54,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
-import { storeToRefs } from 'pinia';
-import { useRestaurantStore } from '../../entities/restaurant';
-import { useMiniAppLaunchSource } from '../../shared/lib/composables';
+interface Props {
+  isVisible?: boolean;
+  botLink?: string;
+  isBotLinkAvailable?: boolean;
+}
 
-const route = useRoute();
-const restaurantStore = useRestaurantStore();
-const { restaurant } = storeToRefs(restaurantStore);
+const {
+  isVisible = false,
+  botLink = '',
+  isBotLinkAvailable = false,
+} = defineProps<Props>();
 
-const isDismissed = ref(false);
-
-const { shouldShowDirectLinkBanner } = useMiniAppLaunchSource();
-
-const botUsername = computed(() => {
-  const restaurantBotUsername = restaurant.value?.bot_username;
-  return typeof restaurantBotUsername === 'string' && restaurantBotUsername.length > 0
-    ? restaurantBotUsername
-    : '';
-});
-
-const botLink = computed(() => `https://t.me/${botUsername.value}`);
-const isBotLinkAvailable = computed(() => botUsername.value.length > 0);
-
-const isRestaurantRoute = computed(() => route.name === 'restaurant');
-
-const shouldShowBanner = computed(() => (
-  shouldShowDirectLinkBanner.value
-  && isRestaurantRoute.value
-  && !isDismissed.value
-));
+const emit = defineEmits<{
+  close: [];
+}>();
 
 const handleDismissClick = () => {
-  isDismissed.value = true;
+  emit('close');
 };
 </script>
 

@@ -43,6 +43,13 @@
 
     <Feed v-if="restaurant?.slug" :slug="restaurant.slug" />
 
+    <DirectLinkBanner
+      :is-visible="isDirectLinkBannerVisible"
+      :bot-link="botLink"
+      :is-bot-link-available="isBotLinkAvailable"
+      @close="handleDirectLinkBannerClose"
+    />
+
     <div class="restaurant-card__footer">
       <p class="restaurant-card__footer-text">By Eat.Drink.Repeat</p>
     </div>
@@ -63,9 +70,11 @@ import ChefRecommendations from './ChefRecommendations.vue';
 import RestaurantCardHeader from '../../features/restaurant-card/RestaurantCardHeader.vue';
 import RestaurantCardDetails from '../../features/restaurant-card/RestaurantCardDetails.vue';
 import RestaurantCardActions from '../../features/restaurant-card/RestaurantCardActions.vue';
+import { DirectLinkBanner } from '../../features/direct-link-banner';
 import RepeatButton from '../../features/restaurant-card/RepeatButton.vue';
 import { FriendsBottomSheet } from '../../features/friends-bottom-sheet';
 import { useBottomSheet } from '../../shared';
+import { useMiniAppLaunchSource } from '../../shared/lib/composables';
 
 interface ContactInfo {
   phone?: string;
@@ -94,8 +103,10 @@ const images = computed(() => props.restaurant?.images?.filter((img) => img?.piv
 const mini = useMiniAppStore();
 const isLiking = computed(() => mini.isLiking);
 const friends = computed(() => mini.friends || []);
+const isDirectLinkBannerVisible = ref(false);
 
 const { open } = useBottomSheet();
+const { shouldShowDirectLinkBanner } = useMiniAppLaunchSource();
 
 // Структура друга из API
 interface Friend {
@@ -121,10 +132,30 @@ const allUsersWhoLiked = computed<UserOrFriend[]>(() => {
   return result;
 });
 
-function handleToggleLike(): void {
+const botUsername = computed(() => {
+  const restaurantBotUsername = props.restaurant?.bot_username;
+  return typeof restaurantBotUsername === 'string' && restaurantBotUsername.length > 0
+    ? restaurantBotUsername
+    : '';
+});
+
+const botLink = computed(() => `https://t.me/${botUsername.value}`);
+const isBotLinkAvailable = computed(() => botUsername.value.length > 0);
+
+function handleToggleLike(nextRepeated: boolean): void {
   const restaurantId = props.restaurant?.id;
   if (!restaurantId) return;
+
+  if (nextRepeated && shouldShowDirectLinkBanner.value) {
+    isDirectLinkBannerVisible.value = true;
+    return;
+  }
+
   void mini.toggleRestaurantLike(restaurantId);
+}
+
+function handleDirectLinkBannerClose(): void {
+  isDirectLinkBannerVisible.value = false;
 }
 
 function handleFriendsClick(): void {
