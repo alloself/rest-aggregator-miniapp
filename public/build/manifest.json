@@ -22,14 +22,31 @@
       "~icons/custom/telegram-icon-fill"
     ]
   },
-  "_SmartForm-CMh_fFXi.js": {
-    "file": "assets/SmartForm-CMh_fFXi.js",
+  "_LegalDocumentPage-BL_JkG_x.js": {
+    "file": "assets/LegalDocumentPage-BL_JkG_x.js",
+    "name": "LegalDocumentPage",
+    "imports": [
+      "_vue-router-BWVVh_1y.js",
+      "_Icon-Q6fa-SkT.js",
+      "_runtime-dom.esm-bundler-CrWfSxA8.js",
+      "__plugin-vue_export-helper-DlAUqK2U.js"
+    ],
+    "css": [
+      "assets/LegalDocumentPage-Dv-h07J0.css"
+    ]
+  },
+  "_LegalDocumentPage-Dv-h07J0.css": {
+    "file": "assets/LegalDocumentPage-Dv-h07J0.css",
+    "src": "_LegalDocumentPage-Dv-h07J0.css"
+  },
+  "_SmartForm-BlaEdaip.js": {
+    "file": "assets/SmartForm-BlaEdaip.js",
     "name": "SmartForm",
     "imports": [
       "_vue-router-BWVVh_1y.js",
       "_runtime-dom.esm-bundler-CrWfSxA8.js",
       "_index-BZDyAUSw.js",
-      "_SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-wyuglJVQ.js",
+      "_SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-B1DXi0SU.js",
       "__plugin-vue_export-helper-DlAUqK2U.js"
     ]
   },
@@ -37,8 +54,8 @@
     "file": "assets/SmartForm-Dti85Vce.css",
     "src": "_SmartForm-Dti85Vce.css"
   },
-  "_SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-wyuglJVQ.js": {
-    "file": "assets/SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-wyuglJVQ.js",
+  "_SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-B1DXi0SU.js": {
+    "file": "assets/SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-B1DXi0SU.js",
     "name": "SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang",
     "imports": [
       "_vue-router-BWVVh_1y.js",
@@ -78,21 +95,6 @@
       "_runtime-dom.esm-bundler-CrWfSxA8.js"
     ]
   },
-  "_index-CDy6tstr.js": {
-    "file": "assets/index-CDy6tstr.js",
-    "name": "index",
-    "imports": [
-      "_vue-router-BWVVh_1y.js",
-      "_index-CX52U3KQ.js",
-      "_index-BZDyAUSw.js",
-      "_runtime-dom.esm-bundler-CrWfSxA8.js",
-      "resources/account/ts/main.ts",
-      "_SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-wyuglJVQ.js"
-    ],
-    "css": [
-      "assets/index-LAr3wIMv.css"
-    ]
-  },
   "_index-CX52U3KQ.js": {
     "file": "assets/index-CX52U3KQ.js",
     "name": "index",
@@ -119,6 +121,28 @@
     "imports": [
       "_index-BZDyAUSw.js",
       "_runtime-dom.esm-bundler-CrWfSxA8.js"
+    ]
+  },
+  "_index-ZYUa4M0-.js": {
+    "file": "assets/index-ZYUa4M0-.js",
+    "name": "index",
+    "imports": [
+      "_vue-router-BWVVh_1y.js",
+      "_index-CX52U3KQ.js",
+      "_index-BZDyAUSw.js",
+      "_runtime-dom.esm-bundler-CrWfSxA8.js",
+      "resources/account/ts/main.ts",
+      "_SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-B1DXi0SU.js"
+    ],
+    "css": [
+      "assets/index-LAr3wIMv.css"
+    ]
+  },
+  "_privacyPolicyDocument-_hfbq6hK.js": {
+    "file": "assets/privacyPolicyDocument-_hfbq6hK.js",
+    "name": "privacyPolicyDocument",
+    "imports": [
+      "_LegalDocumentPage-BL_JkG_x.js"
     ]
   },
   "_runtime-dom.esm-bundler-CrWfSxA8.js": {
@@ -178,7 +202,7 @@
     ]
   },
   "resources/account/ts/main.ts": {
-    "file": "assets/main-BGAGgY_f.js",
+    "file": "assets/main-pCcY-8Gu.js",
     "name": "main",
     "src": "resources/account/ts/main.ts",
     "isEntry": true,
@@ -202,7 +226,7 @@
     ]
   },
   "resources/account/ts/pages/Legal/Offer.vue": {
-    "file": "assets/Offer-B1LLIA86.js",
+    "file": "assets/Offer-D39kfKgP.js",
     "name": "Offer",
     "src": "resources/account/ts/pages/Legal/Offer.vue",
     "isDynamicEntry": true,
@@ -213,47 +237,53 @@
       "_runtime-dom.esm-bundler-CrWfSxA8.js",
       "__plugin-vue_export-helper-DlAUqK2U.js",
       "_index-BZDyAUSw.js"
+    ],
+    "css": [
+      "assets/Offer-CSiRvoIw.css"
     ]
   },
   "resources/account/ts/pages/Legal/PersonalData.vue": {
-    "file": "assets/PersonalData-CsT3GOr-.js",
+    "file": "assets/PersonalData-CzbpVgjk.js",
     "name": "PersonalData",
     "src": "resources/account/ts/pages/Legal/PersonalData.vue",
     "isDynamicEntry": true,
     "imports": [
+      "_LegalDocumentPage-BL_JkG_x.js",
       "_vue-router-BWVVh_1y.js",
-      "_Icon-Q6fa-SkT.js",
       "resources/account/ts/main.ts",
       "_runtime-dom.esm-bundler-CrWfSxA8.js",
+      "_Icon-Q6fa-SkT.js",
       "__plugin-vue_export-helper-DlAUqK2U.js",
       "_index-BZDyAUSw.js"
     ]
   },
   "resources/account/ts/pages/Legal/Privacy.vue": {
-    "file": "assets/Privacy-Cf5FsQRv.js",
+    "file": "assets/Privacy-ki2Dj6t-.js",
     "name": "Privacy",
     "src": "resources/account/ts/pages/Legal/Privacy.vue",
     "isDynamicEntry": true,
     "imports": [
+      "_LegalDocumentPage-BL_JkG_x.js",
+      "_privacyPolicyDocument-_hfbq6hK.js",
       "_vue-router-BWVVh_1y.js",
-      "_Icon-Q6fa-SkT.js",
       "resources/account/ts/main.ts",
       "_runtime-dom.esm-bundler-CrWfSxA8.js",
+      "_Icon-Q6fa-SkT.js",
       "__plugin-vue_export-helper-DlAUqK2U.js",
       "_index-BZDyAUSw.js"
     ]
   },
   "resources/account/ts/pages/Login.vue": {
-    "file": "assets/Login-C4jYBYAt.js",
+    "file": "assets/Login-CsM000QG.js",
     "name": "Login",
     "src": "resources/account/ts/pages/Login.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vue-router-BWVVh_1y.js",
-      "_SmartForm-CMh_fFXi.js",
+      "_SmartForm-BlaEdaip.js",
       "_index-BZDyAUSw.js",
       "_index-QbUAX2We.js",
-      "_SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-wyuglJVQ.js",
+      "_SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-B1DXi0SU.js",
       "_index-CX52U3KQ.js",
       "_index-YsbS1fPg.js",
       "_runtime-dom.esm-bundler-CrWfSxA8.js",
@@ -262,21 +292,21 @@
     ]
   },
   "resources/account/ts/pages/Restaurant/Detail.vue": {
-    "file": "assets/Detail-ChtciS4x.js",
+    "file": "assets/Detail-D5a18GYC.js",
     "name": "Detail",
     "src": "resources/account/ts/pages/Restaurant/Detail.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vue-router-BWVVh_1y.js",
-      "_index-CDy6tstr.js",
+      "_index-ZYUa4M0-.js",
       "_dayjs-C2_uhCZM.js",
-      "_SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-wyuglJVQ.js",
+      "_SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-B1DXi0SU.js",
       "_index-BZDyAUSw.js",
       "_runtime-dom.esm-bundler-CrWfSxA8.js",
       "__plugin-vue_export-helper-DlAUqK2U.js",
       "_index-CX52U3KQ.js",
       "_index-BfXda8Ii.js",
-      "_SmartForm-CMh_fFXi.js",
+      "_SmartForm-BlaEdaip.js",
       "resources/account/ts/main.ts",
       "_index-QbUAX2We.js"
     ],
@@ -285,15 +315,15 @@
     ]
   },
   "resources/account/ts/pages/Restaurant/List.vue": {
-    "file": "assets/List-CaQGWTx7.js",
+    "file": "assets/List-YaQNox4S.js",
     "name": "List",
     "src": "resources/account/ts/pages/Restaurant/List.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_index-CDy6tstr.js",
+      "_index-ZYUa4M0-.js",
       "_dayjs-C2_uhCZM.js",
       "_vue-router-BWVVh_1y.js",
-      "_SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-wyuglJVQ.js",
+      "_SmartForm.vue_vue_type_style_index_0_scoped_f0658e56_lang-B1DXi0SU.js",
       "_index-BZDyAUSw.js",
       "_runtime-dom.esm-bundler-CrWfSxA8.js",
       "_index-CX52U3KQ.js",
@@ -301,7 +331,7 @@
     ]
   },
   "resources/account/ts/widgets/Layout/ui/Layout.vue": {
-    "file": "assets/Layout-BQBUyg-0.js",
+    "file": "assets/Layout-DOtucSxH.js",
     "name": "Layout",
     "src": "resources/account/ts/widgets/Layout/ui/Layout.vue",
     "isDynamicEntry": true,
@@ -357,7 +387,7 @@
     ]
   },
   "resources/site/ts/app/main.ts": {
-    "file": "assets/main-BydeWsM5.js",
+    "file": "assets/main-aq_QGA24.js",
     "name": "main",
     "src": "resources/site/ts/app/main.ts",
     "isEntry": true,
@@ -378,7 +408,7 @@
     ]
   },
   "resources/site/ts/pages/RestaurantPage.vue": {
-    "file": "assets/RestaurantPage-B7qTKgaj.js",
+    "file": "assets/RestaurantPage-ff1z8yII.js",
     "name": "RestaurantPage",
     "src": "resources/site/ts/pages/RestaurantPage.vue",
     "isDynamicEntry": true,
@@ -414,18 +444,17 @@
     ]
   },
   "resources/site/ts/pages/legal/Privacy.vue": {
-    "file": "assets/Privacy-D16rlgC1.js",
+    "file": "assets/Privacy-DAJvjqaj.js",
     "name": "Privacy",
     "src": "resources/site/ts/pages/legal/Privacy.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vue-router-BWVVh_1y.js",
-      "_Icon-Q6fa-SkT.js",
+      "_LegalDocumentPage-BL_JkG_x.js",
+      "_privacyPolicyDocument-_hfbq6hK.js",
       "_runtime-dom.esm-bundler-CrWfSxA8.js",
+      "_Icon-Q6fa-SkT.js",
       "__plugin-vue_export-helper-DlAUqK2U.js"
-    ],
-    "css": [
-      "assets/Privacy-BfKv5C70.css"
     ]
   },
   "~icons/custom/arrow": {
