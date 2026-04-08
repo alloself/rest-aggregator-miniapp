@@ -1,7 +1,6 @@
 <template>
-  <LegalDocumentPage
-    :back-link="backLink"
-    :back-label="backLabel"
+  <RestaurantLegalPdfPage
+    :document-key="LEGAL_PRIVACY_PDF_KEY"
     :eyebrow="privacyPolicyEyebrow"
     :title="privacyPolicyTitle"
     :lead="privacyPolicyLead"
@@ -10,31 +9,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
-import LegalDocumentPage from '@/shared/components/LegalDocumentPage.vue';
+import RestaurantLegalPdfPage from './RestaurantLegalPdfPage.vue';
+import { LEGAL_PRIVACY_PDF_KEY } from '@/shared/constants/legalDocuments';
 import {
   privacyPolicyEyebrow,
   privacyPolicyLead,
   privacyPolicySections,
   privacyPolicyTitle,
 } from '@/shared/helpers/privacyPolicyDocument';
-
-const route = useRoute();
-
-const restaurantSlug = computed(() => {
-  const slug = route.query.restaurant;
-
-  return typeof slug === 'string' ? slug : null;
-});
-
-const backLink = computed(() => {
-  if (restaurantSlug.value) {
-    return { path: `/restaurant/${restaurantSlug.value}` };
-  }
-
-  return { path: '/' };
-});
-
-const backLabel = computed(() => (restaurantSlug.value ? 'Назад в приложение' : 'На главную'));
 </script>

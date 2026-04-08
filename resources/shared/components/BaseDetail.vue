@@ -7,6 +7,7 @@
     </template>
     <template #content>
       <SmartForm class="flex-1" :fields="fields" v-model:form="form" :initialValues="initialValues" />
+      <slot />
     </template>
 
     <template #footer>

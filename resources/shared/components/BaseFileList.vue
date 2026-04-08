@@ -55,10 +55,10 @@
   </Dialog>
 </template>
 
-<script setup lang="ts" generic="T extends FileModel">
-import { File as FileModel } from "../types";
+<script setup lang="ts" generic="T extends { id: string; name: string; url: string; extension?: string; pivot?: PivotData }">
 import { ref, computed } from "vue";
-import { AxiosInstance } from "axios";
+import type { AxiosInstance } from "axios";
+import type { PivotData } from "../types";
 
 const {
   baseUrl,
@@ -72,11 +72,11 @@ const {
   client: AxiosInstance;
   type: "file" | "image";
   invalid?: boolean;
-  initialItems?: FileModel[];
+  initialItems?: T[];
   title: string;
 }>();
 
-const getBasePivot = () => {
+const getBasePivot = (): PivotData => {
   return {
     key: "",
     order: 0,
@@ -84,9 +84,9 @@ const getBasePivot = () => {
   };
 };
 
-const selectedFiles = ref<FileModel[]>([]);
+const selectedFiles = ref<T[]>([]);
 
-const files = defineModel<FileModel[]>("modelValue", {
+const files = defineModel<T[]>("modelValue", {
   default: () => [],
 });
 
@@ -110,7 +110,7 @@ const onSave = async () => {
     const response = await client.post(baseUrl, formData);
 
     if (response.data) {
-      files.value = [...files.value, { ...response.data, pivot: getBasePivot() }];
+      files.value = [...files.value, { ...response.data, pivot: getBasePivot() } as T];
     }
 
     showDialog.value = false;
@@ -120,7 +120,9 @@ const onSave = async () => {
 };
 
 const deleteSelectedFiles = async () => {
-  files.value = files.value.filter((file) => !selectedFiles.value.includes(file));
+  files.value = files.value.filter(
+    (file) => !selectedFiles.value.some((selectedFile) => selectedFile.id === file.id),
+  );
   selectedFiles.value = [];
 };
 </script>

@@ -129,6 +129,29 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Проверить роль пользователя в его личном team-контексте.
+     */
+    public function hasGlobalRole(string $role): bool
+    {
+        $currentTeamId = getPermissionsTeamId();
+        setPermissionsTeamId($this->id);
+
+        try {
+            return $this->hasRole($role);
+        } finally {
+            setPermissionsTeamId($currentTeamId);
+        }
+    }
+
+    /**
+     * Является ли пользователь глобальным root.
+     */
+    public function isRoot(): bool
+    {
+        return $this->hasGlobalRole('root');
+    }
+
+    /**
      * Назначить роль пользователю в ресторане
      */
     public function assignRestaurantRole(string $restaurantId, string $role): self

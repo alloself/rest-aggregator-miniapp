@@ -5,6 +5,7 @@ import type { User, Restaurant } from './models';
 export interface AuthUser extends Omit<User, 'roles'> {
   // Override roles to be string array (computed from Role relations)
   roles: string[]; // role names array like ["admin", "restaurant_owner"]
+  is_root: boolean;
   restaurant?: Restaurant; // Preloaded restaurant for restaurant owners
 }
 

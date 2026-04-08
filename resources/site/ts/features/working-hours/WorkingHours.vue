@@ -26,12 +26,13 @@
 import { computed, ref } from 'vue';
 
 interface WorkingDay {
-  startTime: string;
-  endTime: string;
+  open: string;
+  close: string;
+  is_closed: boolean;
 }
 
 interface WorkingHours {
-  [key: string]: WorkingDay;
+  [key: string]: WorkingDay | null;
 }
 
 interface ScheduleGroup {
@@ -49,6 +50,14 @@ const isDialogVisible = ref(false);
 
 const openDialog = () => {
   isDialogVisible.value = true;
+};
+
+const getScheduleTime = (schedule: WorkingDay | null | undefined): string => {
+  if (!schedule || schedule.is_closed) {
+    return 'выходной';
+  }
+
+  return `${schedule.open} - ${schedule.close}`;
 };
 
 const dayNamesMap: Record<string, string> = {
@@ -97,7 +106,7 @@ const detailedSchedule = computed(() => {
     return {
       dayKey,
       dayName,
-      time: schedule ? `${schedule.startTime} - ${schedule.endTime}` : 'выходной',
+      time: getScheduleTime(schedule),
     };
   });
 });
@@ -111,7 +120,11 @@ const groupedSchedule = computed((): ScheduleGroup[] => {
   const timeGroups: Record<string, string[]> = {};
 
   Object.entries(props.workingHours).forEach(([day, schedule]) => {
-    const timeKey = `${schedule.startTime}-${schedule.endTime}`;
+    if (!schedule || schedule.is_closed) {
+      return;
+    }
+
+    const timeKey = `${schedule.open}-${schedule.close}`;
     let groupKey: string;
 
     if (weekdays.includes(day)) {

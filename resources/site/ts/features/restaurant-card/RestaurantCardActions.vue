@@ -13,7 +13,7 @@ import { AppButton } from '../../shared/ui';
 import ContactDropdown from '../contact-dropdown/ContactDropdown.vue';
 
 interface ContactInfo {
-  phone?: string;
+  phone?: string | null;
   telegram?: string;
 }
 

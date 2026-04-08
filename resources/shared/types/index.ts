@@ -32,8 +32,10 @@ export interface IBaseColumn {
 }
 
 export type PivotData = {
-  key?: string;
-  order?: number;
+  id?: string | null;
+  key?: string | null;
+  order?: number | null;
+  type?: string | null;
 };
 
 export interface IBaseTreeEntity<T extends IBaseEntity> {

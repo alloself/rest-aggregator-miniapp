@@ -15,13 +15,6 @@ final class MonitoringAccess
             return false;
         }
 
-        $currentTeamId = getPermissionsTeamId();
-        setPermissionsTeamId($user->id);
-
-        try {
-            return $user->hasRole('root');
-        } finally {
-            setPermissionsTeamId($currentTeamId);
-        }
+        return $user->isRoot();
     }
 }

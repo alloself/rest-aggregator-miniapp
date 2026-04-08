@@ -6,12 +6,15 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    function me(Request $request)
+    public function me(Request $request)
     {
         $user = $request->user();
 
         if ($user) {
-            return $user;
+            return response()->json(array_merge($user->toArray(), [
+                'roles' => $user->getRoleNames()->values()->all(),
+                'is_root' => $user->isRoot(),
+            ]));
         }
 
         return response()->json(['error' => 'not auth'], 401);

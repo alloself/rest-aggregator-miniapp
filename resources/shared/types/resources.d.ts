@@ -7,9 +7,10 @@ import type {
 
 // Вспомогательные типы для pivot полей
 export interface CategoryPivot {
-  id: string | null
-  key: string | null
-  order: number | null
+  id?: string | null
+  key?: string | null
+  order?: number | null
+  type?: string | null
 }
 
 // Рабочие часы ресторана

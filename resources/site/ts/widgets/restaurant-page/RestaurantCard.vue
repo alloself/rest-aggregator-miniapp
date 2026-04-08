@@ -77,7 +77,7 @@ import { useBottomSheet } from '../../shared';
 import { useMiniAppLaunchSource } from '../../shared/lib/composables';
 
 interface ContactInfo {
-  phone?: string;
+  phone?: string | null;
   telegram?: string;
 }
 
