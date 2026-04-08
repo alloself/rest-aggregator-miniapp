@@ -97,7 +97,10 @@ class RestaurantController extends Controller
                 ->where('slug', $eventSlug)
                 ->firstOrFail();
 
-            return new EventResource($event);
+            return response()->json(array_merge(
+                (new EventResource($event))->resolve(request()),
+                ['restaurant' => (new RestaurantResource($restaurant))->resolve(request())]
+            ));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'Событие не найдено',

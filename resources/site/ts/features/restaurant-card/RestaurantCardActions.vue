@@ -4,11 +4,7 @@
     <AppButton label="Бар" variant="secondary" size="medium" @click="handleShowBar" fullWidth />
     <AppButton label="Фото" variant="secondary" size="medium" @click="handleShowPhotos" fullWidth />
 
-    <ContactDropdown
-      v-if="contactInfo.phone || contactInfo.telegram"
-      :phone="contactInfo.phone"
-      :telegram-username="contactInfo.telegram"
-    />
+    <ContactDropdown v-if="contactInfo.phone" :phone="contactInfo.phone" />
   </div>
 </template>
 

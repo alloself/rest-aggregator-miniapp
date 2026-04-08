@@ -21,14 +21,15 @@
           class="repeat-button__avatar"
           :style="{
             zIndex: 3 - index,
-            backgroundColor: getAvatarUrl(friend) ? 'transparent' : generateRandomColor(getDisplayName(friend)),
+            backgroundColor: getRenderableAvatarUrl(friend) ? 'transparent' : generateRandomColor(getDisplayName(friend)),
           }"
         >
           <img
-            v-if="getAvatarUrl(friend)"
-            :src="getAvatarUrl(friend)"
+            v-if="getRenderableAvatarUrl(friend)"
+            :src="getRenderableAvatarUrl(friend)"
             :alt="getDisplayName(friend)"
             class="repeat-button__avatar-img"
+            @error="handleAvatarError(friend.id)"
           />
           <span v-else class="repeat-button__avatar-initials">
             {{ getInitials(friend) }}
@@ -41,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useHapticFeedback } from '../../shared/lib/composables';
 import type { User } from '@/shared/types';
 
@@ -73,6 +74,7 @@ const emit = defineEmits<{
   friendsClick: [friends: UserOrFriend[]];
 }>();
 
+const failedAvatarIds = ref<Record<string, true>>({});
 const { trigger } = useHapticFeedback();
 
 const handleToggle = (): void => {
@@ -122,6 +124,21 @@ const getAvatarUrl = (user: UserOrFriend): string | undefined => {
     return user.profile_photo_url || undefined;
   }
   return user.full_avatar_url || user.avatar_url || undefined;
+};
+
+const getRenderableAvatarUrl = (user: UserOrFriend): string | undefined => {
+  if (failedAvatarIds.value[user.id]) {
+    return undefined;
+  }
+
+  return getAvatarUrl(user);
+};
+
+const handleAvatarError = (userId: string): void => {
+  failedAvatarIds.value = {
+    ...failedAvatarIds.value,
+    [userId]: true,
+  };
 };
 
 const getDisplayName = (user: UserOrFriend): string => {

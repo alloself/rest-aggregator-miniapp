@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Telegram;
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use App\Models\User;
+use App\Services\AvatarService;
 use App\Services\TelegramBotService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -496,7 +497,7 @@ class WebhookController extends Controller
     /**
      * Получить URL аватара пользователя из Telegram
      */
-    private function getUserAvatarUrl(int $userId, TelegramBotService $service): ?string
+    private function getUserAvatarFileId(int $userId, TelegramBotService $service): ?string
     {
         try {
             Log::info('🖼️ ОТЛАДКА: Начало получения аватара пользователя', [
@@ -552,36 +553,7 @@ class WebhookController extends Controller
                 'step' => 'got_file_id'
             ]);
 
-            // Получаем информацию о файле
-            $fileResponse = $service->getFile([
-                'file_id' => $fileId,
-            ]);
-
-            Log::info('🖼️ ОТЛАДКА: Ответ getFile', [
-                'file_response' => $fileResponse,
-                'step' => 'got_file_response'
-            ]);
-
-            if (!isset($fileResponse['result']['file_path'])) {
-                Log::warning('🖼️ ОТЛАДКА: Отсутствует file_path в ответе', [
-                    'file_response' => $fileResponse,
-                    'step' => 'missing_file_path'
-                ]);
-                return null;
-            }
-
-            $filePath = $fileResponse['result']['file_path'];
-
-            // Строим полный URL к файлу
-            $avatarUrl = $service->getFileUrl($filePath);
-
-            Log::info('✅ ОТЛАДКА: Получен URL аватара', [
-                'avatar_url' => $avatarUrl,
-                'user_id' => $userId,
-                'step' => 'got_avatar_url'
-            ]);
-
-            return $avatarUrl;
+            return (string) $fileId;
         } catch (Throwable $e) {
             Log::error('❌ ОТЛАДКА: Ошибка получения аватара пользователя', [
                 'error' => $e->getMessage(),
@@ -613,7 +585,7 @@ class WebhookController extends Controller
 
             // Получаем дополнительную информацию о пользователе
             $userInfo = $this->getUserInfo($userId, $service);
-            $avatarUrl = $this->getUserAvatarUrl($userId, $service);
+            $avatarFileId = $this->getUserAvatarFileId($userId, $service);
 
             // Обновляем данные из дополнительной информации если доступно
             if ($userInfo) {
@@ -666,8 +638,10 @@ class WebhookController extends Controller
                     'first_name' => $firstName,
                     'last_name' => $lastName ?: null,
                     'username' => $username ?: null,
-                    'avatar_url' => $avatarUrl,
+                    'avatar_url' => $avatarFileId ?: $user->avatar_url,
                 ]);
+
+                $this->syncLocalAvatarIfNeeded($user, $restaurant, $avatarFileId);
 
                 Log::info('✅ ОТЛАДКА: Пользователь обновлен', [
                     'user_id' => $user->id,
@@ -700,8 +674,10 @@ class WebhookController extends Controller
                     'first_name' => $firstName,
                     'last_name' => $lastName ?: $matched->last_name,
                     'username' => $username !== '' ? $username : $matched->username,
-                    'avatar_url' => $avatarUrl ?: $matched->avatar_url,
+                    'avatar_url' => $avatarFileId ?: $matched->avatar_url,
                 ]);
+
+                $this->syncLocalAvatarIfNeeded($matched, $restaurant, $avatarFileId);
 
                 Log::info('🔁 ОТЛАДКА: Сопоставлен существующий пользователь по профилю', [
                     'user_id' => $matched->id,
@@ -722,7 +698,7 @@ class WebhookController extends Controller
                 'first_name' => $firstName,
                 'last_name' => $lastName ?: null,
                 'username' => $username ?: null,
-                'avatar_url' => $avatarUrl,
+                'avatar_url' => $avatarFileId,
             ];
 
             Log::info('🔍 ОТЛАДКА: Данные для создания пользователя', [
@@ -731,6 +707,8 @@ class WebhookController extends Controller
             ]);
 
             $user = User::create($userData);
+
+            $this->syncLocalAvatarIfNeeded($user, $restaurant, $avatarFileId);
 
             Log::info('✅ ОТЛАДКА: Новый пользователь создан', [
                 'user_id' => $user->id,
@@ -815,7 +793,7 @@ class WebhookController extends Controller
                 // Получаем дополнительную информацию о пользователе
                 $userId = null;
                 $userInfo = null;
-                $avatarUrl = null;
+                $avatarFileId = null;
 
                 if (isset($sharedUser['user_id'])) {
                     $userId = (int) $sharedUser['user_id'];
@@ -836,7 +814,7 @@ class WebhookController extends Controller
                             ->first();
                     }
 
-                    $friendUser = $existingFriend ?: $this->findOrCreateFriendUser($userId, $sharedUser, $userInfo, $avatarUrl, $restaurant);
+                    $friendUser = $existingFriend ?: $this->findOrCreateFriendUser($userId, $sharedUser, $userInfo, $avatarFileId, $restaurant);
 
                     if ($friendUser) {
                         // Если уже есть связь user->friend, не создаём дубликат
@@ -1044,7 +1022,7 @@ class WebhookController extends Controller
     /**
      * Найти или создать пользователя-друга по данным из Telegram
      */
-    private function findOrCreateFriendUser(int $telegramId, array $sharedUser, ?array $userInfo, ?string $avatarUrl, ?Restaurant $restaurant = null): ?User
+    private function findOrCreateFriendUser(int $telegramId, array $sharedUser, ?array $userInfo, ?string $avatarFileId, ?Restaurant $restaurant = null): ?User
     {
         try {
             Log::info('🔍 ОТЛАДКА: Поиск пользователя-друга', [
@@ -1068,6 +1046,8 @@ class WebhookController extends Controller
                 $friendUser = $query->first();
             }
 
+            $resolvedAvatarFileId = $this->resolveSharedUserAvatarFileId($sharedUser, $avatarFileId);
+
             if ($friendUser) {
                 Log::info('✅ ОТЛАДКА: Пользователь-друг найден в базе', [
                     'friend_user_id' => $friendUser->id,
@@ -1090,19 +1070,8 @@ class WebhookController extends Controller
                     $updateData['username'] = $sharedUser['username'];
                 }
 
-                // Если удалось получить фото из sharedUser->photo — вместо CDN URL сохраняем file_id
-                if (!empty($sharedUser['photo']) && is_array($sharedUser['photo'])) {
-                    $photos = $sharedUser['photo'];
-                    $highest = end($photos);
-                    if (is_array($highest) && !empty($highest['file_id'])) {
-                        $fileId = (string) $highest['file_id'];
-                        if ($fileId !== $friendUser->avatar_url) {
-                            $updateData['avatar_url'] = $fileId;
-                        }
-                    }
-                } elseif (!empty($avatarUrl) && $avatarUrl !== $friendUser->avatar_url) {
-                    // Фолбэк: если нет photo массива, сохраняем как раньше (CDN URL)
-                    $updateData['avatar_url'] = $avatarUrl;
+                if (!empty($resolvedAvatarFileId) && $resolvedAvatarFileId !== $friendUser->avatar_url) {
+                    $updateData['avatar_url'] = $resolvedAvatarFileId;
                 }
 
                 if (!empty($updateData)) {
@@ -1113,6 +1082,8 @@ class WebhookController extends Controller
                         'step' => 'friend_user_updated'
                     ]);
                 }
+
+                $this->syncLocalAvatarIfNeeded($friendUser, $restaurant, $resolvedAvatarFileId);
 
                 return $friendUser;
             }
@@ -1128,20 +1099,12 @@ class WebhookController extends Controller
                 'first_name' => $sharedUser['first_name'] ?? 'Неизвестно',
                 'last_name' => $sharedUser['last_name'] ?? null,
                 'username' => $sharedUser['username'] ?? null,
-                // Если есть photo — сохраняем file_id вместо CDN URL
-                'avatar_url' => (function () use ($sharedUser, $avatarUrl) {
-                    if (isset($sharedUser['photo']) && is_array($sharedUser['photo'])) {
-                        $photos = $sharedUser['photo'];
-                        $highest = end($photos);
-                        if (is_array($highest) && !empty($highest['file_id'])) {
-                            return (string) $highest['file_id'];
-                        }
-                    }
-                    return $avatarUrl;
-                })(),
+                'avatar_url' => $resolvedAvatarFileId,
             ];
 
             $friendUser = User::create($userData);
+
+            $this->syncLocalAvatarIfNeeded($friendUser, $restaurant, $resolvedAvatarFileId);
 
             Log::info('✅ ОТЛАДКА: Новый пользователь-друг создан', [
                 'friend_user_id' => $friendUser->id,
@@ -1160,6 +1123,53 @@ class WebhookController extends Controller
             ]);
 
             return null;
+        }
+    }
+
+    /**
+     * Вытащить лучший доступный file_id из shared user payload.
+     */
+    private function resolveSharedUserAvatarFileId(array $sharedUser, ?string $fallbackFileId): ?string
+    {
+        if (isset($sharedUser['photo']) && is_array($sharedUser['photo'])) {
+            $photos = $sharedUser['photo'];
+            $highest = end($photos);
+
+            if (is_array($highest) && !empty($highest['file_id']) && is_string($highest['file_id'])) {
+                return $highest['file_id'];
+            }
+        }
+
+        if (is_string($fallbackFileId) && $fallbackFileId !== '' && !str_starts_with($fallbackFileId, 'http')) {
+            return $fallbackFileId;
+        }
+
+        return null;
+    }
+
+    /**
+     * Синхронизировать локальную копию avatar, если появился новый file_id
+     * или локальный profile_photo ещё не сохранён.
+     */
+    private function syncLocalAvatarIfNeeded(User $user, ?Restaurant $restaurant, ?string $avatarFileId): void
+    {
+        if (!$restaurant || !$avatarFileId || str_starts_with($avatarFileId, 'http')) {
+            return;
+        }
+
+        if ($user->getProfilePhoto() && $user->avatar_url === $avatarFileId) {
+            return;
+        }
+
+        try {
+            app(AvatarService::class)->syncUserAvatarFromFileId($user, $restaurant, $avatarFileId);
+        } catch (Throwable $e) {
+            Log::warning('Не удалось синхронизировать локальный avatar пользователя', [
+                'user_id' => $user->id,
+                'restaurant_id' => $restaurant->id,
+                'file_id' => $avatarFileId,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -1243,9 +1253,9 @@ class WebhookController extends Controller
             ]);
 
             // Получаем дополнительную информацию о пользователе (аватар)
-            $avatarUrl = null;
+            $avatarFileId = null;
             if ($userId) {
-                $avatarUrl = $this->getUserAvatarUrl((int)$userId, $service);
+                $avatarFileId = $this->getUserAvatarFileId((int)$userId, $service);
             }
 
             // Обновляем данные пользователя
@@ -1273,16 +1283,17 @@ class WebhookController extends Controller
             }
 
             // Обновляем аватар, если получили новый
-            if ($avatarUrl && $avatarUrl !== $user->avatar_url) {
-                $updateData['avatar_url'] = $avatarUrl;
+            if ($avatarFileId && $avatarFileId !== $user->avatar_url) {
+                $updateData['avatar_url'] = $avatarFileId;
                 Log::info('📞 ОТЛАДКА: Обновляем аватар пользователя', [
                     'old_avatar_url' => $user->avatar_url,
-                    'new_avatar_url' => $avatarUrl,
+                    'new_avatar_url' => $avatarFileId,
                     'step' => 'updating_avatar_from_contact'
                 ]);
             }
 
             $user->update($updateData);
+            $this->syncLocalAvatarIfNeeded($user, $restaurant, $avatarFileId);
 
             Log::info('✅ ОТЛАДКА: Номер телефона сохранен', [
                 'user_id' => $user->id,

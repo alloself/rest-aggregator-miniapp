@@ -25,13 +25,13 @@
 
 /* CSS Variables для Design Tokens */
 @theme {
-    --color-bg-primary: #fffefb;
-    --color-bg-secondary: #eeeeee;
-    --color-secondary: #eeeeee;
-    --color-bg-secondary-hover: #e5e5e5;
-    --color-bg-secondary-active: #dcdcdc;
-    --color-bg-card: #fffefd;
-    --color-bg-overlay: rgba(235, 235, 235, 0.38);
+    --color-bg-primary: #fffcf6;
+    --color-bg-secondary: #faf6f0;
+    --color-secondary: #faf6f0;
+    --color-bg-secondary-hover: #ebe7e1;
+    --color-bg-secondary-active: #e1ddd7;
+    --color-bg-card: #fffbf7;
+    --color-bg-overlay: rgba(235, 228, 222, 0.38);
     --color-bg-disabled: rgba(0, 0, 0, 0.2);
     --color-bg-section: #bdbdbd;
 
@@ -48,11 +48,12 @@
     --color-white-soft: #f5f5f5;
 
     /* Цвета интерфейса */
-    --color-surface-default: #eeeeee;
+    --color-surface-default: #faf6f0;
     --color-surface-light: #f2f2f1;
     --color-surface-warm: #f8f7f5;
-    --color-surface-cool: rgba(235, 235, 235, 0.38);
-    --color-surface-muted: rgba(238, 238, 238, 0.73);
+    --color-surface-tertiary: #ebe4de;
+    --color-surface-cool: var(--color-surface-tertiary);
+    --color-surface-muted: rgba(250, 246, 240, 0.73);
 
     /* Акцентные цвета */
     --color-accent-primary: rgba(200, 228, 155, 0.35);

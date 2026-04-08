@@ -16,10 +16,11 @@
                       <!-- Аватар -->
             <div class="friends-bottom-sheet__avatar">
               <img 
-                v-if="getAvatarUrl(friend)" 
-                :src="getAvatarUrl(friend)" 
+                v-if="getRenderableAvatarUrl(friend)" 
+                :src="getRenderableAvatarUrl(friend)" 
                 :alt="getDisplayName(friend)"
                 class="friends-bottom-sheet__avatar-img"
+                @error="handleAvatarError(friend.id)"
               />
               <span 
                 v-else 
@@ -51,6 +52,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import type { User } from '@/shared/types';
 
 // Структура друга из API
@@ -71,6 +73,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   friends: () => [],
 });
+
+const failedAvatarIds = ref<Record<string, true>>({});
 
 // Генерация рандомного цвета для инициалов
 const generateRandomColor = (seed: string): string => {
@@ -130,6 +134,21 @@ const getAvatarUrl = (user: UserOrFriend): string | undefined => {
   return user.full_avatar_url || user.avatar_url || undefined;
 };
 
+const getRenderableAvatarUrl = (user: UserOrFriend): string | undefined => {
+  if (failedAvatarIds.value[user.id]) {
+    return undefined;
+  }
+
+  return getAvatarUrl(user);
+};
+
+const handleAvatarError = (userId: string): void => {
+  failedAvatarIds.value = {
+    ...failedAvatarIds.value,
+    [userId]: true,
+  };
+};
+
 // Получение отображаемого имени
 const getDisplayName = (user: UserOrFriend): string => {
   if (isFriend(user)) {
@@ -143,7 +162,7 @@ const getDisplayName = (user: UserOrFriend): string => {
 
 <style scoped>
 .friends-bottom-sheet {
-  background: #FFFEFB;
+  background: var(--color-bg-primary);
   width: 100%;
   overflow-y: auto;
   padding: 0 32px;

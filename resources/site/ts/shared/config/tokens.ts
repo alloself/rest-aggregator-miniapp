@@ -9,12 +9,12 @@ export const designTokens = {
   colors: {
     // Основной фон
     background: {
-      primary: '#FFFEFB', // fill_GHP0VJ - основной фон приложения
-      secondary: '#EEEEEE', // fill_E1ZDQP - кнопки Меню/Бар/Фото
-      secondaryHover: '#E5E5E5', // hover состояние для secondary фона
-      secondaryActive: '#DCDCDC', // active состояние для secondary фона
-      card: '#FFFEFD', // fill_GD1MSZ - фон карточек
-      overlay: 'rgba(235, 235, 235, 0.38)', // fill_LXG6D8 - полупрозрачный overlay
+      primary: '#FFFCF6', // background - фон приложения и неактивные табы
+      secondary: '#FAF6F0', // secondary - кнопки и активные табы
+      secondaryHover: '#EBE7E1', // hover состояние для secondary фона
+      secondaryActive: '#E1DDD7', // active состояние для secondary фона
+      card: '#FFFBF7', // primary - главная карточка и карточки новостей/событий
+      overlay: 'rgba(235, 228, 222, 0.38)', // полупрозрачный overlay в новой палитре
       disabled: 'rgba(0, 0, 0, 0.2)', // fill_PV2D36 - фон отключенных элементов
       section: '#BDBDBD', // fill_WR6U3B - фон секций
     },
@@ -36,11 +36,12 @@ export const designTokens = {
 
     // Цвета интерфейса
     surface: {
-      default: '#EEEEEE', // fill_RLS316 - стандартные кнопки и поверхности
+      default: '#FAF6F0', // secondary - стандартные кнопки и поверхности
       light: '#F2F2F1', // fill_S82JE9 - светлые поверхности
       warm: '#F8F7F5', // fill_ZT3IAY - теплая поверхность
-      cool: 'rgba(235, 235, 235, 0.38)', // fill_UOBLHO - область описания
-      muted: 'rgba(238, 238, 238, 0.73)', // fill_FBNN2H - приглушенная поверхность
+      tertiary: '#EBE4DE', // tertiary - область описания и поля в событии
+      cool: '#EBE4DE', // alias для прежнего surface-cool
+      muted: 'rgba(250, 246, 240, 0.73)', // приглушенная поверхность из secondary-палитры
     },
 
     // Акцентные цвета
@@ -312,6 +313,7 @@ export const tailwindTokens = {
     'surface-default': designTokens.colors.surface.default,
     'surface-light': designTokens.colors.surface.light,
     'surface-warm': designTokens.colors.surface.warm,
+    'surface-tertiary': designTokens.colors.surface.tertiary,
 
     // Акценты
     'accent-primary': designTokens.colors.accent.primary,

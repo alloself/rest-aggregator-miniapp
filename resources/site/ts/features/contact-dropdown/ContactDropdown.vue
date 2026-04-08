@@ -13,24 +13,6 @@
         </div>
         <span class="contact-dropdown__item-text">Позвонить</span>
       </div>
-
-      <div class="contact-dropdown__divider"></div>
-
-      <div class="contact-dropdown__item" @click="handleTelegramMessage">
-        <div class="contact-dropdown__item-icon contact-dropdown__item-icon--telegram">
-          <Icon name="telegram" :size="18" />
-        </div>
-        <span class="contact-dropdown__item-text">Написать</span>
-      </div>
-
-      <div class="contact-dropdown__divider"></div>
-
-      <div class="contact-dropdown__item" @click="handleBooking">
-        <div class="contact-dropdown__item-icon contact-dropdown__item-icon--booking">
-          <Icon name="booking" :size="18" />
-        </div>
-        <span class="contact-dropdown__item-text">Забронировать</span>
-      </div>
     </div>
   </div>
 </template>
@@ -43,12 +25,10 @@ import { Icon } from '@/shared';
 
 interface Props {
   phone?: string;
-  telegramUsername?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   phone: '+7 (495) 123-45-67',
-  telegramUsername: 'restaurant_bot',
 });
 
 const isOpen = ref(false);
@@ -63,23 +43,6 @@ const closeDropdown = () => {
 };
 
 const handlePhoneCall = () => {
-  if (props.phone) {
-    const cleanPhone = props.phone.replace(/[^\d+]/g, '');
-    window.location.href = `tel:${cleanPhone}`;
-  }
-  closeDropdown();
-};
-
-const handleTelegramMessage = () => {
-  if (props.telegramUsername) {
-    const telegramUrl = `https://t.me/${props.telegramUsername}`;
-    window.open(telegramUrl, '_blank');
-  }
-  closeDropdown();
-};
-
-const handleBooking = () => {
-  // При клике на "Забронировать" звоним в ресторан
   if (props.phone) {
     const cleanPhone = props.phone.replace(/[^\d+]/g, '');
     window.location.href = `tel:${cleanPhone}`;

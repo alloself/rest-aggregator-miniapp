@@ -1,5 +1,5 @@
 .restaurant-card {
-    @apply bg-[rgba(255,254,251,0.97)];
+    @apply bg-[var(--color-bg-primary)];
 }
 
 .restaurant-card__hero-carousel {
@@ -63,7 +63,7 @@
 }
 
 .restaurant-card__full-description {
-    @apply rounded-b-[20px] px-[18px] pt-8 pb-6 relative -mt-2 mx-4 mb-6 bg-[var(--color-bg-secondary)];
+    @apply rounded-b-[20px] px-[18px] pt-8 pb-6 relative -mt-2 mx-4 mb-6 bg-[var(--color-surface-tertiary)];
 }
 
 .restaurant-card__full-description-text {

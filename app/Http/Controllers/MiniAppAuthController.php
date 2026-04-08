@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Restaurant;
 use App\Models\Like;
 use App\Models\User;
+use App\Services\AvatarService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
-use Illuminate\Support\Facades\Log;
-use App\Services\TelegramBotService;
 
 class MiniAppAuthController extends Controller
 {
@@ -88,6 +87,9 @@ class MiniAppAuthController extends Controller
             ->unique('id')
             ->values();
 
+        $avatarService = app(AvatarService::class);
+        $selfAvatarUrl = $avatarService->getAvatarUrlForRestaurant($user, $restaurant) ?? $user->full_avatar_url;
+
         // Формируем данные о друзьях для ответа — перекладываем логику в модель
         $friendsLikedPayload = $friendsLiked->map(function ($friend) use ($restaurant) {
             return [
@@ -99,7 +101,8 @@ class MiniAppAuthController extends Controller
         });
 
         return response()->json(array_merge($user->toArray(), [
-            'full_avatar_url' => $user->full_avatar_url,
+            'avatar_url' => $selfAvatarUrl,
+            'full_avatar_url' => $selfAvatarUrl,
             'liked_by_me' => $liked,
             'friends' => $friendsLikedPayload,
         ]));

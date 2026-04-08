@@ -241,6 +241,11 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getAvatarUrl(): ?string
     {
+        $localAvatar = $this->getProfilePhotoUrl();
+        if ($localAvatar) {
+            return $localAvatar;
+        }
+
         // 1) Если это друг и у него есть telegram_photo_data в pivot таблице — строим динамически через file_id
         if ($this->pivot && isset($this->pivot->telegram_data)) {
             $telegramData = json_decode($this->pivot->telegram_data, true);
@@ -264,7 +269,7 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         // 3) Фолбэк на сохранённый avatar_url (может быть устаревшим)
-        if ($this->avatar_url) {
+        if ($this->avatar_url && str_starts_with((string) $this->avatar_url, 'http')) {
             return $this->avatar_url;
         }
 
@@ -506,8 +511,10 @@ class User extends Authenticatable implements MustVerifyEmail
             ]);
         }
 
-        // 4) Фолбэк
-        return $this->avatar_url ?: null;
+        // 4) Фолбэк только для legacy HTTP URL
+        return $this->avatar_url && str_starts_with((string) $this->avatar_url, 'http')
+            ? $this->avatar_url
+            : null;
     }
 
     /**
