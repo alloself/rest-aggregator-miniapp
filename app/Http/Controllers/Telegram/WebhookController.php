@@ -127,6 +127,12 @@ class WebhookController extends Controller
             $this->handleCreateInviteLink($chatId, $service, $restaurant);
             return;
         }
+
+        // Повторный запуск стартового сценария через кнопку клавиатуры
+        if ($text === 'перезапустить бота') {
+            $this->handleStartCommand($chatId, $service, $restaurant, '/start', $from);
+            return;
+        }
     }
 
     /**
@@ -288,6 +294,12 @@ class WebhookController extends Controller
         $contactKeyboardButtons[] = [
             [
                 'text' => 'Пригласить друга',
+            ],
+        ];
+
+        $contactKeyboardButtons[] = [
+            [
+                'text' => 'перезапустить бота',
             ],
         ];
 
@@ -1399,10 +1411,16 @@ class WebhookController extends Controller
                 ];
             }
 
-            // Всегда добавляем кнопку для создания пригласительной ссылки
+            // Всегда добавляем кнопки для приглашения друга и повторного запуска стартового сценария
             $buttons[] = [
                 [
                     'text' => 'Пригласить друга',
+                ],
+            ];
+
+            $buttons[] = [
+                [
+                    'text' => 'перезапустить бота',
                 ],
             ];
 
