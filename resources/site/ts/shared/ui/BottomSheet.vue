@@ -116,8 +116,58 @@ const isElementScrollable = (el: HTMLElement): boolean => {
  */
 const isScrolledToTop = (el: HTMLElement): boolean => el.scrollTop <= 0;
 
+const CONTENT_GESTURE_THRESHOLD_PX = 8;
+
+type GestureAxis = 'horizontal' | 'vertical' | null;
+
 const activeScrollerRef = ref<HTMLElement | null>(null);
+const contentTouchStartX = ref(0);
 const contentTouchStartY = ref(0);
+const contentGestureAxis = ref<GestureAxis>(null);
+const contentStartedInHorizontalSwipeZone = ref(false);
+
+const isHorizontalSwipeZone = (startNode: EventTarget | null): boolean => {
+  if (!(startNode instanceof Element) || !contentRef.value) return false;
+
+  const swipeZone = startNode.closest('[data-bottom-sheet-swipe-lock="horizontal"]');
+  return swipeZone instanceof HTMLElement && contentRef.value.contains(swipeZone);
+};
+
+const resetDragState = () => {
+  isDragging.value = false;
+  startY.value = 0;
+  currentY.value = 0;
+};
+
+const cancelDragGesture = () => {
+  if (isDragging.value) {
+    animateSheetToZero();
+    resetDragState();
+  }
+};
+
+const resetContentGestureState = () => {
+  activeScrollerRef.value = null;
+  contentTouchStartX.value = 0;
+  contentTouchStartY.value = 0;
+  contentGestureAxis.value = null;
+  contentStartedInHorizontalSwipeZone.value = false;
+};
+
+const resolveGestureAxis = (deltaX: number, deltaY: number): GestureAxis => {
+  const absDeltaX = Math.abs(deltaX);
+  const absDeltaY = Math.abs(deltaY);
+
+  if (Math.max(absDeltaX, absDeltaY) < CONTENT_GESTURE_THRESHOLD_PX) {
+    return null;
+  }
+
+  if (contentStartedInHorizontalSwipeZone.value) {
+    return absDeltaX >= absDeltaY ? 'horizontal' : 'vertical';
+  }
+
+  return absDeltaX > absDeltaY ? 'horizontal' : 'vertical';
+};
 
 /**
  * Начать жест перетаскивания с хэндла
@@ -166,13 +216,10 @@ const handleTouchEnd = () => {
     startY.value = 0;
     currentY.value = 0;
     return;
-  } else {
-    animateSheetToZero();
   }
 
-  isDragging.value = false;
-  startY.value = 0;
-  currentY.value = 0;
+  animateSheetToZero();
+  resetDragState();
 };
 
 /**
@@ -181,7 +228,11 @@ const handleTouchEnd = () => {
 const handleContentTouchStart = (event: TouchEvent) => {
   if (!props.closableBySwipe) return;
   if (event.touches.length > 1) return;
+
+  contentTouchStartX.value = event.touches[0].clientX;
   contentTouchStartY.value = event.touches[0].clientY;
+  contentGestureAxis.value = null;
+  contentStartedInHorizontalSwipeZone.value = isHorizontalSwipeZone(event.target);
   activeScrollerRef.value = findScrollableAncestor(event.target);
 };
 
@@ -190,18 +241,26 @@ const handleContentTouchStart = (event: TouchEvent) => {
  */
 const handleContentTouchMove = (event: TouchEvent) => {
   if (!props.closableBySwipe || !sheetRef.value) return;
+
+  const x = event.touches[0].clientX;
   const y = event.touches[0].clientY;
+  const deltaX = x - contentTouchStartX.value;
   const deltaY = y - contentTouchStartY.value;
+
+  if (!contentGestureAxis.value) {
+    contentGestureAxis.value = resolveGestureAxis(deltaX, deltaY);
+  }
+
+  if (!contentGestureAxis.value) return;
+
+  if (contentGestureAxis.value === 'horizontal') {
+    cancelDragGesture();
+    return;
+  }
 
   // Свайп вверх — отдаем жест контенту
   if (deltaY <= 0) {
-    // Если мы уже начали тянуть шит, откатим его
-    if (isDragging.value) {
-      animateSheetToZero();
-      isDragging.value = false;
-      startY.value = 0;
-      currentY.value = 0;
-    }
+    cancelDragGesture();
     return;
   }
 
@@ -232,7 +291,7 @@ const handleContentTouchEnd = () => {
   if (isDragging.value) {
     handleTouchEnd();
   }
-  activeScrollerRef.value = null;
+  resetContentGestureState();
 };
 
 /**
@@ -409,16 +468,14 @@ onUnmounted(() => {
   justify-content: center;
   /* Изолируем скролл контента от родительского элемента */
   overscroll-behavior: contain;
-  /* Только вертикальный панорамный жест */
-  touch-action: pan-y;
+  /* Не блокируем вложенные горизонтальные свайпы внутри контента */
+  touch-action: auto;
 }
 
 /* Скруглённые верхние углы контейнера шита */
 :deep(.bottom-sheet) {
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
-  /* Предотвращаем случайные touch события на самом sheet */
-  touch-action: none;
 }
 
 /* Handle zone - полный контроль */
@@ -426,10 +483,15 @@ onUnmounted(() => {
   touch-action: none;
 }
 
-/* Content zone - только скролл */
+/* Content zone - без глобальной блокировки осей */
 :deep(.bottom-sheet__content) {
-  touch-action: pan-y;
+  touch-action: auto;
   overscroll-behavior: contain;
+}
+
+/* Вложенные горизонтальные свайп-компоненты обрабатывают X, сохраняя вертикальный скролл */
+:deep(.bottom-sheet__content [data-bottom-sheet-swipe-lock='horizontal']) {
+  touch-action: pan-y;
 }
 
 /* Transitions */

@@ -30,11 +30,16 @@
 
 .bottom-sheet__content {
     @apply flex-1 overflow-y-auto [-webkit-overflow-scrolling:touch];
-    /* Content zone: только вертикальный скролл, без возможности закрытия BottomSheet */
-    touch-action: pan-y;
+    /* По умолчанию не ограничиваем жесты внутри контента — это важно для вложенных swiper/carousel. */
+    touch-action: auto;
     overscroll-behavior: contain;
     /* Предотвращаем цепочку прокрутки */
     overscroll-behavior-y: contain;
+}
+
+.bottom-sheet__content [data-bottom-sheet-swipe-lock='horizontal'] {
+    /* Горизонтальные свайп-компоненты сами обрабатывают ось X, сохраняя вертикальный скролл контейнера. */
+    touch-action: pan-y;
 }
 
 .bottom-sheet-backdrop-enter-active,

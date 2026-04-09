@@ -1,9 +1,15 @@
 <template>
-  <div class="hero-carousel">
+  <div class="hero-carousel" data-bottom-sheet-swipe-lock="horizontal">
     <div class="swiper hero-carousel__swiper" ref="swiperContainer">
       <div class="swiper-wrapper">
         <div v-for="(image, index) in images" :key="index" class="swiper-slide hero-carousel__slide">
-          <img :src="image.url" :alt="image.alt || `Слайд ${index + 1}`" class="hero-carousel__image" loading="lazy" />
+          <img
+            :src="image.url"
+            :alt="image.alt || `Слайд ${index + 1}`"
+            class="hero-carousel__image"
+            loading="lazy"
+            @load="handleImageLoad"
+          />
         </div>
       </div>
 
@@ -13,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
 import { Swiper } from 'swiper';
 import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
@@ -49,6 +55,43 @@ const props = withDefaults(defineProps<Props>(), {
 
 const swiperContainer = ref<HTMLElement>();
 let swiperInstance: Swiper | null = null;
+let updateFrameId = 0;
+let delayedUpdateTimer = 0;
+
+const clearScheduledUpdates = () => {
+  if (updateFrameId) {
+    cancelAnimationFrame(updateFrameId);
+    updateFrameId = 0;
+  }
+
+  if (delayedUpdateTimer) {
+    window.clearTimeout(delayedUpdateTimer);
+    delayedUpdateTimer = 0;
+  }
+};
+
+const updateSwiper = () => {
+  if (!swiperInstance) return;
+
+  swiperInstance.updateSize();
+  swiperInstance.updateSlides();
+  swiperInstance.update();
+};
+
+const scheduleSwiperUpdate = () => {
+  clearScheduledUpdates();
+
+  updateFrameId = requestAnimationFrame(() => {
+    updateFrameId = 0;
+    updateSwiper();
+
+    // Повторный update после анимации шита помогает WebView корректно измерить карусель.
+    delayedUpdateTimer = window.setTimeout(() => {
+      delayedUpdateTimer = 0;
+      updateSwiper();
+    }, 320);
+  });
+};
 
 const initSwiper = async () => {
   if (!swiperContainer.value || props.images.length === 0) return;
@@ -56,6 +99,8 @@ const initSwiper = async () => {
   await nextTick();
 
   if (!swiperContainer.value) return;
+
+  destroySwiper();
 
   swiperInstance = new Swiper(swiperContainer.value, {
     modules: [Pagination, Autoplay],
@@ -89,23 +134,49 @@ const initSwiper = async () => {
     touchAngle: 45,
     grabCursor: true,
     speed: 300,
+    allowTouchMove: props.images.length > 1,
+    watchOverflow: true,
+    observer: true,
+    observeParents: true,
+    resizeObserver: true,
   });
+
+  scheduleSwiperUpdate();
 };
 
 const destroySwiper = () => {
+  clearScheduledUpdates();
+
   if (swiperInstance) {
     swiperInstance.destroy(true, true);
     swiperInstance = null;
   }
 };
 
+const reinitSwiper = async () => {
+  destroySwiper();
+  await initSwiper();
+};
+
+const handleImageLoad = () => {
+  scheduleSwiperUpdate();
+};
+
 onMounted(() => {
-  initSwiper();
+  void initSwiper();
 });
 
 onBeforeUnmount(() => {
   destroySwiper();
 });
+
+watch(
+  [() => props.images, () => props.showPagination, () => props.autoplay],
+  () => {
+    void reinitSwiper();
+  },
+  { deep: true }
+);
 
 defineExpose({
   swiper: () => swiperInstance,
