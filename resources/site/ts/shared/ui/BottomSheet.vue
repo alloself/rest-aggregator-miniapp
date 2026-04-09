@@ -117,6 +117,8 @@ const isElementScrollable = (el: HTMLElement): boolean => {
 const isScrolledToTop = (el: HTMLElement): boolean => el.scrollTop <= 0;
 
 const CONTENT_GESTURE_THRESHOLD_PX = 8;
+const HORIZONTAL_SWIPE_ZONE_THRESHOLD_PX = 12;
+const HORIZONTAL_SWIPE_ZONE_VERTICAL_RATIO = 1.5;
 
 type GestureAxis = 'horizontal' | 'vertical' | null;
 
@@ -163,7 +165,17 @@ const resolveGestureAxis = (deltaX: number, deltaY: number): GestureAxis => {
   }
 
   if (contentStartedInHorizontalSwipeZone.value) {
-    return absDeltaX >= absDeltaY ? 'horizontal' : 'vertical';
+    if (Math.max(absDeltaX, absDeltaY) < HORIZONTAL_SWIPE_ZONE_THRESHOLD_PX) {
+      return null;
+    }
+
+    // В зоне карусели явно предпочитаем горизонтальный свайп:
+    // вертикаль считаем только если палец движется вниз/вверх почти по оси Y.
+    if (absDeltaY > absDeltaX * HORIZONTAL_SWIPE_ZONE_VERTICAL_RATIO) {
+      return 'vertical';
+    }
+
+    return 'horizontal';
   }
 
   return absDeltaX > absDeltaY ? 'horizontal' : 'vertical';

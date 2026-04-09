@@ -418,7 +418,7 @@
     ]
   },
   "resources/site/ts/app/main.ts": {
-    "file": "assets/main-BXvnX8oh.js",
+    "file": "assets/main-Dm2apJmr.js",
     "name": "main",
     "src": "resources/site/ts/app/main.ts",
     "isEntry": true,
@@ -435,11 +435,11 @@
       "resources/site/ts/pages/legal/Privacy.vue"
     ],
     "css": [
-      "assets/main-DJT9jsqu.css"
+      "assets/main-DqNPFeu1.css"
     ]
   },
   "resources/site/ts/pages/RestaurantPage.vue": {
-    "file": "assets/RestaurantPage-B8ENaH9y.js",
+    "file": "assets/RestaurantPage-D5JMqNSI.js",
     "name": "RestaurantPage",
     "src": "resources/site/ts/pages/RestaurantPage.vue",
     "isDynamicEntry": true,
