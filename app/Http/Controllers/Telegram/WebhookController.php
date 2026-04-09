@@ -300,7 +300,7 @@ class WebhookController extends Controller
 
         $contactKeyboardButtons[] = [
             [
-                'text' => 'перезапустить бота',
+                'text' => 'Перезапустить бота',
             ],
         ];
 
@@ -415,20 +415,20 @@ class WebhookController extends Controller
         $baseUrl = rtrim((string) config('app.url'), '/');
         $slug = $restaurant->slug;
         $escapedName = htmlspecialchars($restaurant->name, ENT_QUOTES, 'UTF-8');
-        $openAppText = $openAppWithPeriod ? 'Откройте приложение.' : 'Откройте приложение';
         $messageLines = [
             'Привет!',
             "В приложении собрана вся информация о {$escapedName}: меню, фото, адрес, новости и бронирование.",
             '',
             'Здесь можно поставить «Repeat», если вы планируете вернуться сюда ещё раз. Отметку увидят ваши друзья — так они узнают, какие места вы рекомендуете.',
-            '',
-            $openAppText,
         ];
 
         if ($this->restaurantHasLegalPdfDocuments($restaurant)) {
+            $openAppText = $openAppWithPeriod ? 'Откройте приложение.' : 'Откройте приложение';
             $consentUrl = "{$baseUrl}/legal/personal-data?restaurant={$slug}";
             $privacyUrl = "{$baseUrl}/legal/privacy?restaurant={$slug}";
 
+            $messageLines[] = '';
+            $messageLines[] = $openAppText;
             $messageLines[] = '';
             $messageLines[] = 'Продолжая использовать чат-бот, вы даете <a href="' . $consentUrl . '">согласие</a> на обработку ваших персональных данных в соответствии с условиями <a href="' . $privacyUrl . '">политики конфиденциальности</a>.';
         }
@@ -1442,7 +1442,7 @@ class WebhookController extends Controller
 
             $buttons[] = [
                 [
-                    'text' => 'перезапустить бота',
+                    'text' => 'Перезапустить бота',
                 ],
             ];
 
