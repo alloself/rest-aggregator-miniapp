@@ -7,6 +7,7 @@ use App\Models\Restaurant;
 use App\Models\User;
 use App\Services\AvatarService;
 use App\Services\TelegramBotService;
+use App\Support\RestaurantLegalDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
@@ -414,23 +415,44 @@ class WebhookController extends Controller
         $baseUrl = rtrim((string) config('app.url'), '/');
         $slug = $restaurant->slug;
         $escapedName = htmlspecialchars($restaurant->name, ENT_QUOTES, 'UTF-8');
-
-        $consentUrl = "{$baseUrl}/legal/personal-data?restaurant={$slug}";
-        $privacyUrl = "{$baseUrl}/legal/privacy?restaurant={$slug}";
-        $privacyText = 'Продолжая использовать чат-бот, вы даете <a href="' . $consentUrl . '">согласие</a> на обработку ваших персональных данных в соответствии с условиями <a href="' . $privacyUrl . '">политики конфиденциальности</a>.';
-
         $openAppText = $openAppWithPeriod ? 'Откройте приложение.' : 'Откройте приложение';
-
-        return implode("\n", [
+        $messageLines = [
             'Привет!',
             "В приложении собрана вся информация о {$escapedName}: меню, фото, адрес, новости и бронирование.",
             '',
             'Здесь можно поставить «Repeat», если вы планируете вернуться сюда ещё раз. Отметку увидят ваши друзья — так они узнают, какие места вы рекомендуете.',
             '',
             $openAppText,
-            '',
-            $privacyText,
-        ]) . "\n";
+        ];
+
+        if ($this->restaurantHasLegalPdfDocuments($restaurant)) {
+            $consentUrl = "{$baseUrl}/legal/personal-data?restaurant={$slug}";
+            $privacyUrl = "{$baseUrl}/legal/privacy?restaurant={$slug}";
+
+            $messageLines[] = '';
+            $messageLines[] = 'Продолжая использовать чат-бот, вы даете <a href="' . $consentUrl . '">согласие</a> на обработку ваших персональных данных в соответствии с условиями <a href="' . $privacyUrl . '">политики конфиденциальности</a>.';
+        }
+
+        return implode("\n", $messageLines) . "\n";
+    }
+
+    private function restaurantHasLegalPdfDocuments(Restaurant $restaurant): bool
+    {
+        $requiredKeys = [
+            RestaurantLegalDocument::PERSONAL_DATA_PDF_KEY,
+            RestaurantLegalDocument::PRIVACY_PDF_KEY,
+        ];
+
+        $availableKeys = $restaurant->files()
+            ->wherePivotIn('key', $requiredKeys)
+            ->get()
+            ->pluck('pivot.key')
+            ->filter(static fn (?string $key): bool => $key !== null && $key !== '')
+            ->unique()
+            ->values()
+            ->all();
+
+        return count($availableKeys) === count($requiredKeys);
     }
 
     /**
