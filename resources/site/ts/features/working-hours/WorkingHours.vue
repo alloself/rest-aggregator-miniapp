@@ -25,14 +25,26 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-interface WorkingDay {
+interface CurrentWorkingDay {
+  startTime: string;
+  endTime: string;
+}
+
+interface LegacyWorkingDay {
   open: string;
   close: string;
-  is_closed: boolean;
+  is_closed?: boolean;
 }
+
+type WorkingDay = CurrentWorkingDay | LegacyWorkingDay;
 
 interface WorkingHours {
   [key: string]: WorkingDay | null;
+}
+
+interface ResolvedWorkingDay {
+  startTime: string;
+  endTime: string;
 }
 
 interface ScheduleGroup {
@@ -52,12 +64,33 @@ const openDialog = () => {
   isDialogVisible.value = true;
 };
 
+const getResolvedSchedule = (schedule: WorkingDay | null | undefined): ResolvedWorkingDay | null => {
+  if (!schedule) {
+    return null;
+  }
+
+  if ('is_closed' in schedule && schedule.is_closed) {
+    return null;
+  }
+
+  const startTime = 'startTime' in schedule ? schedule.startTime : schedule.open;
+  const endTime = 'endTime' in schedule ? schedule.endTime : schedule.close;
+
+  if (!startTime || !endTime) {
+    return null;
+  }
+
+  return { startTime, endTime };
+};
+
 const getScheduleTime = (schedule: WorkingDay | null | undefined): string => {
-  if (!schedule || schedule.is_closed) {
+  const resolvedSchedule = getResolvedSchedule(schedule);
+
+  if (!resolvedSchedule) {
     return 'выходной';
   }
 
-  return `${schedule.open} - ${schedule.close}`;
+  return `${resolvedSchedule.startTime} - ${resolvedSchedule.endTime}`;
 };
 
 const dayNamesMap: Record<string, string> = {
@@ -118,13 +151,18 @@ const groupedSchedule = computed((): ScheduleGroup[] => {
   const weekendDays = ['saturday', 'sunday'];
 
   const timeGroups: Record<string, string[]> = {};
+  const workingDays = new Set<string>();
 
   Object.entries(props.workingHours).forEach(([day, schedule]) => {
-    if (!schedule || schedule.is_closed) {
+    const resolvedSchedule = getResolvedSchedule(schedule);
+
+    if (!resolvedSchedule) {
       return;
     }
 
-    const timeKey = `${schedule.open}-${schedule.close}`;
+    workingDays.add(day);
+
+    const timeKey = `${resolvedSchedule.startTime}-${resolvedSchedule.endTime}`;
     let groupKey: string;
 
     if (weekdays.includes(day)) {
@@ -141,9 +179,8 @@ const groupedSchedule = computed((): ScheduleGroup[] => {
     timeGroups[groupKey].push(day);
   });
 
-  const workingDays = Object.keys(props.workingHours);
-  const nonWorkingWeekdays = weekdays.filter((day) => !workingDays.includes(day));
-  const nonWorkingWeekends = weekendDays.filter((day) => !workingDays.includes(day));
+  const nonWorkingWeekdays = weekdays.filter((day) => !workingDays.has(day));
+  const nonWorkingWeekends = weekendDays.filter((day) => !workingDays.has(day));
 
   if (nonWorkingWeekdays.length > 0) {
     timeGroups['weekdays-off'] = nonWorkingWeekdays;

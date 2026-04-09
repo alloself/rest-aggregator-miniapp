@@ -223,7 +223,7 @@
     ]
   },
   "resources/account/css/app.css": {
-    "file": "assets/app-CBsa3qWU.css",
+    "file": "assets/app-Dab3KaIq.css",
     "src": "resources/account/css/app.css",
     "isEntry": true,
     "names": [
@@ -377,7 +377,7 @@
     ]
   },
   "resources/admin/css/app.css": {
-    "file": "assets/app-C6aStWaW.css",
+    "file": "assets/app-LRqBC_Qe.css",
     "src": "resources/admin/css/app.css",
     "isEntry": true,
     "names": [
@@ -410,7 +410,7 @@
     "src": "resources/site/assets/fonts/SF-Pro-Display-Semibold.otf"
   },
   "resources/site/css/app.css": {
-    "file": "assets/app-9ZjiFWgG.css",
+    "file": "assets/app-CHAiIBHp.css",
     "src": "resources/site/css/app.css",
     "isEntry": true,
     "names": [
@@ -418,7 +418,7 @@
     ]
   },
   "resources/site/ts/app/main.ts": {
-    "file": "assets/main-CurpFyUq.js",
+    "file": "assets/main-Dkdt2RXH.js",
     "name": "main",
     "src": "resources/site/ts/app/main.ts",
     "isEntry": true,
@@ -439,7 +439,7 @@
     ]
   },
   "resources/site/ts/pages/RestaurantPage.vue": {
-    "file": "assets/RestaurantPage-Co8W9ATi.js",
+    "file": "assets/RestaurantPage-CvNHEaQ0.js",
     "name": "RestaurantPage",
     "src": "resources/site/ts/pages/RestaurantPage.vue",
     "isDynamicEntry": true,

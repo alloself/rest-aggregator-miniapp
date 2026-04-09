@@ -478,9 +478,8 @@ export interface CategoryPivot {
 // Рабочие часы ресторана
 export interface WorkingHours {
   [day: string]: {
-    open: string
-    close: string
-    is_closed: boolean
+    startTime: string
+    endTime: string
   } | null
 }
 TYPESCRIPT;
