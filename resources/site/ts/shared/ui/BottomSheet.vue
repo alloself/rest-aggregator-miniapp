@@ -24,10 +24,10 @@
             <div
               ref="contentRef"
               class="bottom-sheet__content"
-              @touchstart.stop="handleContentTouchStart"
-              @touchmove.stop="handleContentTouchMove"
-              @touchend.stop="handleContentTouchEnd"
-              @touchcancel.stop="handleContentTouchEnd"
+              @touchstart="handleContentTouchStart"
+              @touchmove="handleContentTouchMove"
+              @touchend="handleContentTouchEnd"
+              @touchcancel="handleContentTouchEnd"
             >
               <slot />
             </div>
@@ -468,8 +468,8 @@ onUnmounted(() => {
   justify-content: center;
   /* Изолируем скролл контента от родительского элемента */
   overscroll-behavior: contain;
-  /* Не блокируем вложенные горизонтальные свайпы внутри контента */
-  touch-action: auto;
+  /* Только вертикальный панорамный жест */
+  touch-action: pan-y;
 }
 
 /* Скруглённые верхние углы контейнера шита */
@@ -483,15 +483,10 @@ onUnmounted(() => {
   touch-action: none;
 }
 
-/* Content zone - без глобальной блокировки осей */
+/* Content zone - только скролл */
 :deep(.bottom-sheet__content) {
-  touch-action: auto;
-  overscroll-behavior: contain;
-}
-
-/* Вложенные горизонтальные свайп-компоненты обрабатывают X, сохраняя вертикальный скролл */
-:deep(.bottom-sheet__content [data-bottom-sheet-swipe-lock='horizontal']) {
   touch-action: pan-y;
+  overscroll-behavior: contain;
 }
 
 /* Transitions */

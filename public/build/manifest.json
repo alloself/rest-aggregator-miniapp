@@ -410,7 +410,7 @@
     "src": "resources/site/assets/fonts/SF-Pro-Display-Semibold.otf"
   },
   "resources/site/css/app.css": {
-    "file": "assets/app-Dtp7-Fod.css",
+    "file": "assets/app-CHAiIBHp.css",
     "src": "resources/site/css/app.css",
     "isEntry": true,
     "names": [
@@ -418,7 +418,7 @@
     ]
   },
   "resources/site/ts/app/main.ts": {
-    "file": "assets/main-Uo1lUzHR.js",
+    "file": "assets/main-BXvnX8oh.js",
     "name": "main",
     "src": "resources/site/ts/app/main.ts",
     "isEntry": true,
@@ -435,11 +435,11 @@
       "resources/site/ts/pages/legal/Privacy.vue"
     ],
     "css": [
-      "assets/main-_ubTJ2Tz.css"
+      "assets/main-DJT9jsqu.css"
     ]
   },
   "resources/site/ts/pages/RestaurantPage.vue": {
-    "file": "assets/RestaurantPage-BS6Amq8J.js",
+    "file": "assets/RestaurantPage-B8ENaH9y.js",
     "name": "RestaurantPage",
     "src": "resources/site/ts/pages/RestaurantPage.vue",
     "isDynamicEntry": true,
@@ -456,7 +456,7 @@
       "_index-BfXda8Ii.js"
     ],
     "css": [
-      "assets/RestaurantPage-B_4ZJcEd.css"
+      "assets/RestaurantPage-BWDjBYo8.css"
     ]
   },
   "resources/site/ts/pages/legal/PersonalData.vue": {
