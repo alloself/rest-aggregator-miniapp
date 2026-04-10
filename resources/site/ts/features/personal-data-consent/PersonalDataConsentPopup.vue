@@ -1,8 +1,11 @@
 <template>
   <Teleport to="body">
     <div v-if="shouldShowPopup" class="personal-data-consent-popup">
-      <div class="personal-data-consent-popup__content">
-        <p class="personal-data-consent-popup__text">
+      <div
+        class="personal-data-consent-popup__content"
+        :class="{ 'personal-data-consent-popup__content--compact': !canShowLegalLinks }"
+      >
+        <p v-if="canShowLegalLinks" class="personal-data-consent-popup__text">
           Продолжая использовать приложение, вы даете
           <RouterLink :to="personalDataLink" class="personal-data-consent-popup__link">
             согласие на обработку ваших персональных данных
@@ -26,16 +29,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { computed, onMounted, ref, watch } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
+import { useRestaurantStore } from '@site/ts/entities/restaurant';
+import { client } from '@site/ts/shared/api/axios';
+import { hasRequiredRestaurantLegalDocuments } from '@/shared/helpers/restaurantLegalDocuments';
+import type { RestaurantResourceData } from '@/shared/types/resources';
 
 const PERSONAL_DATA_CONSENT_STORAGE_KEY = 'site-personal-data-consent-accepted';
 const LEGAL_ROUTE_NAMES = new Set(['site-legal-personal-data', 'site-legal-privacy']);
 
 const route = useRoute();
+const restaurantStore = useRestaurantStore();
+const { restaurant, loading: isRestaurantLoading } = storeToRefs(restaurantStore);
 
 const isConsentResolved = ref(false);
 const isConsentAccepted = ref(false);
+const isLegalLinksResolved = ref(false);
+const canShowLegalLinks = ref(false);
+
+let legalLinksRequestId = 0;
 
 const restaurantSlug = computed(() => {
   const routeSlug = route.params.slug;
@@ -66,7 +80,10 @@ const isLegalRoute = computed(() => (
 ));
 
 const shouldShowPopup = computed(() => (
-  isConsentResolved.value && !isConsentAccepted.value && !isLegalRoute.value
+  isConsentResolved.value
+  && isLegalLinksResolved.value
+  && !isConsentAccepted.value
+  && !isLegalRoute.value
 ));
 
 const handleAcceptClick = () => {
@@ -74,9 +91,78 @@ const handleAcceptClick = () => {
   localStorage.setItem(PERSONAL_DATA_CONSENT_STORAGE_KEY, 'true');
 };
 
+const setLegalLinksVisibility = (files?: RestaurantResourceData['files']) => {
+  canShowLegalLinks.value = hasRequiredRestaurantLegalDocuments(files);
+  isLegalLinksResolved.value = true;
+};
+
+const resolveLegalLinksVisibility = async (): Promise<void> => {
+  const slug = restaurantSlug.value;
+  const requestId = ++legalLinksRequestId;
+
+  if (!slug || isLegalRoute.value || isConsentAccepted.value) {
+    canShowLegalLinks.value = false;
+    isLegalLinksResolved.value = true;
+
+    return;
+  }
+
+  if (restaurant.value?.slug === slug) {
+    setLegalLinksVisibility(restaurant.value.files);
+
+    return;
+  }
+
+  if (typeof route.name === 'string' && route.name === 'restaurant' && isRestaurantLoading.value) {
+    isLegalLinksResolved.value = false;
+
+    return;
+  }
+
+  isLegalLinksResolved.value = false;
+
+  try {
+    const response = await client.get<RestaurantResourceData>(`/api/site/restaurants/${slug}`);
+
+    if (requestId !== legalLinksRequestId) {
+      return;
+    }
+
+    setLegalLinksVisibility(response.data.files);
+  } catch (error) {
+    if (requestId !== legalLinksRequestId) {
+      return;
+    }
+
+    canShowLegalLinks.value = false;
+    isLegalLinksResolved.value = true;
+    console.error('Failed to resolve restaurant legal documents', error);
+  }
+};
+
+watch(
+  [
+    restaurantSlug,
+    isLegalRoute,
+    isConsentAccepted,
+    isRestaurantLoading,
+    () => restaurant.value?.slug,
+    () => restaurant.value?.files,
+  ],
+  () => {
+    if (!isConsentResolved.value) {
+      return;
+    }
+
+    void resolveLegalLinksVisibility();
+  },
+  { immediate: true },
+);
+
 onMounted(() => {
   isConsentAccepted.value = localStorage.getItem(PERSONAL_DATA_CONSENT_STORAGE_KEY) === 'true';
   isConsentResolved.value = true;
+  void resolveLegalLinksVisibility();
 });
 </script>
 
@@ -103,6 +189,12 @@ onMounted(() => {
   background: #fffefb;
   box-shadow: 0 8px 24px rgb(0 0 0 / 8%);
   pointer-events: auto;
+}
+
+.personal-data-consent-popup__content--compact {
+  width: fit-content;
+  max-width: 100%;
+  justify-content: center;
 }
 
 .personal-data-consent-popup__text {
@@ -135,6 +227,10 @@ onMounted(() => {
 @media (max-width: 480px) {
   .personal-data-consent-popup__content {
     width: 100%;
+  }
+
+  .personal-data-consent-popup__content--compact {
+    width: fit-content;
   }
 }
 </style>
